@@ -1,0 +1,100 @@
+/* ===================================
+   SEARCH & SUGGESTION
+=================================== */
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin-left: 8px;
+  /* THÊM DÒNG NÀY: 
+    Thêm z-index để đảm bảo toàn bộ wrapper (bao gồm cả suggestion box)
+    hiển thị bên trên các thành phần nội dung khác của trang.
+    Bạn có thể điều chỉnh giá trị 1050 nếu cần.
+  */
+  z-index: 1050;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 42px 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  outline: none;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 6px rgba(13, 110, 253, 0.25);
+}
+
+.search-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #d33;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.25s;
+}
+
+.search-btn:hover {
+  color: #d33;
+}
+
+#suggestionBox {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 350px;
+  overflow-y: auto;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 6px;
+  /* z-index này (1000) vẫn đúng, 
+    nó đảm bảo suggestionBox nằm trên search-input 
+    bên trong .search-wrapper.
+  */
+  z-index: 1000;
+  display: none;
+}
+
+#suggestionBox::-webkit-scrollbar {
+  width: 8px;
+  max-height: 280px;
+}
+
+#suggestionBox::-webkit-scrollbar-track {
+  background: #f9f9f9;
+  border-radius: 25px;
+}
+
+#suggestionBox::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 25px;
+}
+
+#suggestionBox::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+#suggestionBox div {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s, color 0.2s;
+}
+
+#suggestionBox div:hover {
+  background: #f2f2f2;
+  color: #d33;
+}

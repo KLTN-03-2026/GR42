@@ -1,0 +1,72 @@
+/* ===================================
+   ACTION BUTTONS (Fav + Comment)
+=================================== */
+.action-buttons {
+    position      : absolute;
+    display       : flex;
+    flex-direction: column;
+    gap           : 10px;
+    z-index       : 10;
+}
+
+.action-buttons button {
+    width          : 40px;
+    height         : 40px;
+    border-radius  : 50%;
+    background     : #fff;
+    border         : 1px solid #ddd;
+    box-shadow     : 0 2px 6px rgba(0, 0, 0, 0.1);
+    display        : flex;
+    justify-content: center;
+    align-items    : center;
+    cursor         : pointer;
+    transition     : all 0.25s ease;
+}
+
+.action-buttons button i {
+    font-size : 18px;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.fav-btn i {
+    color: #aaa;
+}
+
+.fav-btn.saved i {
+    color    : #d33;
+    animation: pulse 0.3s ease-in-out;
+}
+
+.fav-btn:hover {
+    transform: scale(1.1);
+}
+
+.fav-btn:hover i {
+    color: #d33;
+}
+
+.cmt-btn i {
+    color: #555;
+}
+
+.cmt-btn:hover {
+    transform: scale(1.1);
+}
+
+.cmt-btn:hover i {
+    color: #007bff;
+}
+
+.cmt-btn.active i {
+    animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

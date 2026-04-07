@@ -1,0 +1,85 @@
+/* ======= GLOBAL ======= */
+body {
+  background: #f8f9fb;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.container {
+  max-width: 900px;
+}
+
+/* ======= ITEM YÊU THÍCH ======= */
+.fav-item {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  gap: 15px;
+  border-bottom: 1px solid #eee;
+  padding: 14px 0;
+  align-items: center;
+  position: relative;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+/* hiệu ứng xóa */
+.fav-item.fade-out {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+/* ✅ HÌNH ẢNH — cố định kích thước & không méo */
+.fav-item img {
+  width: 150px;
+  height: 100px;
+  object-fit: cover; /* chống méo hình */
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  display: block;
+}
+
+/* ======= INFO ======= */
+.fav-info h5 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.fav-info h5 a {
+  text-decoration: none;
+  color: #222;
+}
+
+.fav-info h5 a:hover {
+  color: #d33;
+}
+
+.fav-info .meta {
+  font-size: 13px;
+  color: #777;
+}
+
+/* ======= REMOVE BUTTON ======= */
+.remove-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.remove-btn i {
+  font-size: 16px;
+  color: #d33;
+}
+
+.remove-btn:hover {
+  background: #ffecec;
+}

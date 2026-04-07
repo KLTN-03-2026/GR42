@@ -1,0 +1,240 @@
+/* Reset cơ bản */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f7f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Container chính */
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+/* Nút quay lại */
+.btn-back {
+  display: inline-block;
+  text-decoration: none;
+  background: #5c636a;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: background 0.3s;
+  margin-bottom: 20px;
+}
+
+.btn-back:hover {
+  background: #495057;
+}
+
+/* Chi tiết bài báo */
+.news-detail {
+  background: #fff;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.news-detail h2 {
+  color: #000; /* tiêu đề tím */
+  margin-bottom: 15px;
+}
+
+.news-detail img {
+  width: 100%;
+  border-radius: 12px;
+  margin: 15px 0;
+}
+
+.news-detail a {
+  color: #d32f2f; /* link đỏ */
+  text-decoration: none;
+}
+
+.news-detail a:hover {
+  text-decoration: underline;
+}
+
+/* Thêm bình luận */
+.add-comment {
+  background: #fff;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.add-comment h3 {
+  color: #000;
+  margin-bottom: 15px;
+}
+
+.add-comment textarea {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  resize: vertical;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+.add-comment button {
+  background: #d32f2f; /* nút đỏ */
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-comment button:hover {
+  background: #b71c1c;
+}
+
+/* Danh sách bình luận */
+.comments {
+  background: #fff;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.comments h3 {
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-item img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+  border: 2px solid #b71c1c;
+}
+
+.comment-body {
+  flex: 1;
+}
+
+.comment-body p:first-child {
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 5px;
+}
+
+.comment-body p:nth-child(2) {
+  margin-bottom: 8px;
+}
+
+.comment-body small {
+  color: #777;
+  font-size: 13px;
+}
+
+.comment-item form {
+  margin-left: 10px;
+}
+
+.comment-item form button {
+  background: #d32f2f;
+  border: none;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-size: 13px;
+}
+
+.comment-item form button:hover {
+  background: #b71c1c;
+}
+
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comment-item img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nội dung và hành động cùng hàng */
+.comment-content-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.comment-content-display p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 10px;
+}
+
+.comment-actions button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.comment-actions button:hover {
+  background-color: #e5e5e5;
+}
+
+.comment-content-edit {
+  display: none;
+  margin-top: 6px;
+}
+
+.comment-content-edit textarea {
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 6px;
+}
