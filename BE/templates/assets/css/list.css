@@ -119,8 +119,26 @@ img {
 /* HERO ACTION */
 .top-news .action-buttons {
   position: absolute;
-  right   : 16px;
-  bottom  : 16px;
+  top: 16px;
+  right: 16px;
+  bottom: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.top-news .action-buttons button {
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
 }
 
 /* ===================================
