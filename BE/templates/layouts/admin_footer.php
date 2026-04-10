@@ -3,7 +3,7 @@
             
             <!-- Footer -->
             <footer class="bg-white text-center py-3 border-top mt-auto text-muted" style="font-size: 0.9rem;">
-                &copy; <?= date('Y') ?> Admin Dashboard. Designed for KLTN_CaoBao.
+                &copy; <?= date('Y') ?> Admin Dashboard. Designed for GR42.
             </footer>
         </div>
         <!-- End Main Content Wrapper -->

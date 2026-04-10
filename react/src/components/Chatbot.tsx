@@ -13,6 +13,7 @@ import {
   Minimize2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE_URL } from '../config';
 
 interface Message {
   role: 'user' | 'bot';
@@ -50,7 +51,7 @@ const Chatbot = () => {
     setLoading(true);
 
     try {
-      const host = window.location.hostname === 'localhost' ? 'http://localhost/KLTN_CaoBao' : '';
+      const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
       const response = await axios.post(`${host}/BE/modules/api/news_chat_ai.php`, {
         prompt: input
       }, {

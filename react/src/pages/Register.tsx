@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { API_BASE_URL } from '../config';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,7 +22,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost/KLTN_CaoBao/BE/?module=api&action=register', {
+      const response = await fetch(`${API_BASE_URL}/?module=api&action=register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

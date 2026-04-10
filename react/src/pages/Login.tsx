@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { API_BASE_URL, PROJECT_FOLDER } from '../config';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -41,7 +42,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost/KLTN_CaoBao/BE/?module=api&action=login', {
+      const response = await fetch(`${API_BASE_URL}/?module=api&action=login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -76,7 +77,7 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     const client_id = "406500628615-c725efu1d7ijrg41ekuuv0m32uvqdafo.apps.googleusercontent.com";
-    const redirect_uri = 'http://localhost/KLTN_CaoBao/BE/?module=auth&action=google_callback';
+    const redirect_uri = `${window.location.protocol}//${window.location.hostname}${PROJECT_FOLDER}/BE/?module=auth&action=google_callback`;
     const scope = "email profile";
     const google_login_url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=select_account&state=react`;
     window.location.href = google_login_url;
