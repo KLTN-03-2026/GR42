@@ -29,4 +29,4 @@ define('_GEMINI_API_KEY', $envConfig['GEMINI_API_KEY'] ?? '');
 define('_GOOGLE_CLIENT_ID', $envConfig['GOOGLE_CLIENT_ID'] ?? '');
 define('_GOOGLE_CLIENT_SECRET', $envConfig['GOOGLE_CLIENT_SECRET'] ?? '');
 /*Json URL GGSHEET*/
-define('_JSON_URL_GGSHEET', $envConfig['JSON_URL_GGSHEET'] ?? '');
+define('_JSON_URL_SHEET', $envConfig['JSON_URL_SHEET'] ?? '');

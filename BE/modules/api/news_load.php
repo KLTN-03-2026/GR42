@@ -27,7 +27,7 @@ if (!empty($category)) {
     $params[] = $category;
 }
 
-$sqlCount = "SELECT COUNT(id) as total FROM crawl_news $where";
+$sqlCount = "SELECT COUNT(DISTINCT title) as total FROM crawl_news $where";
 $stmtCount = $conn->prepare($sqlCount);
 if (!empty($params)) {
     $stmtCount->bind_param($types, ...$params);
@@ -43,9 +43,14 @@ $sql = "SELECT n.*,
            FROM favourite_news f 
            WHERE f.news_id = n.id AND f.user_id = ?
        ) AS is_favourite
-FROM crawl_news n
-$where
-ORDER BY pubDate DESC
+FROM (
+    SELECT MAX(id) as id
+    FROM crawl_news
+    $where
+    GROUP BY title
+) as unique_news
+JOIN crawl_news n ON n.id = unique_news.id
+ORDER BY n.pubDate DESC
 LIMIT ? OFFSET ?";
 
 $stmt = $conn->prepare($sql);

@@ -1,11 +1,9 @@
 <?php
-define('_TAI', true);
 require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../includes/database.php';
 
 $conn->set_charset("utf8mb4");
-
 function fetchUrl($url)
 {
     $ch = curl_init($url);
@@ -37,6 +35,7 @@ function cleanContent($html)
     if (!$html)
         return '';
     $html = str_replace('""', '"', $html);
+    $html = str_replace('id="maincontent">', '', $html);
     libxml_use_internal_errors(true);
     $dom = new DOMDocument();
     $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
@@ -60,7 +59,9 @@ function cleanContent($html)
         if (!$img)
             continue;
 
-        $src = $img->getAttribute('data-src') ?: $img->getAttribute('src');
+        $src = $img->getAttribute('data-original')
+            ?: $img->getAttribute('data-src')
+            ?: $img->getAttribute('src');
         $capNode = $xpath->query('.//figcaption', $fig)->item(0);
         $caption = $capNode ? trim($capNode->textContent) : '';
 
@@ -91,13 +92,13 @@ function makeThumbnailUrl($url)
     return $url;
 }
 
-$jsonUrl = _JSON_URL_GGSHEET;
+$jsonUrl = _JSON_URL_SHEET;
 $response = fetchUrl($jsonUrl);
 
 if (!$response || strlen($response) < 50) {
     die(json_encode([
         "status" => "error",
-        "message" => "Không fetch được Google Sheet hoặc dữ liệu rỗng"
+        "message" => "Khong fetch duoc Google Sheet hoac du lieu rong"
     ]));
 }
 
@@ -109,10 +110,11 @@ $data = json_decode($json, true);
 if (!$data) {
     die(json_encode([
         "status" => "error",
-        "message" => "JSON decode lỗi từ chuỗi Google Sheet"
+        "message" => "JSON decode loi tu chuoi Google Sheet"
     ]));
 }
 
+$conn->query("DELETE FROM crawl_news");
 $sql = "INSERT INTO crawl_news (id, title, link, image, pubdate, source, savedtime, category, content) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE title = VALUES(title), link = VALUES(link),
         image = VALUES(image), pubdate = VALUES(pubdate), source = VALUES(source), savedtime = VALUES(savedtime),
@@ -122,7 +124,7 @@ $stmt = $conn->prepare($sql);
 if (!$stmt) {
     die(json_encode([
         "status" => "error",
-        "message" => "Prepare lỗi: " . $conn->error
+        "message" => "Prepare loi: " . $conn->error
     ]));
 }
 
@@ -154,7 +156,6 @@ if (isset($data['table']['rows']) && is_array($data['table']['rows'])) {
         $contentRaw = isset($row['c'][8]['v']) ? $row['c'][8]['v'] : '';
         $content = cleanContent($contentRaw);
         $savedtime = date("Y-m-d H:i:s");
-
         $stmt->bind_param("issssssss", $id, $title, $link, $image, $pubdate, $source, $savedtime, $category, $content);
 
         if ($stmt->execute()) {

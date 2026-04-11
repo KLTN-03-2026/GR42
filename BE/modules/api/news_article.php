@@ -23,10 +23,15 @@ if (!$current) {
 $fallback = [];
 $offset = ($page - 1) * $perPage;
 $stmt = $mysqli->prepare("
-    SELECT id, title, link, image, source, pubDate 
-    FROM crawl_news
-    WHERE id <> ? AND category = ? 
-    ORDER BY pubDate DESC 
+    SELECT n.id, n.title, n.link, n.image, n.source, n.pubDate 
+    FROM (
+        SELECT MAX(id) as max_id 
+        FROM crawl_news 
+        WHERE id <> ? AND category = ? 
+        GROUP BY title
+    ) unique_news
+    JOIN crawl_news n ON n.id = unique_news.max_id
+    ORDER BY n.pubDate DESC 
     LIMIT ?, ?
 ");
 $stmt->bind_param("isii", $articleId, $current['category'], $offset, $perPage);
@@ -37,7 +42,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 $totalRes = $mysqli->prepare("
-    SELECT COUNT(*) as cnt 
+    SELECT COUNT(DISTINCT title) as cnt 
     FROM crawl_news 
     WHERE id <> ? AND category = ?
 ");
@@ -76,10 +81,15 @@ register_shutdown_function(function () use ($current, $articleId, $apiKey, $mode
     $mysqli->set_charset("utf8mb4");
     $others = [];
     $res = $mysqli->query("
-        SELECT id, title, link, image, source, pubDate, category
-        FROM crawl_news 
-        WHERE id<>$articleId 
-        ORDER BY pubDate DESC 
+        SELECT n.id, n.title, n.link, n.image, n.source, n.pubDate, n.category
+        FROM (
+            SELECT MAX(id) as max_id 
+            FROM crawl_news 
+            WHERE id<>$articleId 
+            GROUP BY title
+        ) unique_news
+        JOIN crawl_news n ON n.id = unique_news.max_id
+        ORDER BY n.pubDate DESC 
         LIMIT 20
     ");
     while ($row = $res->fetch_assoc()) {
