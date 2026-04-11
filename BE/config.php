@@ -16,8 +16,9 @@ define('_DB', $envConfig['DB_NAME'] ?? 'crawl_news');
 define('_USER', $envConfig['DB_USER'] ?? 'root');
 define('_PASS', $envConfig['DB_PASS'] ?? '');
 
-define('_HOST_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/KLTN_CaoBao/BE');
-define('_FRONTEND_URL', 'http://localhost:3002');
+$projectPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+define('_HOST_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $projectPath);
+define('_FRONTEND_URL', 'http://localhost:3000');
 define('_HOST_URL_TEMPLATES', _HOST_URL . '/templates');
 
 define('_PATH_URL', __DIR__);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 
 const RelatedNews = ({ articleId }: { articleId: number }) => {
   const [related, setRelated] = useState([]);
@@ -6,7 +7,7 @@ const RelatedNews = ({ articleId }: { articleId: number }) => {
 
   useEffect(() => {
     // GỌI CODE Ở ĐÂY:
-    fetch(`http://localhost/KLTN_CaoBao/BE/modules/news/API_keyGemini.php?id=${articleId}`)
+    fetch(`${API_BASE_URL}/modules/news/API_keyGemini.php?id=${articleId}`)
       .then(res => res.json())
       .then(data => {
         setRelated(data.related); // Lưu danh sách bài báo vào state

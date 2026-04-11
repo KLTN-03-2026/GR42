@@ -7,7 +7,7 @@
     <title>Document</title>
     <link href="templates/assets/css/list.css" rel="stylesheet">
     <link href="templates/assets/css/search.css" rel="stylesheet">
-    <link href="/KLTN_CaoBao/BE/templates/assets/css/comment.css" rel="stylesheet">
+    <link href="templates/assets/css/comment.css" rel="stylesheet">
     <style>
         body { background-color: #f4f4f4; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
         .container { max-width: 900px; margin: 20px auto; background: #fff; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 8px; }
@@ -93,7 +93,7 @@
                 e.preventDefault();
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData.entries());
-                fetch('/KLTN_CaoBao/BE/modules/api/comment_add.php', {
+                fetch('modules/api/comment_add.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -109,7 +109,8 @@
             <?php if ($comments->num_rows > 0): ?>
             <?php while ($c = $comments->fetch_assoc()): ?>
             <?php
-                $baseUrl = '/KLTN_CaoBao'; // URL gốc của dự án
+                $projectPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+                $baseUrl = rtrim($projectPath, '/BE'); // Lấy folder cha của BE
                 $baseDir = $_SERVER['DOCUMENT_ROOT'] . $baseUrl; // Thư mục gốc của dự án
                 $defaultAvatar = 'templates/uploads/avatar.jpg'; // Avatar mặc định
             
@@ -221,7 +222,7 @@
                 button.disabled = true;
                 button.innerText = 'Đang lưu...';
 
-                    fetch('/KLTN_CaoBao/BE/modules/api/comment_edit.php', {
+                    fetch('modules/api/comment_edit.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -265,7 +266,7 @@
             button.addEventListener('click', () => {
                 if(!confirm('Bạn có chắc chắn muốn xóa bình luận này?')) return;
                 const commentId = button.dataset.commentId;
-                fetch('/KLTN_CaoBao/BE/modules/api/comment_delete.php', {
+                fetch('modules/api/comment_delete.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ comment_id: commentId })

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../config';
+
 export type RelatedArticlesResponse = {
   related: {
     id: number;
@@ -20,7 +22,7 @@ export async function getRelatedArticles(
 ): Promise<RelatedArticlesResponse> {
   try {
     const res = await fetch(
-      `http://localhost/KLTN_CaoBao/BE/modules/news/API_keyGemini.php?id=${articleId}&page=${page}&perPage=${perPage}`
+      `${API_BASE_URL}/modules/news/API_keyGemini.php?id=${articleId}&page=${page}&perPage=${perPage}`
     );
     const data = await res.json();
     if (data.error) throw new Error(data.error);

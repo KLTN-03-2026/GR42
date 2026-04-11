@@ -3,6 +3,7 @@ import axios from 'axios';
 import NewsCard, { NewsItem } from '../components/NewsCard';
 import { Newspaper, LayoutGrid, List, SlidersHorizontal, Loader2, TrendingUp, ChevronRight, ArrowRight, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { API_BASE_URL } from '../config';
 
 const categories = [
   { id: '', name: 'Tất cả' },
@@ -28,7 +29,7 @@ const Home = () => {
   const fetchNews = async (pageNum: number, category: string, reset = false) => {
     try {
       setLoading(true);
-      const host = window.location.hostname === 'localhost' ? 'http://localhost/KLTN_CaoBao' : '';
+      const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
       const response = await axios.get(`${host}/BE/modules/api/news_load.php`, {
         params: {
           page: pageNum,
