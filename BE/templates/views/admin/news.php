@@ -10,7 +10,7 @@ layout('admin_sidebar');
             <p class="text-muted small mb-0">Quản lý, thao tác với các bài báo trong cơ sở dữ liệu.</p>
         </div>
         <div>
-            <a href="crawl_database.php" class="btn btn-outline-success shadow-sm rounded-pill px-4 me-2">
+            <a href="#" onclick="runCrawl(event)" class="btn btn-outline-success shadow-sm rounded-pill px-4 me-2">
                 <i class="fa-solid fa-spider me-2"></i>Crawl Dữ Liệu
             </a>
             <a href="?module=admin&action=news_add" class="btn btn-primary shadow-sm rounded-pill px-4">
@@ -149,5 +149,36 @@ layout('admin_sidebar');
         </div>
     </div>
 </div>
+
+<script>
+function runCrawl(e) {
+    e.preventDefault();
+    if(confirm('Bạn có chắc chắn muốn tiến hành thu thập dữ liệu mới? (Quá trình này sẽ mất một chút thời gian)')) {
+        const btn = e.currentTarget;
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang chạy...';
+        btn.classList.add('disabled');
+
+        fetch('modules/api/crawl_database.php')
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    alert('Thành công! Đã thêm: ' + data.new + ' - Cập nhật: ' + data.updated + ' bài báo.');
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + (data.message || 'Thất bại'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Lỗi kết nối máy chủ!');
+            })
+            .finally(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.remove('disabled');
+            });
+    }
+}
+</script>
 
 <?php layout('admin_footer'); ?>
