@@ -109,7 +109,7 @@ layout('admin_sidebar');
                             <span class="fw-bold"><i class="fa-solid fa-comments me-2"></i>Duyệt Bình Luận <span class="badge bg-danger ms-2 rounded-pill">12</span></span>
                             <i class="fa-solid fa-chevron-right opacity-50"></i>
                         </a>
-                        <a href="crawl_database.php" class="btn btn-outline-success text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
+                        <a href="#" onclick="runCrawl(event)" class="btn btn-outline-success text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
                             <span class="fw-bold"><i class="fa-solid fa-spider me-2"></i>Chạy Thu Thập Dữ Liệu</span>
                             <i class="fa-solid fa-chevron-right opacity-50"></i>
                         </a>
@@ -119,5 +119,36 @@ layout('admin_sidebar');
         </div>
     </div>
 </div>
+
+<script>
+function runCrawl(e) {
+    e.preventDefault();
+    if(confirm('Bạn có chắc chắn muốn tiến hành thu thập dữ liệu mới? (Quá trình này sẽ mất một chút thời gian)')) {
+        const btn = e.currentTarget;
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<span class="fw-bold"><i class="fa-solid fa-spinner fa-spin me-2"></i>Đang chạy...</span><i class="fa-solid fa-chevron-right opacity-50"></i>';
+        btn.classList.add('disabled');
+
+        fetch('modules/api/crawl_database.php')
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    alert('Thành công! Đã thêm: ' + data.new + ' - Cập nhật: ' + data.updated + ' bài báo.');
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + (data.message || 'Thất bại'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Lỗi kết nối máy chủ!');
+            })
+            .finally(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.remove('disabled');
+            });
+    }
+}
+</script>
 
 <?php layout('admin_footer'); ?>
