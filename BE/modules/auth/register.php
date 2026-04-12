@@ -80,7 +80,9 @@ if(isPost()){
 
     $errorsArr =  getSessionFlash('errors');
 }
-
+$msg = getSessionFlash('msg');
+$msg_type = getSessionFlash('msg_type');
+$oldData = getSessionFlash('oldData');
 renderView('auth/register', [
     'msg' => $msg,
     'msg_type' => $msg_type,
