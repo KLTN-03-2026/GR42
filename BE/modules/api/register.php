@@ -2,9 +2,7 @@
 if (!defined('_TAI')) {
     die('Truy cap khong hop le');
 }
-
 require_once __DIR__ . '/cors.php';
-
 if (session_status() === PHP_SESSION_ACTIVE) {
     session_write_close();
 }

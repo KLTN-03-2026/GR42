@@ -18,7 +18,7 @@ define('_PASS', $envConfig['DB_PASS'] ?? '');
 
 $projectPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 define('_HOST_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $projectPath);
-define('_FRONTEND_URL', 'http://localhost:3000');
+define('_FRONTEND_URL', 'http://localhost:3001');
 define('_HOST_URL_TEMPLATES', _HOST_URL . '/templates');
 
 define('_PATH_URL', __DIR__);
@@ -29,4 +29,4 @@ define('_GEMINI_API_KEY', $envConfig['GEMINI_API_KEY'] ?? '');
 define('_GOOGLE_CLIENT_ID', $envConfig['GOOGLE_CLIENT_ID'] ?? '');
 define('_GOOGLE_CLIENT_SECRET', $envConfig['GOOGLE_CLIENT_SECRET'] ?? '');
 /*Json URL GGSHEET*/
-define('_JSON_URL_GGSHEET', $envConfig['JSON_URL_SHEET'] ?? '');
+define('_JSON_URL_SHEET', $envConfig['JSON_URL_SHEET'] ?? '');

@@ -15,10 +15,10 @@ if ($conn->connect_error) {
 }
 
 $dbCheck = $conn->query("SHOW DATABASES LIKE '$dbname'");
-if ($dbCheck && $dbCheck -> num_rows > 0) {
+if ($dbCheck && $dbCheck->num_rows > 0) {
     echo "Database `$dbname` đã tồn tại.<br>";
     $conn->select_db($dbname);
-    $dropTables = ["comments", "favourite_news", "crawl_news", "token_login", "users"];
+    $dropTables = ["ai_related", "category", "news_sub_category", "comments", "favourite_news", "crawl_news", "token_login", "users"];
     foreach ($dropTables as $table) {
         $conn->query("DROP TABLE IF EXISTS `$table`");
         echo "Đã xóa bảng `$table` (nếu có).<br>";
