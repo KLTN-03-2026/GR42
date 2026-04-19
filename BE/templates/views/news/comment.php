@@ -37,6 +37,30 @@
         #commentAddForm textarea:focus { border-color: #b22222; }
         #commentAddForm button { background: #b22222; color: #fff; border: none; padding: 10px 25px; border-radius: 4px; font-size: 15px; cursor: pointer; font-weight: bold; }
         #commentAddForm button:hover { background: #901616; }
+
+        .btn-read-paragraph {
+            margin-left: 10px;
+            padding: 4px 8px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fdfdfd;
+            color: #333;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .btn-read-paragraph:hover {
+            background: #f0f0f0;
+            border-color: #b22222;
+        }
+        .btn-read-paragraph:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -279,6 +303,79 @@
     });
     </script>
 
+    <script>
+    // Logic cho nút đọc văn bản từng đoạn văn
+    document.addEventListener('DOMContentLoaded', () => {
+        const paragraphs = document.querySelectorAll('.article-content p');
+        let currentAudio = null;
+        let currentButton = null;
+
+        paragraphs.forEach(p => {
+            const textToRead = p.innerText.trim();
+            if (!textToRead) return; // Không hiển thị nút cho đoạn rỗng
+
+            const btn = document.createElement('button');
+            btn.className = 'btn-read-paragraph';
+            btn.innerHTML = '🔊 Đọc đoạn này';
+            
+            p.appendChild(btn); // Đặt nút ở cuối đoạn
+
+            btn.addEventListener('click', async () => {
+                // Nếu đang phát chính đoạn này thì Dừng
+                if (currentButton === btn && currentAudio && !currentAudio.paused) {
+                    currentAudio.pause();
+                    btn.innerHTML = '🔊 Đọc đoạn này';
+                    currentAudio = null;
+                    currentButton = null;
+                    return;
+                }
+
+                // Dừng đoạn khác nếu đang phát
+                if (currentAudio) {
+                    currentAudio.pause();
+                    if (currentButton) currentButton.innerHTML = '🔊 Đọc đoạn này';
+                }
+
+                btn.innerHTML = '⏳ Đang tải...';
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch('http://localhost:3001/tts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: textToRead })
+                    });
+
+                    if (!response.ok) throw new Error('Lỗi fetch TTS');
+                    
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    
+                    currentAudio = new Audio(url);
+                    currentButton = btn;
+
+                    currentAudio.onplay = () => {
+                        btn.innerHTML = '⏸ Dừng đọc';
+                        btn.disabled = false;
+                    };
+
+                    currentAudio.onended = () => {
+                        btn.innerHTML = '🔊 Đọc đoạn này';
+                        currentAudio = null;
+                        currentButton = null;
+                    };
+
+                    currentAudio.play();
+                } catch (err) {
+                    console.error(err);
+                    alert('Không thể tải giọng đọc. Vui lòng kiểm tra Server TTS.');
+                    btn.innerHTML = '🔊 Đọc đoạn này';
+                    btn.disabled = false;
+                }
+            });
+        });
+    });
+    </script>
 </body>
 
 </html>
