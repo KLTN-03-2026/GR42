@@ -9,58 +9,214 @@
     <link href="templates/assets/css/search.css" rel="stylesheet">
     <link href="templates/assets/css/comment.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f4f4; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
-        .container { max-width: 900px; margin: 20px auto; background: #fff; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 8px; }
-        .btn-back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: transparent;
-                    color: #b22222; font-weight: 600; font-size: 14px; text-decoration: none; border: 1px solid #b22222; transition: all 0.25s ease; cursor: pointer;}
-        .btn-back:hover { background: #b22222; color: #fff; transform: translateX(-3px); box-shadow: 0 4px 10px rgba(178, 34, 34, 0.2);}
-        .btn-back:active { transform: scale(0.96);box-shadow: none;}
-        .btn-back:hover { text-decoration: underline; }
-        
-        .article-header { border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px; }
-        .article-category { text-transform: uppercase; color: #9f224e; font-weight: bold; font-size: 13px; margin-bottom: 10px; display: inline-block; }
-        .article-title { font-size: 32px; line-height: 1.4; color: #222; margin: 0 0 15px 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-weight: 700; }
-        .article-meta { font-size: 14px; color: #757575; display: flex; align-items: center; justify-content: space-between; }
-        
-        .article-content { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 19px; line-height: 1.7; color: #111; margin-bottom: 30px; letter-spacing: 0.1px; }
-        .article-content p { margin: 0 0 20px 0; text-align: justify; }
-        .article-content img { max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto; border-radius: 4px; }
-        .article-content figure { margin: 0 0 25px 0; text-align: center; }
-        .article-content figcaption { font-size: 14px; color: #757575; font-style: italic; background-color: #f7f7f7; padding: 8px; margin-top: 5px; }
-        
-        .source-link-wrapper { text-align: left; padding: 15px 0; border-top: 1px solid #e5e5e5; margin-top: 20px; }
-        .source-link-wrapper a { display: inline-flex; align-items: center; background: #fdfdfd; border: 1px solid #ddd; padding: 10px 20px; color: #004d80; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 4px; transition: all 0.2s; }
-        .source-link-wrapper a:hover { background: #004d80; color: #fff; border-color: #004d80; }
-        
-        .add-comment h3, .comments h3 { font-family: Arial, sans-serif; border-bottom: 2px solid #b22222; display: inline-block; padding-bottom: 8px; margin-top: 30px; }
-        #commentAddForm textarea { width: 100%; border: 1px solid #dcdcdc; border-radius: 4px; padding: 15px; font-size: 15px; font-family: inherit; margin-bottom: 10px; resize: vertical; outline: none; }
-        #commentAddForm textarea:focus { border-color: #b22222; }
-        #commentAddForm button { background: #b22222; color: #fff; border: none; padding: 10px 25px; border-radius: 4px; font-size: 15px; cursor: pointer; font-weight: bold; }
-        #commentAddForm button:hover { background: #901616; }
+    body {
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+    }
 
-        .btn-read-paragraph {
-            margin-left: 10px;
-            padding: 4px 8px;
-            font-size: 13px;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: #fdfdfd;
-            color: #333;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .btn-read-paragraph:hover {
-            background: #f0f0f0;
-            border-color: #b22222;
-        }
-        .btn-read-paragraph:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+    .container {
+        max-width: 900px;
+        margin: 20px auto;
+        background: #fff;
+        padding: 40px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        background: transparent;
+        color: #b22222;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        border: 1px solid #b22222;
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+
+    .btn-back:hover {
+        background: #b22222;
+        color: #fff;
+        transform: translateX(-3px);
+        box-shadow: 0 4px 10px rgba(178, 34, 34, 0.2);
+    }
+
+    .btn-back:active {
+        transform: scale(0.96);
+        box-shadow: none;
+    }
+
+    .btn-back:hover {
+        text-decoration: underline;
+    }
+
+    .article-header {
+        border-bottom: 1px solid #e5e5e5;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+
+    .article-category {
+        text-transform: uppercase;
+        color: #9f224e;
+        font-weight: bold;
+        font-size: 13px;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    .article-title {
+        font-size: 32px;
+        line-height: 1.4;
+        color: #222;
+        margin: 0 0 15px 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-weight: 700;
+    }
+
+    .article-meta {
+        font-size: 14px;
+        color: #757575;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .article-content {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-size: 19px;
+        line-height: 1.7;
+        color: #111;
+        margin-bottom: 30px;
+        letter-spacing: 0.1px;
+    }
+
+    .article-content p {
+        margin: 0 0 20px 0;
+        text-align: justify;
+    }
+
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto 10px auto;
+        border-radius: 4px;
+    }
+
+    .article-content figure {
+        margin: 0 0 25px 0;
+        text-align: center;
+    }
+
+    .article-content figcaption {
+        font-size: 14px;
+        color: #757575;
+        font-style: italic;
+        background-color: #f7f7f7;
+        padding: 8px;
+        margin-top: 5px;
+    }
+
+    .source-link-wrapper {
+        text-align: left;
+        padding: 15px 0;
+        border-top: 1px solid #e5e5e5;
+        margin-top: 20px;
+    }
+
+    .source-link-wrapper a {
+        display: inline-flex;
+        align-items: center;
+        background: #fdfdfd;
+        border: 1px solid #ddd;
+        padding: 10px 20px;
+        color: #004d80;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .source-link-wrapper a:hover {
+        background: #004d80;
+        color: #fff;
+        border-color: #004d80;
+    }
+
+    .add-comment h3,
+    .comments h3 {
+        font-family: Arial, sans-serif;
+        border-bottom: 2px solid #b22222;
+        display: inline-block;
+        padding-bottom: 8px;
+        margin-top: 30px;
+    }
+
+    #commentAddForm textarea {
+        width: 100%;
+        border: 1px solid #dcdcdc;
+        border-radius: 4px;
+        padding: 15px;
+        font-size: 15px;
+        font-family: inherit;
+        margin-bottom: 10px;
+        resize: vertical;
+        outline: none;
+    }
+
+    #commentAddForm textarea:focus {
+        border-color: #b22222;
+    }
+
+    #commentAddForm button {
+        background: #b22222;
+        color: #fff;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 4px;
+        font-size: 15px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    #commentAddForm button:hover {
+        background: #901616;
+    }
+
+    .btn-read-paragraph {
+        margin-left: 10px;
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fdfdfd;
+        color: #333;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 500;
+        transition: 0.2s;
+    }
+
+    .btn-read-paragraph:hover {
+        background: #f0f0f0;
+        border-color: #b22222;
+    }
+
+    .btn-read-paragraph:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
     </style>
 </head>
 
@@ -75,10 +231,10 @@
             <header class="article-header">
                 <span class="article-category"><?= htmlspecialchars($news['category'] ?? 'Tin tức') ?></span>
                 <h1 class="article-title"><?= htmlspecialchars($news['title']) ?></h1>
-                
+
                 <div class="article-meta">
                     <div class="author-time">
-                        <strong>Nguồn: <?= htmlspecialchars($news['source'] ?? 'Tổng hợp') ?></strong> &nbsp;|&nbsp; 
+                        <strong>Nguồn: <?= htmlspecialchars($news['source'] ?? 'Tổng hợp') ?></strong> &nbsp;|&nbsp;
                         <span><?= htmlspecialchars(date('l, d/m/Y H:i', strtotime($news['pubDate']))) ?></span>
                     </div>
                 </div>
@@ -87,12 +243,12 @@
             <!-- ARTICLE CONTENT BODY -->
             <div class="article-content">
                 <?php if (!empty($news['image'])): ?>
-                    <figure>
-                        <img src="<?= htmlspecialchars($news['image']) ?>" alt="Ảnh bài báo">
-                        <figcaption>Ảnh đại diện bài báo.</figcaption>
-                    </figure>
+                <figure>
+                    <img src="<?= htmlspecialchars($news['image']) ?>" alt="Ảnh bài báo">
+                    <figcaption>Ảnh đại diện bài báo.</figcaption>
+                </figure>
                 <?php endif; ?>
-                
+
                 <!-- IN RAW HTML CONTENT -->
                 <?= $news['content'] ?>
             </div>
@@ -119,10 +275,13 @@
                 const data = Object.fromEntries(formData.entries());
                 fetch('modules/api/comment_add.php', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(data)
                 }).then(res => res.json()).then(res => {
-                    if(res.status === 'success') location.reload(); else alert(res.message);
+                    if (res.status === 'success') location.reload();
+                    else alert(res.message);
                 });
             });
             </script>
@@ -134,16 +293,12 @@
             <?php while ($c = $comments->fetch_assoc()): ?>
             <?php
                 $projectPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-                $baseUrl = rtrim($projectPath, '/BE'); // Lấy folder cha của BE
-                $baseDir = $_SERVER['DOCUMENT_ROOT'] . $baseUrl; // Thư mục gốc của dự án
-                $defaultAvatar = 'templates/uploads/avatar.jpg'; // Avatar mặc định
-            
-                $avatarToShow = $defaultAvatar; // Mặc định là avatar default
-            
-                // 2. Kiểm tra nếu user có avatar riêng
+                $baseUrl = rtrim($projectPath, '/BE'); 
+                $baseDir = $_SERVER['DOCUMENT_ROOT'] . $baseUrl; 
+                $defaultAvatar = 'templates/uploads/avatar.jpg'; 
+                $avatarToShow = $defaultAvatar;
                 if (!empty($c['avatar'])) {
                     
-                    // 3. Lấy đường dẫn từ DB
                     $userAvatarPath = $c['avatar'];
                     if (strpos($userAvatarPath, $baseUrl . '/') === 0) {
                         $userAvatarPath = substr($userAvatarPath, strlen($baseUrl . '/'));
@@ -198,7 +353,6 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Khi nhấn "Sửa"
         document.querySelectorAll('.btn-edit-comment').forEach(button => {
             button.addEventListener('click', () => {
                 const commentItem = button.closest('.comment-item');
@@ -215,7 +369,6 @@
             });
         });
 
-        // Khi nhấn "Hủy"
         document.querySelectorAll('.btn-cancel-comment').forEach(button => {
             button.addEventListener('click', () => {
                 const commentItem = button.closest('.comment-item');
@@ -229,7 +382,6 @@
             });
         });
 
-        // Khi nhấn "Lưu"
         document.querySelectorAll('.btn-save-comment').forEach(button => {
             button.addEventListener('click', () => {
                 const commentItem = button.closest('.comment-item');
@@ -242,27 +394,27 @@
                     return;
                 }
 
-                // Tạo hiệu ứng loading nhỏ
                 button.disabled = true;
                 button.innerText = 'Đang lưu...';
 
-                    fetch('modules/api/comment_edit.php', {
+                fetch('modules/api/comment_edit.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ comment_id: commentId, content: newContent })
+                        body: JSON.stringify({
+                            comment_id: commentId,
+                            content: newContent
+                        })
                     })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            // Cập nhật nội dung hiển thị
                             commentItem.querySelector('.comment-content-display p')
                                 .innerHTML = data.content.replace(/\n/g, '<br>');
                             commentItem.querySelector('.comment-content-display small')
                                 .innerText = 'Vừa chỉnh sửa';
 
-                            // Ẩn form edit, hiện lại hiển thị
                             commentItem.querySelector('.comment-content-edit').style
                                 .display = 'none';
                             commentItem.querySelector('.comment-content-display').style
@@ -285,17 +437,20 @@
                     });
             });
         });
-        // Khi nhấn nút Xóa
         document.querySelectorAll('.btn-delete-comment').forEach(button => {
             button.addEventListener('click', () => {
-                if(!confirm('Bạn có chắc chắn muốn xóa bình luận này?')) return;
+                if (!confirm('Bạn có chắc chắn muốn xóa bình luận này?')) return;
                 const commentId = button.dataset.commentId;
                 fetch('modules/api/comment_delete.php', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment_id: commentId })
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        comment_id: commentId
+                    })
                 }).then(r => r.json()).then(res => {
-                    if(res.status === 'success') location.reload();
+                    if (res.status === 'success') location.reload();
                     else alert(res.message);
                 });
             });
@@ -304,7 +459,6 @@
     </script>
 
     <script>
-    // Logic cho nút đọc văn bản từng đoạn văn
     document.addEventListener('DOMContentLoaded', () => {
         const paragraphs = document.querySelectorAll('.article-content p');
         let currentAudio = null;
@@ -312,16 +466,14 @@
 
         paragraphs.forEach(p => {
             const textToRead = p.innerText.trim();
-            if (!textToRead) return; // Không hiển thị nút cho đoạn rỗng
-
+            if (!textToRead) return;
             const btn = document.createElement('button');
             btn.className = 'btn-read-paragraph';
             btn.innerHTML = '🔊 Đọc đoạn này';
-            
-            p.appendChild(btn); // Đặt nút ở cuối đoạn
+
+            p.appendChild(btn);
 
             btn.addEventListener('click', async () => {
-                // Nếu đang phát chính đoạn này thì Dừng
                 if (currentButton === btn && currentAudio && !currentAudio.paused) {
                     currentAudio.pause();
                     btn.innerHTML = '🔊 Đọc đoạn này';
@@ -330,7 +482,6 @@
                     return;
                 }
 
-                // Dừng đoạn khác nếu đang phát
                 if (currentAudio) {
                     currentAudio.pause();
                     if (currentButton) currentButton.innerHTML = '🔊 Đọc đoạn này';
@@ -340,17 +491,21 @@
                 btn.disabled = true;
 
                 try {
-                    const response = await fetch('http://localhost:3001/tts', {
+                    const response = await fetch('modules/api/tts.php', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: textToRead })
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text: textToRead
+                        })
                     });
 
-                    if (!response.ok) throw new Error('Lỗi fetch TTS');
-                    
+                    if (!response.ok) throw new Error('Lỗi fetch TTS API backend');
+
                     const blob = await response.blob();
                     const url = URL.createObjectURL(blob);
-                    
+
                     currentAudio = new Audio(url);
                     currentButton = btn;
 
@@ -367,10 +522,37 @@
 
                     currentAudio.play();
                 } catch (err) {
-                    console.error(err);
-                    alert('Không thể tải giọng đọc. Vui lòng kiểm tra Server TTS.');
-                    btn.innerHTML = '🔊 Đọc đoạn này';
-                    btn.disabled = false;
+                    console.warn(err, "- Đang chuyển sang sử dụng giọng đọc mặc định của trình duyệt...");
+                    
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(textToRead);
+                        utterance.lang = 'vi-VN';
+                        
+                        utterance.onstart = () => {
+                            btn.innerHTML = '⏸ Dừng đọc';
+                            btn.disabled = false;
+                        };
+                        utterance.onend = () => {
+                            btn.innerHTML = '🔊 Đọc đoạn này';
+                            currentAudio = null;
+                            currentButton = null;
+                        };
+                        
+                        currentAudio = {
+                            paused: false,
+                            pause: () => {
+                                window.speechSynthesis.cancel();
+                            }
+                        };
+                        currentButton = btn;
+                        
+                        window.speechSynthesis.speak(utterance);
+                    } else {
+                        console.error('Không thể kích hoạt API SpeechSynthesis');
+                        alert('Không thể tải Server TTS và trình duyệt không hỗ trợ giọng nói.');
+                        btn.innerHTML = '🔊 Đọc đoạn này';
+                        btn.disabled = false;
+                    }
                 }
             });
         });

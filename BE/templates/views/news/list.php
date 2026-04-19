@@ -56,7 +56,6 @@
         <section class="home-top">
             <div class="home-top__main">
                 <section class="hero-wrapper" aria-label="Tin nổi bật">
-                    <!-- JS render hero vào đây -->
                     <div class="top-news" id="topNews"></div>
                 </section>
             </div>
