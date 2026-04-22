@@ -18,8 +18,6 @@ if (empty(trim($text))) {
     exit;
 }
 
-// Ensure the text isn't too long to avoid issues and chunk by spaces or dots.
-// Simple naive chunking for 190 characters.
 $chunks = [];
 while (mb_strlen($text) > 0) {
     if (mb_strlen($text) > 190) {
@@ -42,12 +40,10 @@ foreach ($chunks as $chunk) {
     
     $url = 'https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=vi-VN&q=' . urlencode($chunk);
     
-    // Fetch with cURL to override User-Agent
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    // Suppress warnings in case of temporary Google block
     list($response, $httpcode) = @array(curl_exec($ch), curl_getinfo($ch, CURLINFO_HTTP_CODE));
     curl_close($ch);
     

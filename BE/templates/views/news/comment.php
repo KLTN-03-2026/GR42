@@ -217,6 +217,31 @@
         opacity: 0.6;
         cursor: not-allowed;
     }
+
+    .btn-read-article {
+        padding: 6px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        border: 1px solid #b22222;
+        border-radius: 6px;
+        background: #fff;
+        color: #b22222;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .btn-read-article:hover {
+        background: #b22222;
+        color: #fff;
+    }
+
+    .btn-read-article:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
     </style>
 </head>
 
@@ -226,7 +251,6 @@
             &larr; Trở về trang chủ
         </a>
 
-        <!-- ARTICLE HEADER -->
         <article>
             <header class="article-header">
                 <span class="article-category"><?= htmlspecialchars($news['category'] ?? 'Tin tức') ?></span>
@@ -237,6 +261,7 @@
                         <strong>Nguồn: <?= htmlspecialchars($news['source'] ?? 'Tổng hợp') ?></strong> &nbsp;|&nbsp;
                         <span><?= htmlspecialchars(date('l, d/m/Y H:i', strtotime($news['pubDate']))) ?></span>
                     </div>
+                    <button class="btn-read-article" id="btnReadAll" title="Đọc toàn bộ bài viết">🔊 Đọc bài</button>
                 </div>
             </header>
 
@@ -461,22 +486,25 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const paragraphs = document.querySelectorAll('.article-content p');
+        const btnReadAll = document.getElementById('btnReadAll');
         let currentAudio = null;
         let currentButton = null;
 
-        paragraphs.forEach(p => {
-            const textToRead = p.innerText.trim();
-            if (!textToRead) return;
-            const btn = document.createElement('button');
-            btn.className = 'btn-read-paragraph';
-            btn.innerHTML = '🔊 Đọc đoạn này';
+        function resetCurrentButton() {
+            if (currentButton) {
+                if (currentButton === btnReadAll) {
+                    currentButton.innerHTML = '🔊 Đọc bài';
+                } else {
+                    currentButton.innerHTML = '🔊';
+                }
+            }
+        }
 
-            p.appendChild(btn);
-
-            btn.addEventListener('click', async () => {
-                if (currentButton === btn && currentAudio && !currentAudio.paused) {
+        if (btnReadAll) {
+            btnReadAll.addEventListener('click', async () => {
+                if (currentButton === btnReadAll && currentAudio && !currentAudio.paused) {
                     currentAudio.pause();
-                    btn.innerHTML = '🔊 Đọc đoạn này';
+                    resetCurrentButton();
                     currentAudio = null;
                     currentButton = null;
                     return;
@@ -484,78 +512,122 @@
 
                 if (currentAudio) {
                     currentAudio.pause();
-                    if (currentButton) currentButton.innerHTML = '🔊 Đọc đoạn này';
+                    resetCurrentButton();
                 }
 
-                btn.innerHTML = '⏳ Đang tải...';
+                let fullText = document.querySelector('.article-title').innerText + ". \n";
+                // Lọc bỏ text của nút 🔊 khỏi paragraph text
+                paragraphs.forEach(p => {
+                    let clone = p.cloneNode(true);
+                    let btns = clone.querySelectorAll('button');
+                    btns.forEach(b => b.remove());
+                    let text = clone.innerText.trim();
+                    if(text) fullText += text + " \n";
+                });
+                
+                btnReadAll.innerHTML = '⏳';
+                btnReadAll.disabled = true;
+                currentButton = btnReadAll;
+
+                await playTTS(fullText, btnReadAll, '⏸', '🔊 Đọc bài');
+            });
+        }
+
+        paragraphs.forEach(p => {
+            let clone = p.cloneNode(true);
+            let btns = clone.querySelectorAll('button');
+            btns.forEach(b => b.remove());
+            const textToRead = clone.innerText.trim();
+            if (!textToRead) return;
+            
+            const btn = document.createElement('button');
+            btn.className = 'btn-read-paragraph';
+            btn.innerHTML = '🔊';
+
+            p.appendChild(btn);
+
+            btn.addEventListener('click', async () => {
+                if (currentButton === btn && currentAudio && !currentAudio.paused) {
+                    currentAudio.pause();
+                    btn.innerHTML = '🔊';
+                    currentAudio = null;
+                    currentButton = null;
+                    return;
+                }
+
+                if (currentAudio) {
+                    currentAudio.pause();
+                    resetCurrentButton();
+                }
+
+                btn.innerHTML = '⏳';
                 btn.disabled = true;
+                currentButton = btn;
 
-                try {
-                    const response = await fetch('modules/api/tts.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            text: textToRead
-                        })
-                    });
+                await playTTS(textToRead, btn, '⏸', '🔊');
+            });
+        });
 
-                    if (!response.ok) throw new Error('Lỗi fetch TTS API backend');
+        async function playTTS(text, btnElement, pauseIcon, playIcon) {
+            try {
+                const response = await fetch('modules/api/tts.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
 
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
+                if (!response.ok) throw new Error('Lỗi fetch TTS API backend');
 
-                    currentAudio = new Audio(url);
-                    currentButton = btn;
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
 
-                    currentAudio.onplay = () => {
-                        btn.innerHTML = '⏸ Dừng đọc';
-                        btn.disabled = false;
+                currentAudio = new Audio(url);
+
+                currentAudio.onplay = () => {
+                    btnElement.innerHTML = pauseIcon;
+                    btnElement.disabled = false;
+                };
+
+                currentAudio.onended = () => {
+                    btnElement.innerHTML = playIcon;
+                    currentAudio = null;
+                    currentButton = null;
+                };
+
+                currentAudio.play();
+            } catch (err) {
+                console.warn(err, "- Đang chuyển sang sử dụng giọng đọc mặc định của trình duyệt...");
+                
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'vi-VN';
+                    
+                    utterance.onstart = () => {
+                        btnElement.innerHTML = pauseIcon;
+                        btnElement.disabled = false;
                     };
-
-                    currentAudio.onended = () => {
-                        btn.innerHTML = '🔊 Đọc đoạn này';
+                    utterance.onend = () => {
+                        btnElement.innerHTML = playIcon;
                         currentAudio = null;
                         currentButton = null;
                     };
-
-                    currentAudio.play();
-                } catch (err) {
-                    console.warn(err, "- Đang chuyển sang sử dụng giọng đọc mặc định của trình duyệt...");
                     
-                    if ('speechSynthesis' in window) {
-                        const utterance = new SpeechSynthesisUtterance(textToRead);
-                        utterance.lang = 'vi-VN';
-                        
-                        utterance.onstart = () => {
-                            btn.innerHTML = '⏸ Dừng đọc';
-                            btn.disabled = false;
-                        };
-                        utterance.onend = () => {
-                            btn.innerHTML = '🔊 Đọc đoạn này';
-                            currentAudio = null;
-                            currentButton = null;
-                        };
-                        
-                        currentAudio = {
-                            paused: false,
-                            pause: () => {
-                                window.speechSynthesis.cancel();
-                            }
-                        };
-                        currentButton = btn;
-                        
-                        window.speechSynthesis.speak(utterance);
-                    } else {
-                        console.error('Không thể kích hoạt API SpeechSynthesis');
-                        alert('Không thể tải Server TTS và trình duyệt không hỗ trợ giọng nói.');
-                        btn.innerHTML = '🔊 Đọc đoạn này';
-                        btn.disabled = false;
-                    }
+                    currentAudio = {
+                        paused: false,
+                        pause: () => {
+                            window.speechSynthesis.cancel();
+                        }
+                    };
+                    
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    console.error('Không thể kích hoạt API SpeechSynthesis');
+                    alert('Không thể tải Server TTS và trình duyệt không hỗ trợ giọng nói.');
+                    btnElement.innerHTML = playIcon;
+                    btnElement.disabled = false;
                 }
-            });
-        });
+            }
+        }
     });
     </script>
 </body>

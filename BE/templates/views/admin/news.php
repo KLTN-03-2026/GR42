@@ -24,10 +24,12 @@ layout('admin_sidebar');
         <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
             <h6 class="mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2 text-primary"></i>Danh sách bài báo</h6>
             
-            <div class="input-group" style="width: 250px;">
-                <input type="text" class="form-control form-control-sm bg-light border-0" placeholder="Tìm kiếm bài báo...">
-                <button class="btn btn-sm btn-light border-0"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </div>
+            <form action="" method="GET" class="input-group" style="width: 250px;">
+                <input type="hidden" name="module" value="admin">
+                <input type="hidden" name="action" value="news">
+                <input type="text" name="keyword" value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>" class="form-control form-control-sm bg-light border-0" placeholder="Tìm kiếm bài báo...">
+                <button type="submit" class="btn btn-sm btn-light border-0"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -102,12 +104,15 @@ layout('admin_sidebar');
             <div class="d-flex justify-content-between align-items-center mt-3 p-3 border-top bg-light bg-opacity-50">
                 <small class="text-muted">Hiển thị <?= count($news) ?> trên tổng số <?= $totalRecords ?? 0 ?> bài báo</small>
                 
-                <?php if (isset($totalPages) && $totalPages > 1): ?>
+                <?php 
+                if (isset($totalPages) && $totalPages > 1): 
+                    $queryString = isset($_GET['keyword']) ? '&keyword=' . urlencode($_GET['keyword']) : '';
+                ?>
                 <nav aria-label="Page navigation">
                     <ul class="pagination pagination-sm mb-0">
                         <!-- Nút Trước -->
                         <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                            <a class="page-link border-0 text-muted bg-transparent" href="?module=admin&action=news&page=<?= $page - 1 ?>">Trước</a>
+                            <a class="page-link border-0 text-muted bg-transparent" href="?module=admin&action=news<?= $queryString ?>&page=<?= $page - 1 ?>">Trước</a>
                         </li>
                         
                         <!-- Lặp qua các số trang (rút gọn nếu quá nhiều trang tuỳ chọn) -->
@@ -117,7 +122,7 @@ layout('admin_sidebar');
                         
                         // Luôn hiện trang 1
                         if ($startPage > 1) {
-                            echo '<li class="page-item"><a class="page-link rounded-circle border-0 text-dark bg-transparent d-flex align-items-center justify-content-center mx-1" style="width: 30px; height: 30px;" href="?module=admin&action=news&page=1">1</a></li>';
+                            echo '<li class="page-item"><a class="page-link rounded-circle border-0 text-dark bg-transparent d-flex align-items-center justify-content-center mx-1" style="width: 30px; height: 30px;" href="?module=admin&action=news' . $queryString . '&page=1">1</a></li>';
                             if ($startPage > 2) {
                                 echo '<li class="page-item disabled"><span class="page-link border-0 bg-transparent text-muted">...</span></li>';
                             }
@@ -126,7 +131,7 @@ layout('admin_sidebar');
                         for ($i = $startPage; $i <= $endPage; $i++): 
                         ?>
                             <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                                <a class="page-link rounded-circle border-0 <?= ($i == $page) ? 'd-flex align-items-center justify-content-center mx-1 shadow-sm' : 'text-dark bg-transparent d-flex align-items-center justify-content-center mx-1' ?>" style="width: 30px; height: 30px;" href="?module=admin&action=news&page=<?= $i ?>"><?= $i ?></a>
+                                <a class="page-link rounded-circle border-0 <?= ($i == $page) ? 'd-flex align-items-center justify-content-center mx-1 shadow-sm' : 'text-dark bg-transparent d-flex align-items-center justify-content-center mx-1' ?>" style="width: 30px; height: 30px;" href="?module=admin&action=news<?= $queryString ?>&page=<?= $i ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
 
@@ -135,12 +140,12 @@ layout('admin_sidebar');
                             <?php if ($endPage < $totalPages - 1): ?>
                                 <li class="page-item disabled"><span class="page-link border-0 bg-transparent text-muted">...</span></li>
                             <?php endif; ?>
-                            <li class="page-item"><a class="page-link rounded-circle border-0 text-dark bg-transparent d-flex align-items-center justify-content-center mx-1" style="width: 30px; height: 30px;" href="?module=admin&action=news&page=<?= $totalPages ?>"><?= $totalPages ?></a></li>
+                            <li class="page-item"><a class="page-link rounded-circle border-0 text-dark bg-transparent d-flex align-items-center justify-content-center mx-1" style="width: 30px; height: 30px;" href="?module=admin&action=news<?= $queryString ?>&page=<?= $totalPages ?>"><?= $totalPages ?></a></li>
                         <?php endif; ?>
 
                         <!-- Nút Sau -->
                         <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : '' ?>">
-                            <a class="page-link border-0 text-muted bg-transparent" href="?module=admin&action=news&page=<?= $page + 1 ?>">Sau</a>
+                            <a class="page-link border-0 text-muted bg-transparent" href="?module=admin&action=news<?= $queryString ?>&page=<?= $page + 1 ?>">Sau</a>
                         </li>
                     </ul>
                 </nav>
