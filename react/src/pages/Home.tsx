@@ -29,6 +29,7 @@ const Home = () => {
   const fetchNews = async (pageNum: number, category: string, reset = false) => {
     try {
       setLoading(true);
+      if (reset) setNews([]);
       const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
       const authToken = localStorage.getItem('auth_token');
       const response = await axios.get(`${host}/BE/modules/api/news_load.php`, {

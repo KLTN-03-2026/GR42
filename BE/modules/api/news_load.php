@@ -33,10 +33,10 @@ if (!empty($category)) {
     $where .= " AND category = ? ";
     $types .= "s";
     $params[] = $category;
-} else if ($user_id > 0) {
-    $userDetail = getOne("SELECT interests FROM users WHERE id = $user_id");
-    if (!empty($userDetail['interests'])) {
-        $interests = explode(',', $userDetail['interests']);
+} else if ($user_id > 0 && !isset($_GET['category'])) {
+    $interestsRes = getAll("SELECT category_name FROM user_interests WHERE user_id = $user_id");
+    if (!empty($interestsRes)) {
+        $interests = array_column($interestsRes, 'category_name');
         $placeholders = implode(',', array_fill(0, count($interests), '?'));
         $where .= " AND category IN ($placeholders) ";
         $types .= str_repeat("s", count($interests));
