@@ -11,6 +11,9 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminNewsList from './pages/AdminNewsList';
 
+import AdminUsers from './pages/AdminUsers';
+import AdminRoute from './components/AdminRoute';
+
 // Placeholders for remaining pages
 const Favorites = () => <div className="p-10 text-center bg-white rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold">Trang Tin yêu thích đang được phát triển...</div>;
 
@@ -45,20 +48,22 @@ function App() {
         } />
 
         {/* Protected/Admin routes with AdminLayout (Sidebar) */}
-        <Route path="/*" element={
-          <AdminLayout>
-            <Routes>
-              <Route path="/favorites" element={<Favorites />} />
-              
-              {/* Admin routes */}
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/news" element={<AdminNewsList />} />
-              <Route path="/admin/users" element={<div className="p-10 text-center bg-white rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold">Quản lý người dùng đang được xây dựng...</div>} />
-              
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </AdminLayout>
-        } />
+        <Route element={<AdminRoute />}>
+          <Route path="/*" element={
+            <AdminLayout>
+              <Routes>
+                <Route path="/favorites" element={<Favorites />} />
+                
+                {/* Admin routes */}
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/news" element={<AdminNewsList />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </AdminLayout>
+          } />
+        </Route>
       </Routes>
     </Router>
   );

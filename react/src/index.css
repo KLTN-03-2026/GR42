@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400;1,700&display=swap');
 
 @tailwind base;
@@ -6,9 +7,35 @@
 
 @layer base {
   body {
-    @apply bg-background text-slate-900 font-sans antialiased;
+    @apply bg-background text-slate-900 font-inter antialiased;
     margin: 0;
   }
+}
+
+/* Fallback for typography if plugin is missing */
+.prose {
+  @apply text-slate-600 leading-relaxed max-w-none;
+}
+.prose p {
+  @apply mb-6 text-lg;
+}
+.prose h1 {
+  @apply text-3xl font-black mb-8 tracking-tighter text-slate-900;
+}
+.prose h2 {
+  @apply text-2xl font-black mb-6 tracking-tighter text-slate-900 mt-12;
+}
+.prose h3 {
+  @apply text-xl font-black mb-4 tracking-tighter text-slate-900 mt-8;
+}
+.prose img {
+  @apply rounded-[2rem] shadow-xl my-12 w-full object-cover;
+}
+.prose ul, .prose ol {
+  @apply mb-8 ml-6;
+}
+.prose li {
+  @apply mb-2;
 }
 
 @layer components {

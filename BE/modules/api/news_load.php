@@ -4,7 +4,15 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../includes/database.php';
 require_once __DIR__ . '/../../includes/functions.php';
 
-$user_id = $_SESSION['user_id'] ?? 0;
+$user_id = 0;
+$token = isset($_GET['token']) ? trim($_GET['token']) : '';
+if (!empty($token)) {
+    $checkToken = getOne("SELECT * FROM token_login WHERE token = '$token'");
+    if (!empty($checkToken)) {
+        $user_id = $checkToken['user_id'];
+    }
+}
+
 $perPage = 10;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
@@ -25,6 +33,17 @@ if (!empty($category)) {
     $where .= " AND category = ? ";
     $types .= "s";
     $params[] = $category;
+} else if ($user_id > 0) {
+    $userDetail = getOne("SELECT interests FROM users WHERE id = $user_id");
+    if (!empty($userDetail['interests'])) {
+        $interests = explode(',', $userDetail['interests']);
+        $placeholders = implode(',', array_fill(0, count($interests), '?'));
+        $where .= " AND category IN ($placeholders) ";
+        $types .= str_repeat("s", count($interests));
+        foreach ($interests as $interest) {
+            $params[] = $interest;
+        }
+    }
 }
 
 $sqlCount = "SELECT COUNT(DISTINCT title) as total FROM crawl_news $where";
