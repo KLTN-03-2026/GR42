@@ -55,62 +55,33 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-white flex overflow-hidden font-inter">
-      <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 items-center justify-center p-12">
-        <div className="absolute inset-0 overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop" 
-            alt="Tech Art" 
-            className="w-full h-full object-cover opacity-40 brightness-75 scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-transparent to-blue-600/20"></div>
-          
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full animate-[spin_30s_linear_infinite]"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] border border-white/10 rounded-full animate-[spin_20s_linear_infinite_reverse]"></div>
-        </div>
+      <div className="hidden lg:flex lg:w-1/2 relative bg-white items-center justify-center overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAFC] via-white to-[#EFF6FF]"></div>
+        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-amber-400/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+        
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#2563eb 0.5px, transparent 0.5px)', backgroundSize: '32px 32px' }}></div>
 
-        <div className="relative z-10 max-w-lg text-center">
-            <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-20 h-20 bg-blue-600/20 backdrop-blur-3xl rounded-3xl flex items-center justify-center border border-white/20 mx-auto mb-10 shadow-2xl shadow-blue-500/20"
-            >
-                <UserPlus size={40} className="text-white" />
-            </motion.div>
-            <motion.h1 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-5xl font-black text-white mb-8 tracking-tighter leading-tight"
-            >
-                Tham gia mạng lưới <span className="text-blue-600 italic">Tri thức</span> số
-            </motion.h1>
-            <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-slate-400 text-lg font-medium leading-relaxed"
-            >
-                Tạo tài khoản ngay để nhận bản tin cá nhân hóa và tương tác cùng cộng đồng.
-            </motion.p>
-            
-            <div className="mt-16 grid grid-cols-2 gap-4 text-left">
-                {[
-                    { title: 'Tài khoản miễn phí', desc: 'Sử dụng trọn đời' },
-                    { title: 'Cập nhật 24/7', desc: 'Tin tức thời gian thực' }
-                ].map((item, idx) => (
-                    <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.4 + (idx * 0.1) }}
-                        key={idx} 
-                        className="bg-white/5 backdrop-blur-md p-6 rounded-[2rem] border border-white/5 hover:bg-white/10 transition-all"
-                    >
-                        <h4 className="text-white font-black text-xs uppercase tracking-widest mb-1">{item.title}</h4>
-                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">{item.desc}</p>
-                    </motion.div>
-                ))}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="relative z-10 w-full flex justify-center"
+        >
+          <div className="bg-white/40 backdrop-blur-2xl p-32 rounded-[6rem] border border-white/70 shadow-[0_48px_128px_-32px_rgba(37,99,235,0.2)] flex flex-col items-center w-[90%] max-w-4xl">
+            <img
+              src="/logo_vertex.png"
+              alt="Vertex"
+              className="h-80 w-auto object-contain hover:scale-110 transition-transform duration-1000 cursor-pointer"
+            />
+            <div className="mt-20 text-center space-y-6 w-full">
+              <div className="h-1.5 w-32 bg-blue-600/30 mx-auto rounded-full"></div>
+              <p className="text-xl font-black text-slate-900 uppercase tracking-[0.8em] whitespace-nowrap pl-[0.8em]">Vertex Platform</p>
+              <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.3em] opacity-90">Intelligence • speed • accuracy</p>
             </div>
-        </div>
+          </div>
+        </motion.div>
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-20 bg-[#F9FAFB] relative overflow-y-auto pt-24 lg:pt-20">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NewsCard, { NewsItem } from '../components/NewsCard';
-import { Newspaper, LayoutGrid, List, SlidersHorizontal, Loader2, TrendingUp, ChevronRight, ArrowRight, Clock } from 'lucide-react';
+import { Newspaper, LayoutGrid, List, SlidersHorizontal, Loader2, TrendingUp, ChevronRight, ArrowRight, Clock, Heart, MessageCircle, Link } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { API_BASE_URL } from '../config';
 
@@ -30,11 +30,13 @@ const Home = () => {
     try {
       setLoading(true);
       const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
+      const authToken = localStorage.getItem('auth_token');
       const response = await axios.get(`${host}/BE/modules/api/news_load.php`, {
         params: {
           page: pageNum,
           category: category,
-          perPage: 12
+          perPage: 12,
+          token: authToken
         }
       });
 
@@ -62,6 +64,54 @@ const Home = () => {
   const featuredItem = news.length > 0 ? news[0] : null;
   const trendingItems = news.slice(1, 6);
   const otherItems = news.slice(6);
+
+  const [isFavFeatured, setIsFavFeatured] = useState(false);
+  const [isLikingFeatured, setIsLikingFeatured] = useState(false);
+
+  useEffect(() => {
+    if (featuredItem) {
+        setIsFavFeatured(featuredItem.is_favourite || false);
+    }
+  }, [featuredItem]);
+
+  const handleToggleLikeFeatured = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!featuredItem) return;
+    
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      alert('Vui lòng đăng nhập để thực hiện tính năng này');
+      return;
+    }
+
+    if (isLikingFeatured) return;
+
+    try {
+        setIsLikingFeatured(true);
+        const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
+        const response = await axios.post(`${host}/BE/modules/api/favorites.php`, {
+            news_id: featuredItem.id,
+            token: token,
+            action: 'toggle'
+        });
+
+        if (response.data.status === 'success') {
+            setIsFavFeatured(response.data.action === 'added');
+        }
+    } catch (error) {
+        console.error('Error toggling favorite:', error);
+    } finally {
+        setIsLikingFeatured(false);
+    }
+  };
+
+  const handleCommentFeatured = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (featuredItem) {
+        window.location.href = `/article/${featuredItem.id}#comments`;
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 pb-20">
@@ -95,12 +145,29 @@ const Home = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
             
+            {/* Featured Article Interaction Buttons */}
+            <div className="absolute top-6 right-6 flex flex-col gap-3 z-10">
+                <button 
+                  onClick={handleToggleLikeFeatured}
+                  disabled={isLikingFeatured}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border border-white/40 transition-all shadow-xl active:scale-90 ${isFavFeatured ? 'bg-red-500 text-white border-red-400' : 'bg-white/90 text-slate-400 hover:text-blue-600 hover:bg-white'}`}
+                >
+                  <Heart size={22} className={isFavFeatured ? 'fill-current' : ''} />
+                </button>
+                <button 
+                  onClick={handleCommentFeatured}
+                  className="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md bg-white/90 text-slate-400 border border-white/40 hover:text-blue-600 hover:bg-white transition-all shadow-xl active:scale-90"
+                >
+                  <MessageCircle size={22} />
+                </button>
+            </div>
+
             <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full max-w-3xl">
                 <span className="inline-block px-3 py-1 bg-blue-600 rounded-lg text-white text-[10px] font-black uppercase tracking-widest mb-6">
                     TIÊU ĐIỂM
                 </span>
                 <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-[1.1] tracking-tighter line-clamp-2">
-                    {featuredItem.title}
+                    <Link to={`/article/${featuredItem.id}`}>{featuredItem.title}</Link>
                 </h1>
                 <div className="flex items-center gap-6 text-slate-300 text-xs font-bold uppercase tracking-wider mb-8">
                     <span className="flex items-center gap-2">
@@ -110,10 +177,10 @@ const Home = () => {
                     <span className="w-1.5 h-1.5 bg-slate-600 rounded-full"></span>
                     <span>{featuredItem.pubDate}</span>
                 </div>
-                <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-white/5 active:scale-95 flex items-center gap-3">
+                <Link to={`/article/${featuredItem.id}`} className="inline-flex px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-white/5 active:scale-95 flex items-center gap-3">
                     Đọc toàn bộ bài viết
                     <ArrowRight size={18} />
-                </button>
+                </Link>
             </div>
           </motion.div>
 

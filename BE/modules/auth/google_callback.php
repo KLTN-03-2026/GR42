@@ -77,8 +77,13 @@ if (isset($_GET['code'])) {
             insert('token_login', $tokenData);
             $avatar = $userinfo['picture'] ?? '';
             $state = $_GET['state'] ?? '';
+            
+            // Fetch role for redirect
+            $userForRole = getOne("SELECT role FROM users WHERE id = '$userId'");
+            $role = $userForRole['role'] ?? 'user';
+
             if ($state === 'react') {
-                $redirectUrl = _FRONTEND_URL . "/login?token=" . $token . "&name=" . urlencode($name) . "&avatar=" . urlencode($avatar);
+                $redirectUrl = _FRONTEND_URL . "/login?token=" . $token . "&name=" . urlencode($name) . "&avatar=" . urlencode($avatar) . "&role=" . $role;
             } else {
                 $redirectUrl = _HOST_URL . "/?module=news&action=list";
             }
