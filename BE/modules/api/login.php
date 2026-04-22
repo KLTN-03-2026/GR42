@@ -45,6 +45,7 @@ if (isPost()) {
                     $response['data'] = [
                         'token' => $token,
                         'name' => $user['fullname'],
+                        'email' => $user['email'],
                         'avatar' => $user['avatar'] ?? '',
                         'role' => $user['role'] ?? 'user'
                     ];

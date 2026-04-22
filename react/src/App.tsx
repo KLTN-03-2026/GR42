@@ -12,10 +12,10 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminNewsList from './pages/AdminNewsList';
 
 import AdminUsers from './pages/AdminUsers';
+import Favorites from './pages/Favorites';
 import AdminRoute from './components/AdminRoute';
 
-// Placeholders for remaining pages
-const Favorites = () => <div className="p-10 text-center bg-white rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold">Trang Tin yêu thích đang được phát triển...</div>;
+
 
 interface AppProps {}
 
@@ -23,12 +23,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Auth routes without main Layout */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Public Application routes with PublicLayout (Top Navbar only) */}
         <Route path="/article/:id" element={
           <PublicLayout>
             <ArticleDetail />
@@ -47,14 +45,12 @@ function App() {
           </PublicLayout>
         } />
 
-        {/* Protected/Admin routes with AdminLayout (Sidebar) */}
         <Route element={<AdminRoute />}>
           <Route path="/*" element={
             <AdminLayout>
               <Routes>
                 <Route path="/favorites" element={<Favorites />} />
                 
-                {/* Admin routes */}
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/news" element={<AdminNewsList />} />
                 <Route path="/admin/users" element={<AdminUsers />} />

@@ -1,4 +1,3 @@
-// src/components/RelatedArticles.tsx
 import React, { useEffect, useState } from "react";
 import { getRelatedArticles } from "../services/newsService";
 

@@ -1,13 +1,17 @@
 <?php
 require_once __DIR__ . '/cors.php';
-define('_TAI', true);
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../includes/database.php';
+if (!defined('_TAI')) {
+    define('_TAI', true);
+}
+if (!defined('_HOST')) {
+    require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../../includes/database.php';
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $inputData = json_decode(file_get_contents('php://input'), true);
-$token = $_GET['token'] ?? ($inputData['token'] ?? '');
-$action = $_GET['action'] ?? ($inputData['action'] ?? 'list');
+$token = trim($_GET['token'] ?? ($inputData['token'] ?? ''));
+$action_type = trim($_GET['action_type'] ?? ($inputData['action_type'] ?? 'list'));
 
 if (empty($token)) {
     die(json_encode(['status' => 'error', 'message' => 'Thiếu token xác thực']));
@@ -19,9 +23,9 @@ if (!$checkToken) {
 }
 $user_id = (int)$checkToken['user_id'];
 
-if ($method === 'GET' || $action === 'list') {
+if ($method === 'GET' || $action_type === 'list') {
     $favorites = getAll("
-        SELECT n.id, n.title, n.category, n.source, n.image, n.pubDate, n.description
+        SELECT n.id, n.title, n.category, n.source, n.image, n.pubDate, 1 AS is_favourite
         FROM favourite_news f
         JOIN crawl_news n ON f.news_id = n.id
         WHERE f.user_id = $user_id
@@ -30,14 +34,27 @@ if ($method === 'GET' || $action === 'list') {
     echo json_encode(['status' => 'success', 'data' => $favorites]);
 } 
 else if ($method === 'POST') {
-    if ($action === 'toggle') {
+    if ($action_type === 'toggle') {
         $news_id = (int)($inputData['news_id'] ?? 0);
         if ($news_id <= 0) die(json_encode(['status' => 'error', 'message' => 'ID không hợp lệ']));
         
-        $exists = getOne("SELECT id FROM favourite_news WHERE user_id = $user_id AND news_id = $news_id");
+        $news = getOne("SELECT title FROM crawl_news WHERE id = $news_id");
+        if (!$news) die(json_encode(['status' => 'error', 'message' => 'Tin tức không tồn tại']));
         
-        if ($exists) {
-            delete('favourite_news', "user_id = $user_id AND news_id = $news_id");
+        $fav = getOne("
+            SELECT f.id 
+            FROM favourite_news f 
+            JOIN crawl_news n2 ON f.news_id = n2.id
+            WHERE n2.title = '" . $conn->real_escape_string($news['title']) . "' AND f.user_id = $user_id
+        ");
+        
+        if ($fav) {
+            $titleEscaped = $conn->real_escape_string($news['title']);
+            $conn->query("
+                DELETE f FROM favourite_news f
+                JOIN crawl_news n ON f.news_id = n.id
+                WHERE n.title = '$titleEscaped' AND f.user_id = $user_id
+            ");
             echo json_encode(['status' => 'success', 'action' => 'removed', 'message' => 'Đã xóa khỏi yêu thích']);
         } else {
             insert('favourite_news', [

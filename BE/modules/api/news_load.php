@@ -60,7 +60,8 @@ $sql = "SELECT n.*,
        EXISTS (
            SELECT 1 
            FROM favourite_news f 
-           WHERE f.news_id = n.id AND f.user_id = ?
+           JOIN crawl_news n2 ON f.news_id = n2.id
+           WHERE n2.title = n.title AND f.user_id = ?
        ) AS is_favourite
 FROM (
     SELECT MAX(id) as id

@@ -31,6 +31,10 @@ const Login = () => {
       if (role) {
         localStorage.setItem('user_role', role);
       }
+      const email = params.get('email');
+      if (email) {
+        localStorage.setItem('user_email', decodeURIComponent(email));
+      }
       
       if (role === 'admin') {
         navigate('/admin');
@@ -68,6 +72,9 @@ const Login = () => {
           localStorage.setItem('user_avatar', result.data.avatar);
         }
         localStorage.setItem('user_role', result.data.role);
+        if (result.data.email) {
+            localStorage.setItem('user_email', result.data.email);
+        }
 
         if (result.data.role === 'admin') {
           navigate('/admin');

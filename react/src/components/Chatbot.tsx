@@ -51,8 +51,7 @@ const Chatbot = () => {
     setLoading(true);
 
     try {
-      const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-      const response = await axios.post(`${host}/BE/modules/api/news_chat_ai.php`, {
+      const response = await axios.post(`${API_BASE_URL}/index.php?module=api&action=news_chat_ai`, {
         prompt: input
       }, {
         headers: {
@@ -62,7 +61,7 @@ const Chatbot = () => {
 
       const botMessage: Message = {
         role: 'bot',
-        content: response.data.content || 'Xin lỗi, tôi gặp sự cố khi xử lý yêu cầu của bạn.',
+        content: response.data.message || 'Xin lỗi, tôi gặp sự cố khi xử lý yêu cầu của bạn.',
         timestamp: new Date()
       };
 

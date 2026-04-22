@@ -24,14 +24,18 @@ if (!empty($token)) {
     $checkToken = getOne("SELECT user_id FROM token_login WHERE token = '$token'");
     if (!empty($checkToken)) {
         $user_id = $checkToken['user_id'];
-        $fav = getOne("SELECT id FROM favourite_news WHERE user_id = $user_id AND news_id = $id");
+        $fav = getOne("
+            SELECT f.id 
+            FROM favourite_news f 
+            JOIN crawl_news n2 ON f.news_id = n2.id
+            WHERE n2.title = '" . $conn->real_escape_string($news['title']) . "' AND f.user_id = $user_id
+        ");
         if (!empty($fav)) {
             $is_favourite = true;
         }
     }
 }
 
-// Lấy danh sách bình luận (Top 15)
 $comments = getAll("
     SELECT c.id, c.user_id, c.content, c.created_at, u.fullname, u.avatar
     FROM comments c

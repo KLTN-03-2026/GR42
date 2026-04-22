@@ -20,10 +20,12 @@ if (!$checkToken) {
 $user_id = (int)$checkToken['user_id'];
 
 if ($method === 'GET' || $action === 'get_all') {
-    // 1. Get Profile
-    $profile = getOne("SELECT id, fullname, email, phone, address, avatar, role FROM users WHERE id = $user_id");
+    $profile = getOne("SELECT id, fullname, email, phone, address, avatar, role, created_at FROM users WHERE id = $user_id");
     
-    // 2. Get Interests
+    if (!empty($profile['avatar']) && !preg_match('/^http/', $profile['avatar'])) {
+        $profile['avatar'] = _HOST_URL . '/' . $profile['avatar'];
+    }
+    
     $interests = [];
     $intRes = getAll("SELECT category_name FROM user_interests WHERE user_id = $user_id");
     foreach($intRes as $row) {
@@ -55,6 +57,22 @@ else if ($method === 'POST') {
             insert('user_interests', ['user_id' => $user_id, 'category_name' => $cat]);
         }
         echo json_encode(['status' => 'success', 'msg' => 'Đã cập nhật sở thích']);
+    }
+    else if ($action === 'update_avatar') {
+        $avatarData = $inputData['avatar_base64'] ?? '';
+        if (empty($avatarData)) die(json_encode(['status' => 'error', 'msg' => 'Dữ liệu ảnh trống']));
+
+        try {
+            // Save base64 directly to database
+            $res = update('users', ['avatar' => $avatarData], "id = $user_id");
+            if ($res) {
+                echo json_encode(['status' => 'success', 'avatar_url' => $avatarData]);
+            } else {
+                echo json_encode(['status' => 'error', 'msg' => 'Không thể cập nhật ảnh vào database']);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'msg' => 'Lỗi xử lý: ' . $e->getMessage()]);
+        }
     }
 }
 ?>

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import NewsCard, { NewsItem } from '../components/NewsCard';
-import { Newspaper, LayoutGrid, List, SlidersHorizontal, Loader2, TrendingUp, ChevronRight, ArrowRight, Clock, Heart, MessageCircle, Link } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Search, Heart, MessageCircle, Share2, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import VButton from '../components/VButton';
+import NewsCard, { NewsItem } from '../components/NewsCard';
+import { CategoryBadge } from '../components/CategoryUI';
 
 const categories = [
   { id: '', name: 'Tất cả' },
@@ -20,6 +23,10 @@ const categories = [
 ];
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const currentKeyword = searchParams.get('keyword') || '';
+  
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -30,12 +37,14 @@ const Home = () => {
     try {
       setLoading(true);
       if (reset) setNews([]);
-      const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
       const authToken = localStorage.getItem('auth_token');
-      const response = await axios.get(`${host}/BE/modules/api/news_load.php`, {
+      const response = await axios.get(`${API_BASE_URL}/index.php`, {
         params: {
+          module: 'api',
+          action: 'news_load',
           page: pageNum,
           category: category,
+          keyword: currentKeyword,
           perPage: 12,
           token: authToken
         }
@@ -60,7 +69,30 @@ const Home = () => {
   useEffect(() => {
     fetchNews(1, selectedCategory, true);
     setPage(1);
-  }, [selectedCategory]);
+    window.scrollTo(0, 0);
+  }, [selectedCategory, currentKeyword]);
+
+  useEffect(() => {
+    if (!hasMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          const nextPage = page + 1;
+          setPage(nextPage);
+          fetchNews(nextPage, selectedCategory);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const trigger = document.getElementById('infinite-scroll-trigger');
+    if (trigger) observer.observe(trigger);
+
+    return () => {
+      if (trigger) observer.unobserve(trigger);
+    };
+  }, [hasMore, loading, page, selectedCategory]);
 
   const featuredItem = news.length > 0 ? news[0] : null;
   const trendingItems = news.slice(1, 6);
@@ -90,15 +122,18 @@ const Home = () => {
 
     try {
         setIsLikingFeatured(true);
-        const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-        const response = await axios.post(`${host}/BE/modules/api/favorites.php`, {
+        const response = await axios.post(`${API_BASE_URL}/index.php?module=api&action=favorites`, {
             news_id: featuredItem.id,
             token: token,
-            action: 'toggle'
+            action_type: 'toggle'
         });
 
         if (response.data.status === 'success') {
-            setIsFavFeatured(response.data.action === 'added');
+            const isAdded = response.data.action === 'added';
+            setIsFavFeatured(isAdded);
+            setNews(prev => prev.map((n, idx) => 
+                idx === 0 ? { ...n, is_favourite: isAdded } : n
+            ));
         }
     } catch (error) {
         console.error('Error toggling favorite:', error);
@@ -110,129 +145,152 @@ const Home = () => {
   const handleCommentFeatured = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (featuredItem) {
-        window.location.href = `/article/${featuredItem.id}#comments`;
+        navigate(`/article/${featuredItem.id}#comments`);
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-6 pb-20">
-      <div className="flex items-center gap-6 py-6 overflow-x-auto no-scrollbar mb-8 border-b border-slate-50">
+      <div className="flex items-center gap-4 py-8 overflow-x-auto no-scrollbar mb-8 border-b border-slate-50">
         {categories.map((cat) => (
-          <button
+          <VButton
             key={cat.id}
+            variant={selectedCategory === cat.id ? 'primary' : 'ghost'}
+            size="sm"
             onClick={() => setSelectedCategory(cat.id)}
-            className={`whitespace-nowrap text-sm font-bold transition-all uppercase tracking-widest pb-2 border-b-2 ${
-              selectedCategory === cat.id 
-                ? 'text-blue-600 border-blue-600' 
-                : 'text-slate-400 border-transparent hover:text-slate-600'
-            }`}
+            className="whitespace-nowrap"
           >
             {cat.name}
-          </button>
+          </VButton>
         ))}
       </div>
-
-      {!selectedCategory && featuredItem && page === 1 && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-8 group relative aspect-[16/9] md:aspect-[21/9] lg:aspect-auto lg:h-[500px] rounded-[2rem] overflow-hidden bg-slate-900 border border-slate-100 shadow-2xl"
-          >
-            <img 
-              src={featuredItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop'} 
-              alt={featuredItem.title}
-              className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-1000"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
-            
-            {/* Featured Article Interaction Buttons */}
-            <div className="absolute top-6 right-6 flex flex-col gap-3 z-10">
-                <button 
-                  onClick={handleToggleLikeFeatured}
-                  disabled={isLikingFeatured}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border border-white/40 transition-all shadow-xl active:scale-90 ${isFavFeatured ? 'bg-red-500 text-white border-red-400' : 'bg-white/90 text-slate-400 hover:text-blue-600 hover:bg-white'}`}
-                >
-                  <Heart size={22} className={isFavFeatured ? 'fill-current' : ''} />
-                </button>
-                <button 
-                  onClick={handleCommentFeatured}
-                  className="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md bg-white/90 text-slate-400 border border-white/40 hover:text-blue-600 hover:bg-white transition-all shadow-xl active:scale-90"
-                >
-                  <MessageCircle size={22} />
-                </button>
+ 
+      {currentKeyword ? (
+        <div className="mb-16">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+              <Search size={24} />
             </div>
-
-            <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full max-w-3xl">
-                <span className="inline-block px-3 py-1 bg-blue-600 rounded-lg text-white text-[10px] font-black uppercase tracking-widest mb-6">
-                    TIÊU ĐIỂM
-                </span>
-                <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-[1.1] tracking-tighter line-clamp-2">
-                    <Link to={`/article/${featuredItem.id}`}>{featuredItem.title}</Link>
-                </h1>
-                <div className="flex items-center gap-6 text-slate-300 text-xs font-bold uppercase tracking-wider mb-8">
-                    <span className="flex items-center gap-2">
-                        <Clock size={14} className="text-blue-600" />
-                        {featuredItem.source}
-                    </span>
-                    <span className="w-1.5 h-1.5 bg-slate-600 rounded-full"></span>
-                    <span>{featuredItem.pubDate}</span>
-                </div>
-                <Link to={`/article/${featuredItem.id}`} className="inline-flex px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-white/5 active:scale-95 flex items-center gap-3">
-                    Đọc toàn bộ bài viết
-                    <ArrowRight size={18} />
-                </Link>
+            <div>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">Kết quả tìm kiếm</h2>
+                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Tìm thấy {news.length} bài viết cho "{currentKeyword}"</p>
             </div>
-          </motion.div>
-
-          <div className="lg:col-span-4 flex flex-col">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
-                <h3 className="font-black text-slate-900 uppercase tracking-[0.2em] text-xs flex items-center gap-2">
-                    <TrendingUp size={16} className="text-blue-600" />
-                    XU HƯỚNG
-                </h3>
-            </div>
-            <div className="space-y-6">
-                {trendingItems.map((item, idx) => (
-                    <div key={item.id} className="flex gap-4 group cursor-pointer">
-                        <span className="text-3xl font-black text-slate-100 group-hover:text-blue-600/10 transition-colors leading-none pt-1">
-                            0{idx + 1}
-                        </span>
-                        <div className="flex-1">
-                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 block">
-                                {item.category}
-                            </span>
-                            <h4 className="font-bold text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
-                                {item.title}
-                            </h4>
-                        </div>
-                    </div>
+          </div>
+          
+          {news.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {news.map(item => (
+                    <NewsCard key={item.id} item={item} />
                 ))}
             </div>
-            <button className="mt-auto pt-6 flex items-center gap-2 text-xs font-black text-slate-400 hover:text-blue-600 transition-colors group">
-                Xem bảng xếp hạng đầy đủ
-                <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </button>
+          ) : (
+            <div className="py-20 text-center bg-white rounded-[3rem] border border-slate-100 shadow-xl">
+                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
+                    <Search size={40} />
+                </div>
+                <h3 className="text-xl font-black text-slate-900 mb-2">Không tìm thấy kết quả</h3>
+                <p className="text-slate-400 font-medium">Thử lại với từ khóa khác nhé!</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {featuredItem && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={() => navigate(`/article/${featuredItem.id}`)}
+                className="lg:col-span-8 group relative aspect-[16/9] md:aspect-[21/9] lg:aspect-auto lg:h-[500px] rounded-[2rem] overflow-hidden bg-slate-900 border border-slate-100 shadow-2xl cursor-pointer"
+              >
+                <img 
+                  src={featuredItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop'} 
+                  alt={featuredItem.title}
+                  className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-1000"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
+                
+                <div className="absolute top-6 right-6 flex flex-col gap-3 z-10">
+                    <VButton
+                      variant={isFavFeatured ? 'primary' : 'outline'}
+                      icon={Heart}
+                      onClick={handleToggleLikeFeatured}
+                      loading={isLikingFeatured}
+                      className={`w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFavFeatured ? 'bg-red-500 border-red-500' : 'bg-white/90 border-white/40'}`}
+                    />
+                    <VButton
+                      variant="outline"
+                      icon={MessageCircle}
+                      onClick={handleCommentFeatured}
+                      className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/90 border-white/40"
+                    />
+                    <VButton
+                      variant="outline"
+                      icon={Share2}
+                      onClick={(e) => {
+                          e.stopPropagation();
+                          if (navigator.share) {
+                              navigator.share({ title: featuredItem.title, url: featuredItem.link });
+                          } else {
+                              navigator.clipboard.writeText(featuredItem.link);
+                              alert('Đã sao chép liên kết!');
+                          }
+                      }}
+                      className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/90 border-white/40"
+                    />
+                </div>
+
+                <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full max-w-3xl">
+                    <span className="inline-block px-3 py-1 bg-blue-600 rounded-lg text-white text-[10px] font-black uppercase tracking-widest mb-6">
+                        TIÊU ĐIỂM
+                    </span>
+                    <h3 className="text-2xl md:text-4xl font-black text-white leading-tight mb-4 group-hover:text-blue-400 transition-colors">
+                        {featuredItem.title}
+                    </h3>
+                </div>
+              </motion.div>
+              <div className="lg:col-span-4 flex flex-col">
+                <div className="flex items-center justify-between mb-8">
+                    <h3 className="font-black text-slate-900 uppercase tracking-widest">Trending</h3>
+                    <div className="h-1 flex-1 bg-slate-100 ml-4 rounded-full"></div>
+                </div>
+                <div className="space-y-6">
+                    {trendingItems.map((item, idx) => (
+                        <div 
+                        key={item.id} 
+                        className="flex gap-4 group cursor-pointer"
+                        onClick={() => navigate(`/article/${item.id}`)}
+                        >
+                            <span className="text-3xl font-black text-slate-100 group-hover:text-blue-600/10 transition-colors leading-none pt-1">
+                                0{idx + 1}
+                            </span>
+                            <div className="flex-1">
+                                <CategoryBadge name={item.category} showIcon={false} className="mb-2" />
+                                <h4 className="font-bold text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                                    {item.title}
+                                </h4>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase flex items-center gap-3">
+              <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
+              {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : 'TIN MỚI NHẤT'}
+            </h2>
           </div>
-        </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            {(selectedCategory ? news : otherItems).map((item) => (
+              <NewsCard key={item.id} item={item} />
+            ))}
+          </div>
+        </>
       )}
-
-      <div className="flex items-center justify-between mb-10">
-        <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase flex items-center gap-3">
-          <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
-          {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : 'TIN MỚI NHẤT'}
-        </h2>
-        <div className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-blue-600 cursor-pointer transition-colors">
-            Xem tất cả bài báo ({news.length})
-            <ChevronRight size={14} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {(selectedCategory ? news : otherItems).map((item) => (
-          <NewsCard key={item.id} item={item} />
-        ))}
-      </div>
 
       {loading && (
         <div className="flex flex-col items-center justify-center py-20">
@@ -240,20 +298,17 @@ const Home = () => {
         </div>
       )}
 
-      {!loading && hasMore && (
-        <div className="mt-20 text-center">
-          <button 
-            onClick={() => {
-                const next = page + 1;
-                setPage(next);
-                fetchNews(next, selectedCategory);
-            }}
-            className="px-12 py-5 bg-white border border-slate-100 rounded-[1.25rem] font-black text-sm uppercase tracking-widest text-slate-500 hover:text-blue-600 hover:border-blue-600/20 hover:shadow-2xl hover:shadow-blue-600/10 transition-all active:scale-95"
-          >
-            Tải thêm tin tức mới
-          </button>
-        </div>
-      )}
+      <div id="infinite-scroll-trigger" className="h-20 flex items-center justify-center mt-12">
+        {hasMore && (
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Đang tải thêm tin tức...</p>
+          </div>
+        )}
+        {!hasMore && news.length > 0 && (
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Bạn đã xem hết tin tức hôm nay</p>
+        )}
+      </div>
     </div>
   );
 };

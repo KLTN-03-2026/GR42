@@ -1,14 +1,19 @@
 <?php
 require_once __DIR__ . '/cors.php';
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../includes/database.php';
+if (!defined('_TAI')) {
+    define('_TAI', true);
+}
+if (!defined('_HOST')) {
+    require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../../includes/database.php';
+}
 
 $apiKey = _GEMINI_API_KEY;
-$caCertPath = "D:\\laragon\\etc\\ssl\\cacert.pem";
-$model = "gemini-2.5-flash";
+$caCertPath = ""; 
+$model = "gemini-1.5-flash-latest";
 function callGeminiApi(array $data, string $apiKey, string $model, string $caCertPath): ?array
 {
-    $url = "https://generativelanguage.googleapis.com/v1/models/{$model}:generateContent?key={$apiKey}";
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
     $ch = curl_init();
     curl_setopt_array($ch, [
         CURLOPT_URL => $url,
@@ -16,9 +21,12 @@ function callGeminiApi(array $data, string $apiKey, string $model, string $caCer
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode($data, JSON_UNESCAPED_UNICODE),
         CURLOPT_HTTPHEADER => ["Content-Type: application/json; charset=utf-8"],
-        CURLOPT_CAINFO => $caCertPath,
         CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => !empty($caCertPath),
     ]);
+    if (!empty($caCertPath)) {
+        curl_setopt($ch, CURLOPT_CAINFO, $caCertPath);
+    }
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     if (curl_errno($ch)) {

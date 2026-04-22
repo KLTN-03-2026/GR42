@@ -36,43 +36,66 @@ function cleanContent($html)
     if (!$html)
         return '';
     $html = str_replace('""', '"', $html);
-    $html = str_replace('id="maincontent">', '', $html);
+    
     libxml_use_internal_errors(true);
     $dom = new DOMDocument();
     $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
     $xpath = new DOMXPath($dom);
-    $result = '';
 
-    foreach ($xpath->query('//script|//style|//table') as $node) {
+    foreach ($xpath->query('//script|//style|//table|//iframe|//form|//nav|//header|//footer') as $node) {
         $node->parentNode->removeChild($node);
     }
 
-    foreach ($xpath->query('//p') as $p) {
-        $text = trim($p->textContent);
-        if ($text) {
-            $result .= "<p>$text</p>";
+    $result = '';
+    
+    $body = $dom->getElementsByTagName('body')->item(0);
+    if ($body) {
+        $result = processNodes($body, $xpath);
+    }
+    
+    return $result;
+}
+
+function processNodes($parentNode, $xpath) {
+    $content = '';
+    foreach ($parentNode->childNodes as $node) {
+        if ($node->nodeName === 'p') {
+            $text = trim($node->textContent);
+            if ($text) {
+                $content .= "<p>$text</p>";
+            }
+        } elseif ($node->nodeName === 'figure' || $node->nodeName === 'img' || ($node->nodeName === 'div' && strpos($node->getAttribute('class'), 'image') !== false)) {
+            $img = null;
+            if ($node->nodeName === 'img') {
+                $img = $node;
+            } else {
+                $img = $xpath->query('.//img', $node)->item(0);
+            }
+
+            if ($img) {
+                $src = $img->getAttribute('data-original')
+                    ?: $img->getAttribute('data-src')
+                    ?: $img->getAttribute('src');
+                
+                if ($src) {
+                    $caption = '';
+                    $capNode = $xpath->query('.//figcaption|.//p[contains(@class, "caption")]|.//div[contains(@class, "caption")]', $node)->item(0);
+                    if ($capNode) {
+                        $caption = trim($capNode->textContent);
+                    }
+
+                    $content .= "
+                        <figure class='news-image'>
+                            <img src='$src' loading='lazy'>
+                            " . ($caption ? "<figcaption>$caption</figcaption>" : "") . "
+                        </figure>";
+                }
+            }
+        } elseif ($node->hasChildNodes()) {
+            $content .= processNodes($node, $xpath);
         }
     }
-
-    foreach ($xpath->query('//figure') as $fig) {
-        $img = $xpath->query('.//img', $fig)->item(0);
-        /** @var DOMElement $img */
-        if (!$img)
-            continue;
-
-        $src = $img->getAttribute('data-original')
-            ?: $img->getAttribute('data-src')
-            ?: $img->getAttribute('src');
-        $capNode = $xpath->query('.//figcaption', $fig)->item(0);
-        $caption = $capNode ? trim($capNode->textContent) : '';
-
-        $result .= "
-            <figure class='news-image'>
-                <img src='$src' loading='lazy'>
-                <figcaption>$caption</figcaption>
-            </figure>";
-    }
-    return $result;
+    return $content;
 }
 
 function makeThumbnailUrl($url)
@@ -115,7 +138,7 @@ if (!$data) {
     ]));
 }
 
-$conn->query("DELETE FROM crawl_news");
+// $conn->query("DELETE FROM crawl_news"); // Commented out to preserve favorites and comments
 $sql = "INSERT INTO crawl_news (id, title, link, image, pubdate, source, savedtime, category, content) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE title = VALUES(title), link = VALUES(link),
         image = VALUES(image), pubdate = VALUES(pubdate), source = VALUES(source), savedtime = VALUES(savedtime),
