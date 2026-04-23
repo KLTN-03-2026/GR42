@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/cors.php';
-define('_TAI', true);
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../includes/database.php';
 
@@ -59,9 +58,9 @@ echo json_encode([
     'data' => [
         'id' => $news['id'],
         'title' => $news['title'],
-        'description' => $news['description'],
-        'content' => $news['content'],
-        'image' => $news['image'],
+        'description' => $news['description'] ?? null,
+        'content' => $news['content'] ?? '',
+        'image' => $news['image'] ?? '',
         'source' => $news['source'],
         'pubDate' => $news['pubDate'],
         'link' => $news['link'],
