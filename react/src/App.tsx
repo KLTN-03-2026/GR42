@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminNewsList from './pages/AdminNewsList';
 
 import AdminUsers from './pages/AdminUsers';
+import AdminReports from './pages/AdminReports';
 import Favorites from './pages/Favorites';
 import AdminRoute from './components/AdminRoute';
 
@@ -54,6 +55,7 @@ function App() {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/news" element={<AdminNewsList />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/reports" element={<AdminReports />} />
                 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

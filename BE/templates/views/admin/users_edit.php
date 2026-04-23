@@ -37,47 +37,30 @@ layout('admin_sidebar');
                     <div class="card-body p-4">
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">Họ và Tên <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="fullname" value="<?= htmlspecialchars($editUser['fullname'] ?? '') ?>" required placeholder="VD: Nguyễn Văn A">
+                                <label class="form-label fw-bold small text-muted">Họ và Tên</label>
+                                <input type="text" class="form-control" value="<?= htmlspecialchars($editUser['fullname'] ?? '') ?>" disabled>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">Địa chỉ Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($editUser['email'] ?? '') ?>" required placeholder="VD: email@example.com">
+                                <label class="form-label fw-bold small text-muted">Địa chỉ Email</label>
+                                <input type="email" class="form-control" value="<?= htmlspecialchars($editUser['email'] ?? '') ?>" disabled>
                             </div>
                         </div>
 
                         <?php if(array_key_exists('phone', $editUser)): ?>
                         <div class="mb-3">
                             <label class="form-label fw-bold small text-muted">Số điện thoại</label>
-                            <input type="text" class="form-control" name="phone" value="<?= htmlspecialchars($editUser['phone'] ?? '') ?>" placeholder="VD: 0987xxx">
+                            <input type="text" class="form-control" value="<?= htmlspecialchars($editUser['phone'] ?? '') ?>" disabled>
                         </div>
                         <?php endif; ?>
 
                         <?php if(array_key_exists('address', $editUser)): ?>
                         <div class="mb-3">
                             <label class="form-label fw-bold small text-muted">Địa chỉ</label>
-                            <input type="text" class="form-control" name="address" value="<?= htmlspecialchars($editUser['address'] ?? '') ?>" placeholder="Nhập địa chỉ của người dùng...">
+                            <input type="text" class="form-control" value="<?= htmlspecialchars($editUser['address'] ?? '') ?>" disabled>
                         </div>
                         <?php endif; ?>
 
-                        <hr class="my-4 border-light">
-                        
-                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-shield-halved text-secondary me-2"></i>Đổi mật khẩu (Bỏ trống nếu không đổi)</h6>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted">Mật khẩu mới</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" name="password" placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)">
-                                <button class="btn btn-outline-secondary" type="button" onclick="const p=document.getElementsByName('password')[0]; p.type=p.type==='password'?'text':'password';"><i class="fa-regular fa-eye"></i></button>
-                            </div>
-                            <small class="text-muted mt-1 d-block">Lưu ý: Hành động này sẽ lập tức thay đổi mật khẩu của người dùng, không thể hoàn tác.</small>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm fw-bold">
-                                <i class="fa-solid fa-floppy-disk me-2"></i>Lưu Thay Đổi
-                            </button>
-                        </div>
-                    </div>
+                        <!-- Password change has been disabled -->
                 </div>
             </div>
 
@@ -112,13 +95,19 @@ layout('admin_sidebar');
                         <?php if(array_key_exists('status', $editUser)): ?>
                             <div class="mb-3 text-start mt-3">
                                 <label class="form-label fw-bold small text-muted">Trạng thái Tài khoản</label>
-                                <select class="form-select" name="status">
+                                <select class="form-select" disabled>
                                     <option value="1" <?= (isset($editUser['status']) && $editUser['status'] == 1) ? 'selected' : '' ?>>Đang hoạt động</option>
                                     <option value="0" <?= (isset($editUser['status']) && $editUser['status'] == 0) ? 'selected' : '' ?>>Tạm khoá (Banned)</option>
                                 </select>
                             </div>
                         <?php endif; ?>
                         
+                        <div class="mb-3 text-start mt-4">
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill shadow-sm fw-bold">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Lưu Phân Quyền
+                            </button>
+                        </div>
+
                         <div class="border-top pt-3 mt-4 text-start">
                             <small class="text-muted d-block mb-1">
                                 <i class="fa-regular fa-calendar-plus me-1"></i> Ngày tạo: 

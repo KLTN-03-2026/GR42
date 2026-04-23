@@ -2,34 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
-    Calendar,
     ExternalLink,
     Share2,
     Heart,
-    ArrowLeft,
     Sparkles,
-    ChevronRight,
     TrendingUp,
     Clock,
     Loader2,
     Volume2,
-    MoreHorizontal,
     ThumbsUp,
     MessageCircle,
-    ArrowRight,
     Send,
     AlertCircle,
     X
 } from 'lucide-react';
-import NewsCard, { NewsItem } from '../components/NewsCard';
-import { motion } from 'framer-motion';
+import { NewsItem } from '../components/NewsCard';
+import { AnimatePresence, motion } from 'framer-motion';
 import { API_BASE_URL } from '../config';
 import VButton from '../components/VButton';
 import VAvatar from '../components/VAvatar';
 import { CategoryBadge } from '../components/CategoryUI';
+import { decodeId } from '../utils/idEncoder';
 
 const ArticleDetail = () => {
-    const { id } = useParams();
+    const { id: encodedId } = useParams();
+    const id = decodeId(encodedId || '');
     const navigate = useNavigate();
     const [article, setArticle] = useState<any>(null);
     const [related, setRelated] = useState<NewsItem[]>([]);
@@ -46,6 +43,19 @@ const ArticleDetail = () => {
     const [submittingReply, setSubmittingReply] = useState(false);
     const [readingIndex, setReadingIndex] = useState<number | null>(null);
     const [isReadingAll, setIsReadingAll] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportReason, setReportReason] = useState('');
+    const [reportDetails, setReportDetails] = useState('');
+    const [submittingReport, setSubmittingReport] = useState(false);
+
+    const reportReasons = [
+        "Nội dung sai sự thật",
+        "Nội dung nhạy cảm, bạo lực",
+        "Vi phạm bản quyền",
+        "Ngôn từ thù ghét",
+        "Spam hoặc lừa đảo",
+        "Khác"
+    ];
 
     const token = localStorage.getItem('auth_token');
 
@@ -61,7 +71,6 @@ const ArticleDetail = () => {
             if (res.data.status === 'success') {
                 const { data } = res.data;
                 setArticle(data);
-                // Handle is_favourite which might be returned as 1/0, true/false, or even a string
                 setIsFav(data.is_favourite === true || Number(data.is_favourite) === 1 || data.is_favourite === '1');
                 setComments(data.comments || []);
                 setRelated(data.related || []);
@@ -87,7 +96,6 @@ const ArticleDetail = () => {
             });
             if (res.data.status === 'success') {
                 let summary = res.data.summary || '';
-                // Clean up markdown code blocks if present
                 summary = summary.replace(/```html|```/g, '').trim();
                 setAiSummary(summary);
             } else {
@@ -117,7 +125,7 @@ const ArticleDetail = () => {
             fetchAiSummary(id);
             window.scrollTo(0, 0);
         }
-    }, [id]);
+    }, [id, token]);
 
     const handleToggleLike = async () => {
         if (!token) {
@@ -275,11 +283,44 @@ const ArticleDetail = () => {
                 await navigator.share(shareData);
             } catch (error) {
                 console.log('Error sharing:', error);
-                // Fallback to clipboard if share was cancelled or failed
                 copyToClipboard();
             }
         } else {
             copyToClipboard();
+        }
+    };
+
+    const handleReportSubmit = async () => {
+        if (!token) {
+            alert('Vui lòng đăng nhập để báo cáo bài viết');
+            return;
+        }
+        if (!reportReason) {
+            alert('Vui lòng chọn lý do báo cáo');
+            return;
+        }
+
+        try {
+            setSubmittingReport(true);
+            const res = await axios.post(`${API_BASE_URL}/modules/api/reports.php`, {
+                news_id: id,
+                reason: reportReason,
+                details: reportDetails,
+                token: token
+            });
+
+            if (res.data.status === 'success') {
+                alert(res.data.message);
+                setShowReportModal(false);
+                navigate('/');
+            } else {
+                alert(res.data.message);
+            }
+        } catch (error) {
+            console.error('Error reporting article:', error);
+            alert('Đã có lỗi xảy ra. Vui lòng thử lại sau.');
+        } finally {
+            setSubmittingReport(false);
         }
     };
 
@@ -392,6 +433,14 @@ const ArticleDetail = () => {
                                 >
                                     <Share2 size={22} />
                                 </VButton>
+                                <VButton 
+                                    variant="ghost" 
+                                    onClick={() => setShowReportModal(true)}
+                                    className="w-11 h-11 rounded-full p-0 flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-100 hover:bg-white hover:text-red-500 transition-all"
+                                    title="Báo cáo bài viết"
+                                >
+                                    <AlertCircle size={22} />
+                                </VButton>
                             </div>
                         </div>
                     </div>
@@ -399,20 +448,32 @@ const ArticleDetail = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mt-16 pb-20 border-b border-slate-100">
                     <div className="lg:col-span-8 flex flex-col items-start">
-                        <div className="w-full aspect-[21/9] rounded-[3rem] overflow-hidden mb-16 bg-slate-100 border border-slate-50 shadow-2xl relative">
-                            <img
-                                src={article.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop'}
-                                alt={article.title}
-                                className="w-full h-full object-cover"
-                            />
-                            <button 
-                                onClick={() => window.open(article.link, '_blank')}
-                                className="absolute bottom-6 right-6 px-6 py-3 bg-white/90 backdrop-blur-md rounded-2xl text-xs font-black text-slate-900 border border-white shadow-xl hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
-                            >
-                                <ExternalLink size={14} />
-                                XEM BẢN GỐC
-                            </button>
-                        </div>
+                        {article.image && !article.image.includes('placeholder') && article.image !== '' ? (
+                            <div className="w-full aspect-[21/9] rounded-[3rem] overflow-hidden mb-16 bg-slate-100 border border-slate-50 shadow-2xl relative">
+                                <img
+                                    src={article.image}
+                                    alt={article.title}
+                                    className="w-full h-full object-cover"
+                                />
+                                <button 
+                                    onClick={() => window.open(article.link, '_blank')}
+                                    className="absolute bottom-6 right-6 px-6 py-3 bg-white/90 backdrop-blur-md rounded-2xl text-xs font-black text-slate-900 border border-white shadow-xl hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
+                                >
+                                    <ExternalLink size={14} />
+                                    XEM TẠI NGUỒN
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="mb-10 w-full flex justify-end">
+                                <button 
+                                    onClick={() => window.open(article.link, '_blank')}
+                                    className="px-6 py-3 bg-slate-50 rounded-2xl text-xs font-black text-slate-900 border border-slate-100 shadow-sm hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
+                                >
+                                    <ExternalLink size={14} />
+                                    XEM TẠI NGUỒN
+                                </button>
+                            </div>
+                        )}
 
                         <div className="w-full">
                             <article className="prose prose-slate md:prose-lg max-w-none prose-p:text-slate-600 prose-p:leading-[1.8] prose-p:font-medium prose-headings:font-black prose-headings:tracking-tighter prose-img:rounded-[2rem] prose-img:shadow-xl">
@@ -486,8 +547,6 @@ const ArticleDetail = () => {
                                     >
                                         Hỏi AI chi tiết hơn
                                     </VButton>
-                                    
-                                    <p className="text-[9px] font-black italic text-blue-400 uppercase tracking-widest mt-6 text-center">Powered by Vertex AI</p>
                                 </div>
                             </div>
 
@@ -499,9 +558,11 @@ const ArticleDetail = () => {
                                 <div className="space-y-8">
                                     {related.map((item) => (
                                         <div key={item.id} className="group flex gap-4 items-center cursor-pointer" onClick={() => navigate(`/article/${item.id}`)}>
-                                            <div className="w-20 h-20 bg-slate-100 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-50 shadow-sm group-hover:shadow-lg transition-all">
-                                                <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
-                                            </div>
+                                            {item.image && !item.image.includes('placeholder') && item.image !== '' && (
+                                                <div className="w-20 h-20 bg-slate-100 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-50 shadow-sm group-hover:shadow-lg transition-all">
+                                                    <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
+                                                </div>
+                                            )}
                                             <div>
                                                 <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest block mb-1">{item.category}</span>
                                                 <h5 className="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">{item.title}</h5>
@@ -638,6 +699,85 @@ const ArticleDetail = () => {
                     </div>
                 </section>
             </div>
+
+            <AnimatePresence>
+                {showReportModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                        <motion.div 
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            onClick={() => setShowReportModal(false)}
+                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-lg bg-white rounded-[2.5rem] p-10 shadow-2xl overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl -z-10 translate-x-16 -translate-y-16"></div>
+                            
+                            <div className="flex justify-between items-center mb-8">
+                                <div className="space-y-1">
+                                    <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase">Báo cáo bài viết</h3>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Giúp chúng tôi cải thiện môi trường tin tức</p>
+                                </div>
+                                <button onClick={() => setShowReportModal(false)} className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 hover:text-slate-600 transition-all">
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 gap-3">
+                                    {reportReasons.map((reason) => (
+                                        <button
+                                            key={reason}
+                                            onClick={() => setReportReason(reason)}
+                                            className={`flex items-center justify-between px-6 py-4 rounded-2xl border-2 transition-all font-bold text-sm ${
+                                                reportReason === reason 
+                                                ? 'border-blue-600 bg-blue-50/50 text-blue-600' 
+                                                : 'border-slate-50 bg-slate-50/30 text-slate-500 hover:border-slate-100'
+                                            }`}
+                                        >
+                                            {reason}
+                                            {reportReason === reason && <div className="w-2 h-2 bg-blue-600 rounded-full"></div>}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Chi tiết thêm (Không bắt buộc)</label>
+                                    <textarea 
+                                        value={reportDetails}
+                                        onChange={(e) => setReportDetails(e.target.value)}
+                                        placeholder="Cung cấp thêm thông tin về báo cáo của bạn..."
+                                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none min-h-[100px] resize-none"
+                                    />
+                                </div>
+
+                                <div className="pt-4 flex gap-4">
+                                    <VButton 
+                                        variant="outline" fullWidth onClick={() => setShowReportModal(false)}
+                                        className="py-4"
+                                    >
+                                        Hủy bỏ
+                                    </VButton>
+                                    <VButton 
+                                        variant="primary" fullWidth 
+                                        onClick={handleReportSubmit}
+                                        loading={submittingReport}
+                                        className="py-4 bg-red-500 hover:bg-red-600 shadow-lg shadow-red-100"
+                                    >
+                                        Gửi báo cáo
+                                    </VButton>
+                                </div>
+                                <p className="text-[9px] text-center font-bold text-slate-400 italic">
+                                    * Lưu ý: Sau khi báo cáo, bài viết này sẽ bị ẩn khỏi dòng thời gian của bạn.
+                                </p>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { API_BASE_URL, PROJECT_FOLDER } from '../config';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +12,18 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const userRole = localStorage.getItem('user_role');
+  const token = localStorage.getItem('auth_token');
+
+  useEffect(() => {
+    if (token && !location.search.includes('token=')) {
+        if (userRole === 'admin') {
+            navigate('/admin');
+        } else {
+            navigate('/');
+        }
+    }
+  }, [token, userRole, navigate, location]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -102,7 +114,6 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-white flex overflow-hidden">
       <div className="hidden lg:flex lg:w-1/2 relative bg-white items-center justify-center overflow-hidden">
-        {/* Animated Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAFC] via-white to-[#EFF6FF]"></div>
         <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[120px] animate-pulse"></div>
         <div className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-amber-400/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
@@ -115,7 +126,6 @@ const Login = () => {
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="relative z-10 w-full flex justify-center"
         >
-          {/* Ultra-Grand Glass Logo Card */}
           <div className="bg-white/40 backdrop-blur-2xl p-32 rounded-[6rem] border border-white/70 shadow-[0_48px_128px_-32px_rgba(37,99,235,0.2)] flex flex-col items-center w-[90%] max-w-4xl">
             <img
               src="/logo_vertex.png"

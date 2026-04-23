@@ -40,13 +40,18 @@ if (isPost()) {
                     ];
                     insert('token_login', $tokenData);
 
+                    $avatar = $user['avatar'] ?? '';
+                    if (!empty($avatar) && !preg_match('/^http/', $avatar) && !preg_match('/^data:/', $avatar)) {
+                        $avatar = _HOST_URL . '/' . $avatar;
+                    }
+
                     $response['status'] = 'success';
                     $response['msg'] = 'Đăng nhập thành công';
                     $response['data'] = [
                         'token' => $token,
                         'name' => $user['fullname'],
                         'email' => $user['email'],
-                        'avatar' => $user['avatar'] ?? '',
+                        'avatar' => $avatar,
                         'role' => $user['role'] ?? 'user'
                     ];
                 } else {

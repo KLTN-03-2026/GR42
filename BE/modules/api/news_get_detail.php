@@ -35,16 +35,22 @@ if (!empty($token)) {
     }
 }
 
+$user_id = !empty($user_id) ? (int)$user_id : 0;
 $comments = getAll("
-    SELECT c.id, c.user_id, c.content, c.created_at, u.fullname, u.avatar
+    SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, 
+           CASE 
+             WHEN u.avatar LIKE 'http%' THEN u.avatar 
+             WHEN u.avatar LIKE 'data:%' THEN u.avatar
+             ELSE CONCAT('" . _HOST_URL . "/', u.avatar) 
+           END as avatar,
+           (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id) as like_count,
+           (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id AND user_id = $user_id) as is_liked
     FROM comments c
     JOIN users u ON c.user_id = u.id
     WHERE c.news_id = $id
-    ORDER BY c.created_at DESC
-    LIMIT 15
+    ORDER BY c.created_at ASC
 ");
 
-// Lấy tin liên quan (Cùng chuyên mục, cùng nguồn hoặc ngẫu nhiên)
 $related = getAll("
     SELECT id, title, category, source, image, pubDate 
     FROM crawl_news 

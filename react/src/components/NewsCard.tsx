@@ -5,6 +5,7 @@ import { Heart, Share2, ArrowRight, MessageCircle, Clock } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import VButton from '../components/VButton';
 import { CategoryBadge } from '../components/CategoryUI';
+import { encodeId } from '../utils/idEncoder';
 
 export interface NewsItem {
   id: number;
@@ -21,6 +22,13 @@ interface NewsCardProps {
   item: NewsItem;
   featured?: boolean;
 }
+
+const normalizeImageUrl = (url: string | undefined) => {
+  if (!url || url === '' || url.includes('placeholder')) return null;
+  if (url.startsWith('//')) return `https:${url}`;
+  if (url.startsWith('/')) return `${API_BASE_URL.replace('/BE', '')}${url}`;
+  return url;
+};
 
 const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
   const navigate = useNavigate();
@@ -60,17 +68,34 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
   const handleCommentClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate(`/article/${item.id}#comments`);
+    navigate(`/article/${encodeId(item.id)}#comments`);
   };
+
+  const imageUrl = normalizeImageUrl(item.image);
 
   if (featured) {
     return (
-      <div className="group relative aspect-[16/10] rounded-[2rem] overflow-hidden bg-slate-900 border border-slate-100 shadow-xl">
-        <img 
-          src={item.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop'} 
-          alt={item.title}
-          className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
-        />
+      <div 
+        className="group relative aspect-[16/10] rounded-[2rem] overflow-hidden bg-slate-900 border border-slate-100 shadow-xl cursor-pointer"
+        onClick={() => navigate(`/article/${encodeId(item.id)}`)}
+      >
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={item.title}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop';
+            }}
+            className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center p-12 text-center">
+             <div className="space-y-4">
+                <CategoryBadge name={item.category} className="mx-auto" />
+                <h3 className="text-xl font-black text-white/40 uppercase tracking-widest leading-tight">{item.source}</h3>
+             </div>
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
         
         <div className="absolute top-6 right-6 flex flex-col gap-3 z-10">
@@ -122,64 +147,69 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
   return (
     <div 
       className="flex flex-col h-full group bg-transparent cursor-pointer"
-      onClick={() => navigate(`/article/${item.id}`)}
+      onClick={() => navigate(`/article/${encodeId(item.id)}`)}
     >
-      <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden mb-6 bg-slate-100 border border-slate-50 shadow-sm group-hover:shadow-xl transition-all duration-500">
-        <img 
-          src={item.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop'} 
-          alt={item.title} 
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-        />
-        
-        <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-          <VButton 
-            variant={isFav ? 'primary' : 'outline'}
-            onClick={handleToggleLike}
-            loading={isLiking}
-            icon={Heart}
-            iconSize={20}
-            className={`w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFav ? 'bg-red-500 border-red-500 shadow-xl shadow-red-200 text-white' : 'bg-white/80 border-white/40 shadow-lg text-slate-800'}`}
-          />
-          <VButton 
-            variant="outline"
-            onClick={handleCommentClick}
-            icon={MessageCircle}
-            iconSize={20}
-            className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 shadow-lg text-slate-800"
-          />
-          <VButton 
-            variant="outline"
-            onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const shareData = { title: item.title, url: item.link };
-                if (navigator.share) {
-                    navigator.share(shareData).catch(() => {
-                        navigator.clipboard.writeText(item.link);
-                        alert('🚀 Đã sao chép liên kết!');
-                    });
-                } else {
-                    navigator.clipboard.writeText(item.link);
-                    alert('🚀 Đã sao chép liên kết!');
-                }
+      {imageUrl && (
+        <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden mb-6 bg-slate-100 border border-slate-50 shadow-sm group-hover:shadow-xl transition-all duration-500">
+          <img 
+            src={imageUrl} 
+            alt={item.title} 
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop';
             }}
-            icon={Share2}
-            iconSize={20}
-            className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 shadow-lg text-slate-800"
-            title="Chia sẻ"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
           />
-        </div>
+          
+          <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+            <VButton 
+              variant={isFav ? 'primary' : 'outline'}
+              onClick={handleToggleLike}
+              loading={isLiking}
+              icon={Heart}
+              iconSize={20}
+              className={`w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFav ? 'bg-red-500 border-red-500 text-white' : 'bg-white/80 border-white/40 text-slate-800'}`}
+            />
+            <VButton 
+              variant="outline"
+              onClick={handleCommentClick}
+              icon={MessageCircle}
+              iconSize={20}
+              className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 text-slate-800"
+            />
+            <VButton 
+              variant="outline"
+              onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const shareData = { title: item.title, url: item.link };
+                  if (navigator.share) {
+                      navigator.share(shareData).catch(() => {
+                          navigator.clipboard.writeText(item.link);
+                          alert('🚀 Đã sao chép liên kết!');
+                      });
+                  } else {
+                      navigator.clipboard.writeText(item.link);
+                      alert('🚀 Đã sao chép liên kết!');
+                  }
+              }}
+              icon={Share2}
+              iconSize={20}
+              className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 text-slate-800"
+              title="Chia sẻ"
+            />
+          </div>
 
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <div className="p-4 bg-white/90 backdrop-blur-md rounded-full text-slate-900 shadow-2xl hover:bg-blue-600 hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0">
-                <ArrowRight size={24} />
-            </div>
-        </div>
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+              <div className="p-4 bg-white/90 backdrop-blur-md rounded-full text-slate-900 shadow-2xl hover:bg-blue-600 hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0">
+                  <ArrowRight size={24} />
+              </div>
+          </div>
 
-        <div className="absolute top-4 left-4">
-            <CategoryBadge name={item.category} className="bg-white/90 backdrop-blur-md shadow-sm border-white" />
+          <div className="absolute top-4 left-4">
+              <CategoryBadge name={item.category} className="bg-white/90 backdrop-blur-md shadow-sm border-white" />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex-1 flex flex-col items-start px-2">
         <div className="flex items-center gap-3 mb-3 text-slate-400">

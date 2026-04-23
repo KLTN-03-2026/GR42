@@ -71,14 +71,7 @@ layout('admin_sidebar');
                                     <td class="text-end pe-4">
                                         <a href="?module=admin&action=users_edit&id=<?= $user['id'] ?? '' ?>" class="btn btn-sm btn-light text-primary rounded-circle me-1" style="width: 32px; height: 32px; padding: 0; line-height: 32px;"><i class="fa-solid fa-pen"></i></a>
                                         
-                                        <?php if((int)($user['id'] ?? 0) !== (int)($_SESSION['user_id'] ?? -1)): ?>
-                                            <a href="?module=admin&action=users&delete_id=<?= $user['id'] ?? '' ?>" 
-                                               class="btn btn-sm btn-light text-danger rounded-circle" 
-                                               style="width: 32px; height: 32px; padding: 0; line-height: 32px;"
-                                               onclick="return confirm('Bạn có chắc muốn xoá người dùng này? Thao tác không thể hoàn tác.');">
-                                               <i class="fa-solid fa-trash-can"></i>
-                                            </a>
-                                        <?php endif; ?>
+                                        <!-- Deletion disabled -->
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

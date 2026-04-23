@@ -68,6 +68,7 @@ if (isPost()) {
             'fullname' => $fullname,
             'password' => password_hash($password, PASSWORD_DEFAULT),
             'email' => $email,
+            'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($fullname) . '&background=random&color=fff',
             'active_token' => $active_token,
             'created_at' => date('Y-m-d H:i:s')
         ];

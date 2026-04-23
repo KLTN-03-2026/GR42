@@ -96,21 +96,20 @@ layout('admin_sidebar');
                         </div>
                         <?php endif; ?>
 
-                        <?php if(array_key_exists('category_id', $article)): ?>
+                        <?php if(array_key_exists('category', $article)): ?>
                         <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted">Chuyên mục (Category)</label>
-                            <select class="form-select" name="category_id">
-                                <option value="0">--- Chọn chuyên mục ---</option>
+                            <label class="form-label fw-bold small text-muted">Chuyên mục</label>
+                            <select class="form-select" name="category">
+                                <option value="">--- Chọn chuyên mục ---</option>
                                 <?php if(!empty($categories)): ?>
-                                <?php foreach($categories as $cat): ?>
-                                <option value="<?= $cat['id'] ?>"
-                                    <?= ($article['category_id'] == $cat['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($cat['name'] ?? 'Không tên') ?>
+                                <?php foreach($categories as $catName): ?>
+                                <option value="<?= htmlspecialchars($catName) ?>"
+                                    <?= ($article['category'] === $catName) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($catName) ?>
                                 </option>
                                 <?php endforeach; ?>
                                 <?php else: ?>
-                                <option value="<?= $article['category_id'] ?>" selected>Chuyên mục ID:
-                                    <?= $article['category_id'] ?></option>
+                                <option value="<?= htmlspecialchars($article['category'] ?? '') ?>" selected><?= htmlspecialchars($article['category'] ?? '') ?></option>
                                 <?php endif; ?>
                             </select>
                         </div>

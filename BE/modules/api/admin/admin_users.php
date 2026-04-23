@@ -41,19 +41,22 @@ else if ($method === 'POST') {
     if (empty($id)) die(json_encode(['status' => 'error', 'msg' => 'Thiếu ID người dùng']));
 
     if ($action === 'delete') {
-        if ($id === $admin_id) die(json_encode(['status' => 'error', 'msg' => 'Không thể tự xóa chính mình']));
-        $res = delete('users', "id = $id");
-        echo json_encode(['status' => $res ? 'success' : 'error', 'msg' => $res ? 'Đã xóa người dùng' : 'Lỗi khi xóa']);
+        die(json_encode(['status' => 'error', 'msg' => 'Tài khoản của bạn chỉ có quyền xem và cấp quyền, không thể xóa người dùng']));
     } 
     else if ($action === 'update') {
+        if (isset($data['status'])) {
+            die(json_encode(['status' => 'error', 'msg' => 'Bạn không có quyền thay đổi trạng thái người dùng']));
+        }
+        
         $updateData = [];
         if (isset($data['role'])) $updateData['role'] = $data['role'];
-        if (isset($data['status'])) $updateData['status'] = $data['status'];
         
         if (empty($updateData)) die(json_encode(['status' => 'error', 'msg' => 'Thiếu dữ liệu cập nhật']));
         
         $res = update('users', $updateData, "id = $id");
         echo json_encode(['status' => $res ? 'success' : 'error', 'msg' => $res ? 'Cập nhật thành công' : 'Lỗi khi cập nhật']);
+    } else {
+        die(json_encode(['status' => 'error', 'msg' => 'Thao tác không hợp lệ']));
     }
 }
 ?>

@@ -52,6 +52,7 @@ if (isset($_GET['code'])) {
                     'fullname' => $name,
                     'password' => password_hash(uniqid(), PASSWORD_DEFAULT),
                     'status' => 1,
+                    'avatar' => $userinfo['picture'] ?? '',
                     'created_at' => date('Y-m-d H:i:s')
                 ];
                 if (insert('users', $newUser)) {
@@ -65,6 +66,10 @@ if (isset($_GET['code'])) {
                 }
             } else {
                 $userId = $checkUser['id'];
+                // Update avatar if it's empty
+                if (empty($checkUser['avatar']) && !empty($userinfo['picture'])) {
+                    update('users', ['avatar' => $userinfo['picture']], "id = '$userId'");
+                }
             }
             $_SESSION['user_id'] = $userId;
             $token = sha1(uniqid() . time());
@@ -75,15 +80,17 @@ if (isset($_GET['code'])) {
                 'created_at' => date('Y-m-d H:i:s')
             ];
             insert('token_login', $tokenData);
-            $avatar = $userinfo['picture'] ?? '';
-            $state = $_GET['state'] ?? '';
+            $userFinal = getOne("SELECT avatar, role FROM users WHERE id = '$userId'");
+            $avatar = $userFinal['avatar'] ?? '';
+            $role = $userFinal['role'] ?? 'user';
             
-            // Fetch role for redirect
-            $userForRole = getOne("SELECT role FROM users WHERE id = '$userId'");
-            $role = $userForRole['role'] ?? 'user';
+            if (!empty($avatar) && !preg_match('/^http/', $avatar) && !preg_match('/^data:/', $avatar)) {
+                $avatar = _HOST_URL . '/' . $avatar;
+            }
+            $state = $_GET['state'] ?? '';
 
             if ($state === 'react') {
-                $redirectUrl = _FRONTEND_URL . "/login?token=" . $token . "&name=" . urlencode($name) . "&avatar=" . urlencode($avatar) . "&role=" . $role;
+                $redirectUrl = _FRONTEND_URL . "/login?token=" . $token . "&name=" . urlencode($name) . "&avatar=" . urlencode($avatar) . "&role=" . $role . "&email=" . urlencode($email);
             } else {
                 $redirectUrl = _HOST_URL . "/?module=news&action=list";
             }

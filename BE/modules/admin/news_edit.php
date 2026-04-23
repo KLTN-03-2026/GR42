@@ -58,11 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// LẤY DANH SÁCH DANH MỤC (NẾU CÓ BẢNG CATEGORY)
+// LẤY DANH SÁCH DANH MỤC
 $categories = [];
 try {
-    $catSql = "SELECT * FROM category";
-    $categories = getAll($catSql);
+    $catSql = "SELECT DISTINCT category FROM crawl_news WHERE category != '' AND category IS NOT NULL ORDER BY category ASC";
+    $catList = getAll($catSql);
+    foreach ($catList as $item) {
+        $categories[] = $item['category'];
+    }
 } catch (Exception $e) {
     $categories = [];
 }

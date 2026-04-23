@@ -24,15 +24,7 @@ if(empty($users)) {
     }
 }
 
-if(isset($_GET['delete_id'])) {
-    $del_id = (int)$_GET['delete_id'];
- 
-    if($del_id !== (int)$_SESSION['user_id']) {
-        $conn->query("DELETE FROM users WHERE id = $del_id");
-        header("Location: ?module=admin&action=users");
-        exit;
-    }
-}
+// Deletion is disabled as requested by user
 
 renderView('admin/users', [
     'users' => $users

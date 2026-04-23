@@ -34,40 +34,24 @@ $msgType = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $updateData = [];
     
-    // Tự động lặp qua các field được post lên
-    foreach($_POST as $key => $val) {
-        // Chỉ update nếu field đó tồn tại trong DB, không phải 'id' và không lấy 'password' thô
-        if(array_key_exists($key, $editUser) && $key !== 'id' && $key !== 'password') {
-            $updateData[$key] = trim($val);
-        }
+    // Chỉ cho phép cập nhật role
+    if (isset($_POST['role'])) {
+        $updateData['role'] = trim($_POST['role']);
     }
     
-    // Cập nhật mật khẩu nếu có nhập vào form
-    if(!empty($_POST['password'])) {
-        $updateData['password'] = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
-    }
-    
-    if(!empty($updateData['fullname']) && !empty($updateData['email'])) {
-        // Kiểm tra email trùng
-        $email = $updateData['email'];
-        $checkEmail = getOne("SELECT id FROM users WHERE email = '$email' AND id != $id");
-        if($checkEmail) {
-            $msg = "Email này đã được sử dụng bởi người dùng khác!";
+    if (!empty($updateData)) {
+        try {
+            update('users', $updateData, "id = $id");
+            $msg = "Cập nhật quyền người dùng thành công!";
+            $msgType = "success";
+            // Cập nhật lại biến hiển thị
+            $editUser = getOne($sql);
+        } catch (Exception $e) {
+            $msg = "Có lỗi xảy ra: " . $e->getMessage();
             $msgType = "danger";
-        } else {
-            try {
-                update('users', $updateData, "id = $id");
-                $msg = "Cập nhật người dùng thành công!";
-                $msgType = "success";
-                // Cập nhật lại biến hiển thị
-                $editUser = getOne($sql);
-            } catch (Exception $e) {
-                $msg = "Có lỗi xảy ra: " . $e->getMessage();
-                $msgType = "danger";
-            }
         }
     } else {
-        $msg = "Vui lòng nhập các thông tin bắt buộc (Tên, Email).";
+        $msg = "Không có quyền nào được thay đổi.";
         $msgType = "warning";
     }
 }

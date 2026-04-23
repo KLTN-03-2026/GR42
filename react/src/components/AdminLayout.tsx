@@ -55,6 +55,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { to: '/admin', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
     { to: '/admin/news', icon: <Newspaper size={20} />, label: 'Quản lý tin' },
     { to: '/admin/users', icon: <Users size={20} />, label: 'Người dùng' },
+    { to: '/admin/reports', icon: <Bell size={20} />, label: 'Báo cáo' },
   ];
 
   return (

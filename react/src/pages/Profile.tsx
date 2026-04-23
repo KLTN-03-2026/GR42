@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -61,8 +61,14 @@ const Profile = () => {
       axios.get(`${API_BASE_URL}/modules/api/user.php?token=${authToken}`)
         .then(res => { 
           if (res.data.status === 'success') {
-            setProfile(res.data.data.profile);
+            const userData = res.data.data.profile;
+            setProfile(userData);
             setSelectedInterests(res.data.data.interests);
+            
+            if (userData.fullname) localStorage.setItem('user_name', userData.fullname);
+            if (userData.email) localStorage.setItem('user_email', userData.email);
+            if (userData.avatar) localStorage.setItem('user_avatar', userData.avatar);
+            if (userData.role) localStorage.setItem('user_role', userData.role);
           }
         })
         .catch(err => console.error('Lỗi fetch user data:', err))
@@ -175,7 +181,7 @@ const Profile = () => {
 
   const handleMouseUp = () => setIsDragging(false);
 
-  const fetchFavorites = async () => {
+  const fetchFavorites = useCallback(async () => {
     if (!authToken) return;
     try {
       setLoadingFavorites(true);
@@ -195,13 +201,13 @@ const Profile = () => {
     } finally {
       setLoadingFavorites(false);
     }
-  };
+  }, [authToken]);
 
   useEffect(() => {
     if (mainTab === 'favorites') {
       fetchFavorites();
     }
-  }, [mainTab, authToken]);
+  }, [mainTab, fetchFavorites]);
 
   const toggleInterest = (name: string) => {
     setSelectedInterests(prev => prev.includes(name) ? prev.filter(i => i !== name) : [...prev, name]);
@@ -284,7 +290,15 @@ const Profile = () => {
                 {subTab === 'personal' ? (
                   <div className="bg-white rounded-[2.5rem] p-12 border border-slate-100 shadow-sm relative overflow-hidden group">
                     <div className="flex justify-between items-center mb-12">
-                      <h3 className="text-xl font-black text-slate-900">Thông tin cá nhân</h3>
+                      <div className="flex items-center gap-4">
+                        <h3 className="text-xl font-black text-slate-900">Thông tin cá nhân</h3>
+                        {localStorage.getItem('user_role') === 'admin' && (
+                          <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white rounded-full">
+                            <Shield size={12} fill="currentColor" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Quản trị viên</span>
+                          </div>
+                        )}
+                      </div>
                       {savingProfile && (
                          <div className="flex items-center gap-2 text-xs font-bold text-blue-600 animate-pulse">
                             <Activity size={14} /> ĐANG LƯU...

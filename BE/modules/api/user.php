@@ -22,8 +22,9 @@ $user_id = (int)$checkToken['user_id'];
 if ($method === 'GET' || $action === 'get_all') {
     $profile = getOne("SELECT id, fullname, email, phone, address, avatar, role, created_at FROM users WHERE id = $user_id");
     
-    if (!empty($profile['avatar']) && !preg_match('/^http/', $profile['avatar'])) {
-        $profile['avatar'] = _HOST_URL . '/' . $profile['avatar'];
+    $avatar = $profile['avatar'] ?? '';
+    if (!empty($avatar) && !preg_match('/^http/', $avatar) && !preg_match('/^data:/', $avatar)) {
+        $profile['avatar'] = _HOST_URL . '/' . $avatar;
     }
     
     $interests = [];
@@ -63,12 +64,23 @@ else if ($method === 'POST') {
         if (empty($avatarData)) die(json_encode(['status' => 'error', 'msg' => 'Dữ liệu ảnh trống']));
 
         try {
-            // Save base64 directly to database
-            $res = update('users', ['avatar' => $avatarData], "id = $user_id");
-            if ($res) {
-                echo json_encode(['status' => 'success', 'avatar_url' => $avatarData]);
+            query("ALTER TABLE users MODIFY COLUMN avatar LONGTEXT");
+
+            if (preg_match('/^data:image\/(\w+);base64,/', $avatarData, $type)) {
+                $res = update('users', ['avatar' => $avatarData], "id = $user_id");
+                
+                if ($res) {
+                    echo json_encode(['status' => 'success', 'avatar_url' => $avatarData]);
+                } else {
+                    echo json_encode(['status' => 'error', 'msg' => 'Không thể cập nhật ảnh vào database']);
+                }
             } else {
-                echo json_encode(['status' => 'error', 'msg' => 'Không thể cập nhật ảnh vào database']);
+                $res = update('users', ['avatar' => $avatarData], "id = $user_id");
+                if ($res) {
+                    echo json_encode(['status' => 'success', 'avatar_url' => $avatarData]);
+                } else {
+                    echo json_encode(['status' => 'error', 'msg' => 'Không thể cập nhật URL ảnh']);
+                }
             }
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'msg' => 'Lỗi xử lý: ' . $e->getMessage()]);

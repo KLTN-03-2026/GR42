@@ -97,11 +97,11 @@ layout('admin_sidebar');
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-3">
-                        <a href="?module=news&action=add" class="btn btn-primary text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
+                        <a href="?module=admin&action=news_add" class="btn btn-primary text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
                             <span class="fw-bold"><i class="fa-solid fa-plus me-2"></i>Thêm Bài Báo Mới</span>
                             <i class="fa-solid fa-chevron-right opacity-50"></i>
                         </a>
-                        <a href="?module=users&action=add" class="btn btn-outline-primary text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
+                        <a href="?module=admin&action=users_add" class="btn btn-outline-primary text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
                             <span class="fw-bold"><i class="fa-solid fa-user-plus me-2"></i>Thêm Người Dùng</span>
                             <i class="fa-solid fa-chevron-right opacity-50"></i>
                         </a>

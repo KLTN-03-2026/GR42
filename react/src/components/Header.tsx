@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import VAvatar from './VAvatar';
+import { encodeId } from '../utils/idEncoder';
 
 const Header = () => {
   const location = useLocation();
@@ -68,7 +69,7 @@ const Header = () => {
   const handleSelectSuggestion = (id: number) => {
     setShowSuggestions(false);
     setSearchTerm('');
-    navigate(`/article/${id}`);
+    navigate(`/article/${encodeId(id)}`);
   };
 
   const handleLogout = () => {
@@ -179,7 +180,12 @@ const Header = () => {
                 >
                   <VAvatar src={userAvatar} name={userName || 'U'} size="md" className="hover:ring-2 hover:ring-blue-100 transition-all active:scale-95" />
                   <div className="hidden lg:block text-left">
-                    <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{userName || 'Người dùng'}</p>
+                    <div className="flex items-center gap-1.5">
+                        <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{userName || 'Người dùng'}</p>
+                        {userRole === 'admin' && (
+                            <span className="px-1.5 py-0.5 bg-blue-600 text-white text-[8px] font-black rounded-md uppercase tracking-tighter">Admin</span>
+                        )}
+                    </div>
                   </div>
                 </Link>
 

@@ -31,24 +31,10 @@
                     <i class="fa-solid fa-comments"></i>
                     <span>Quản lý Bình luận</span>
                 </a>
-                
-                <h6 class="sidebar-heading px-4 mt-4 mb-2 text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Hệ thống</h6>
-                
-                <a href="?module=admin&action=settings" class="sidebar-link <?= ($current_action == 'settings') ? 'active' : '' ?>">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Cài đặt</span>
-                </a>
-                
-                <a href="?module=admin&action=logoutqtv" class="sidebar-link text-danger mt-3">
-                    <i class="fa-solid fa-right-from-bracket text-danger"></i>
-                    <span>Đăng xuất</span>
-                </a>
             </div>
         </nav>
 
-        <!-- Main Content Wrapper -->
         <div id="main-content">
-            <!-- Topbar -->
             <header class="topbar">
                 <div class="d-flex align-items-center">
                     <i class="fa-solid fa-bars sidebar-toggle" id="sidebarToggle"></i>
@@ -81,5 +67,4 @@
                 </div>
             </header>
             
-            <!-- Page Content Start -->
             <main class="content-area">
