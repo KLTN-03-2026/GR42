@@ -495,6 +495,15 @@ const ArticleDetail = () => {
                                     variant="primary" fullWidth 
                                     icon={ArrowRight} 
                                     className="bg-blue-600 hover:bg-blue-700"
+                                    onClick={() => {
+                                        const event = new CustomEvent('openChatbotWithContext', { 
+                                            detail: { 
+                                                title: article?.title,
+                                                summary: aiSummary || article?.description || 'Chưa có thông tin tóm tắt.'
+                                            } 
+                                        });
+                                        window.dispatchEvent(event);
+                                    }}
                                 >
                                     Chat với AI ngay
                                 </VButton>

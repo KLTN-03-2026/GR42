@@ -265,6 +265,17 @@
                 </div>
             </header>
 
+            <!-- AI SUMMARY BOX -->
+            <div class="ai-summary-box" style="background: #f2f7ff; border: 1px solid #cce0ff; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="margin-top: 0; color: #004d80; font-size: 16px; display: flex; align-items: center; gap: 8px; border-bottom: none; padding-bottom: 0;">
+                    ✨ Tóm tắt AI
+                    <button id="btnAiSummary" class="btn-read-article" style="font-size: 12px; padding: 6px 10px; margin-left: auto;">Tạo tóm tắt</button>
+                </h3>
+                <div id="aiSummaryContent" style="font-size: 15px; color: #444; line-height: 1.6; font-style: italic; margin-top: 10px;">
+                    Nhấn nút "Tạo tóm tắt" để AI phân tích và cô đọng nội dung bài báo này.
+                </div>
+            </div>
+
             <!-- ARTICLE CONTENT BODY -->
             <div class="article-content">
                 <?php if (!empty($news['image'])): ?>
@@ -627,6 +638,45 @@
                     btnElement.disabled = false;
                 }
             }
+        }
+    });
+
+    document.getElementById('btnAiSummary')?.addEventListener('click', async function() {
+        const btn = this;
+        const contentBox = document.getElementById('aiSummaryContent');
+        const newsId = document.querySelector('input[name="news_id"]').value;
+        
+        btn.innerHTML = '⏳ Đang phân tích...';
+        btn.disabled = true;
+        contentBox.innerHTML = '<span style="color: #666;">AI đang đọc và phân tích bài báo, vui lòng chờ trong giây lát...</span>';
+        
+        try {
+            const response = await fetch(`modules/api/ai_summary.php?news_id=${newsId}`);
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                let htmlOutput = data.summary.replace(/```html/g, '').replace(/```/g, '');
+                contentBox.innerHTML = `
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #111; line-height: 1.7; font-style: normal; text-align: justify; padding-top: 10px;">
+                        <style>
+                            #aiSummaryContent p { margin-bottom: 12px; }
+                            #aiSummaryContent ul { padding-left: 20px; margin-bottom: 12px; }
+                            #aiSummaryContent li { margin-bottom: 6px; }
+                            #aiSummaryContent b, #aiSummaryContent strong { color: #004d80; }
+                        </style>
+                        ${htmlOutput}
+                    </div>
+                `;
+                btn.style.display = 'none';
+            } else {
+                contentBox.innerHTML = '<span style="color: #b22222;">Lỗi: ' + data.message + '</span>';
+                btn.innerHTML = 'Thử lại';
+                btn.disabled = false;
+            }
+        } catch (err) {
+            contentBox.innerHTML = '<span style="color: #b22222;">Lỗi kết nối API AI. Vui lòng thử lại sau.</span>';
+            btn.innerHTML = 'Thử lại';
+            btn.disabled = false;
         }
     });
     </script>

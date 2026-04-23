@@ -18,7 +18,7 @@ define('_PASS', $envConfig['DB_PASS'] ?? '');
 
 $projectPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 define('_HOST_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $projectPath);
-define('_FRONTEND_URL', 'http://localhost:3001');
+define('_FRONTEND_URL', 'http://localhost:3000');
 define('_HOST_URL_TEMPLATES', _HOST_URL . '/templates');
 
 define('_PATH_URL', __DIR__);
