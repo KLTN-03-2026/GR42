@@ -27,7 +27,28 @@ const Chatbot = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [articleContext, setArticleContext] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOpenWithContext = (e: any) => {
+      setIsOpen(true);
+      if (e.detail?.summary) {
+        const contextStr = `Tiêu đề: ${e.detail.title}\nTóm tắt: ${e.detail.summary}`;
+        setArticleContext(contextStr);
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'bot',
+            content: `Tôi đã nhận được thông tin tóm tắt của bài báo "${e.detail.title}". Bạn muốn hỏi thêm chi tiết gì về bài báo này?`,
+            timestamp: new Date()
+          }
+        ]);
+      }
+    };
+    window.addEventListener('openChatbotWithContext', handleOpenWithContext);
+    return () => window.removeEventListener('openChatbotWithContext', handleOpenWithContext);
+  }, []);
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -52,7 +73,8 @@ const Chatbot = () => {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/index.php?module=api&action=news_chat_ai`, {
-        prompt: input
+        prompt: input,
+        articleContext: articleContext
       }, {
         headers: {
           'Content-Type': 'application/json'
@@ -80,6 +102,7 @@ const Chatbot = () => {
 
   const clearChat = () => {
     setMessages([]);
+    setArticleContext(null);
   };
 
   return (
