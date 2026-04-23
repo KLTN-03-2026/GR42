@@ -71,14 +71,12 @@ $cleanContent = strip_tags($news['content'] ?? '');
 if (mb_strlen($cleanContent, 'UTF-8') > 10000) {
     $cleanContent = mb_substr($cleanContent, 0, 10000, 'UTF-8') . "...";
 }
-if (mb_strlen($cleanContent, 'UTF-8') > 5000) {
-    $cleanContent = mb_substr($cleanContent, 0, 5000, 'UTF-8') . "...";
-}
-$prompt = "Bạn là một biên tập viên. Hãy đọc kỹ bài báo dưới đây và viết một bản tóm tắt gọn gàng, súc tích.\n"
+$prompt = "Bạn là một biên tập viên tin tức chuyên nghiệp. Hãy đọc kỹ bài báo dưới đây và viết một bản tóm tắt gọn gàng, súc tích.\n"
     . "Yêu cầu bắt buộc:\n"
-    . "- Độ dài khoảng 1000 ký tự (khoảng 150 - 300 từ).\n"
-    . "- BẮT BUỘC trả về kết quả dưới định dạng thẻ HTML (chỉ dùng các thẻ <b>, <i>, <ul>, <li>, <p>, <br>). KHÔNG bọc bằng block ```html.\n"
-    . "- Không dùng định dạng Markdown. Trình bày thành đoạn văn ngắn hoặc gạch đầu dòng.\n"
+    . "- Độ dài khoảng 1000 - 1500 ký tự.\n"
+    . "- BẮT BUỘC trả về kết quả dưới định dạng thẻ HTML (chỉ dùng các thẻ <b>, <i>, <ul>, <li>, <p>, <br>).\n"
+    . "- Trình bày đẹp mắt, có thể dùng gạch đầu dòng (<ul><li>) cho các ý chính.\n"
+    . "- KHÔNG bọc bằng ký hiệu markdown ```html hay bất kỳ định dạng nào khác.\n"
     . "Tiêu đề: " . $news['title'] . "\nNội dung: " . $cleanContent;
 $requestData = [
     "contents" => [

@@ -122,7 +122,8 @@ const Home = () => {
 
     try {
         setIsLikingFeatured(true);
-        const response = await axios.post(`${API_BASE_URL}/index.php?module=api&action=favorites`, {
+        const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
+        const response = await axios.post(`${host}/BE/index.php?module=api&action=favorites`, {
             news_id: featuredItem.id,
             token: token,
             action_type: 'toggle'
@@ -131,8 +132,8 @@ const Home = () => {
         if (response.data.status === 'success') {
             const isAdded = response.data.action === 'added';
             setIsFavFeatured(isAdded);
-            setNews(prev => prev.map((n, idx) => 
-                idx === 0 ? { ...n, is_favourite: isAdded } : n
+            setNews(prev => prev.map(n => 
+                n.id === featuredItem.id ? { ...n, is_favourite: isAdded } : n
             ));
         }
     } catch (error) {
@@ -210,25 +211,27 @@ const Home = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
                 
-                <div className="absolute top-6 right-6 flex flex-col gap-3 z-10">
+                <div className="absolute top-6 right-6 flex flex-col gap-4 z-10">
                     <VButton
-                      variant={isFavFeatured ? 'primary' : 'outline'}
-                      icon={Heart}
+                      variant="dark"
                       onClick={handleToggleLikeFeatured}
                       loading={isLikingFeatured}
-                      className={`w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFavFeatured ? 'bg-red-500 border-red-500' : 'bg-white/90 border-white/40'}`}
-                    />
+                      className={`w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md shadow-2xl transition-all ${isFavFeatured ? 'bg-red-500 border-red-500 text-white' : 'bg-slate-900/80 border-slate-700/50 text-white'}`}
+                    >
+                        <Heart size={22} fill={isFavFeatured ? 'currentColor' : 'none'} className="transition-transform duration-300 group-hover:scale-110" />
+                    </VButton>
                     <VButton
-                      variant="outline"
-                      icon={MessageCircle}
+                      variant="dark"
                       onClick={handleCommentFeatured}
-                      className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/90 border-white/40"
+                      icon={MessageCircle}
+                      iconSize={22}
+                      className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-slate-900/80 border-slate-700/50 shadow-2xl text-white"
                     />
                     <VButton
-                      variant="outline"
-                      icon={Share2}
+                      variant="dark"
                       onClick={(e) => {
                           e.stopPropagation();
+                          e.preventDefault();
                           if (navigator.share) {
                               navigator.share({ title: featuredItem.title, url: featuredItem.link });
                           } else {
@@ -236,7 +239,9 @@ const Home = () => {
                               alert('Đã sao chép liên kết!');
                           }
                       }}
-                      className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/90 border-white/40"
+                      icon={Share2}
+                      iconSize={22}
+                      className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-slate-900/80 border-slate-700/50 shadow-2xl text-white"
                     />
                 </div>
 

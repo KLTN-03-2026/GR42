@@ -6,6 +6,7 @@ interface VButtonProps extends Omit<HTMLMotionProps<"button">, 'ref'> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'dark';
   size?: 'sm' | 'md' | 'lg';
   icon?: LucideIcon;
+  iconSize?: number;
   loading?: boolean;
   fullWidth?: boolean;
 }
@@ -15,6 +16,7 @@ const VButton: React.FC<VButtonProps> = ({
   variant = 'primary',
   size = 'md',
   icon: Icon,
+  iconSize,
   loading,
   fullWidth,
   className = '',
@@ -38,13 +40,16 @@ const VButton: React.FC<VButtonProps> = ({
     lg: 'px-12 py-5 text-sm'
   };
 
+  const paddingClass = className.match(/p[xy]?-\d+/)?.[0] || '';
+  const sizeClasses = paddingClass ? '' : sizes[size];
+
   return (
     <motion.button
       whileTap={{ scale: 0.95 }}
       className={`
         ${baseStyles} 
         ${variants[variant]} 
-        ${sizes[size]} 
+        ${sizeClasses} 
         ${fullWidth ? 'w-full' : ''} 
         ${className}
       `}
@@ -52,9 +57,9 @@ const VButton: React.FC<VButtonProps> = ({
       {...(props as any)}
     >
       {loading ? (
-        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        <div className={`border-2 border-current border-t-transparent rounded-full animate-spin ${size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'}`} />
       ) : Icon && (
-        <Icon size={size === 'sm' ? 14 : size === 'lg' ? 20 : 16} />
+        <Icon size={iconSize || (size === 'sm' ? 16 : size === 'lg' ? 24 : 18)} />
       )}
       {children}
     </motion.button>

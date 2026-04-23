@@ -76,7 +76,9 @@ const ArticleDetail = () => {
     const fetchAiSummary = async (newsId: string) => {
         try {
             setIsSummaryLoading(true);
-            const res = await axios.get(`${API_BASE_URL}/index.php`, {
+            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
+            
+            const res = await axios.get(`${host}/BE/index.php`, {
                 params: {
                     module: 'api',
                     action: 'ai_summary',
@@ -84,7 +86,10 @@ const ArticleDetail = () => {
                 }
             });
             if (res.data.status === 'success') {
-                setAiSummary(res.data.summary);
+                let summary = res.data.summary || '';
+                // Clean up markdown code blocks if present
+                summary = summary.replace(/```html|```/g, '').trim();
+                setAiSummary(summary);
             } else {
                 setAiSummary('Không thể tạo tóm tắt vào lúc này.');
             }
@@ -370,22 +375,23 @@ const ArticleDetail = () => {
                                 {isReadingAll ? 'Đang đọc...' : 'Nghe bài báo'}
                             </VButton>
                             <div className="h-6 w-px bg-slate-100 mx-2"></div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-3">
                                 <VButton 
                                     variant={isFav ? 'primary' : 'ghost'} 
-                                    size="sm" 
-                                    icon={Heart}
                                     onClick={handleToggleLike}
                                     loading={isLiking}
-                                    className={isFav ? 'text-white bg-red-500 hover:bg-red-600 border-red-500 shadow-lg shadow-red-100' : 'text-slate-400'}
-                                />
+                                    className={`w-11 h-11 rounded-full p-0 flex items-center justify-center transition-all ${isFav ? 'text-white bg-red-500 hover:bg-red-600 border-red-500 shadow-xl shadow-red-200' : 'text-slate-400 bg-slate-50 border border-slate-100 hover:bg-white hover:text-blue-600'}`}
+                                >
+                                    <Heart size={22} fill={isFav ? 'currentColor' : 'none'} />
+                                </VButton>
                                 <VButton 
-                                    variant="ghost" size="sm" 
-                                    icon={Share2}
+                                    variant="ghost" 
                                     onClick={handleShare}
-                                    className="text-slate-400"
+                                    className="w-11 h-11 rounded-full p-0 flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-100 hover:bg-white hover:text-blue-600 transition-all"
                                     title="Chia sẻ"
-                                />
+                                >
+                                    <Share2 size={22} />
+                                </VButton>
                             </div>
                         </div>
                     </div>
@@ -408,32 +414,8 @@ const ArticleDetail = () => {
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 w-full">
-                            <div className="md:col-span-4 bg-[#F2F7FF] rounded-[2rem] p-8 border border-blue-50 shadow-lg shadow-blue-50 relative overflow-hidden group h-fit sticky top-24">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-600/20 rounded-full blur-3xl group-hover:scale-150 transition-transform"></div>
-                                <div className="relative z-10 flex flex-col h-full">
-                                    <div className="flex items-center gap-2 mb-6">
-                                        <Sparkles size={18} className="text-blue-600 animate-pulse" />
-                                        <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">Tóm tắt AI</span>
-                                    </div>
-                                    {isSummaryLoading ? (
-                                        <div className="flex flex-col gap-4">
-                                            <div className="h-4 bg-blue-100/50 animate-pulse rounded-full w-full"></div>
-                                            <div className="h-4 bg-blue-100/50 animate-pulse rounded-full w-[90%]"></div>
-                                            <div className="h-4 bg-blue-100/50 animate-pulse rounded-full w-[80%]"></div>
-                                        </div>
-                                    ) : (
-                                        <p className="text-xs font-bold text-slate-600 leading-relaxed italic mb-8 whitespace-pre-wrap">
-                                            {aiSummary || article.description || 'Đang cập nhật tóm tắt thông minh cho bài viết này...'}
-                                        </p>
-                                    )}
-                                    <div className="mt-4 pt-6 border-t border-blue-600/10">
-                                        <p className="text-[9px] font-black italic text-blue-600 uppercase tracking-widest leading-relaxed text-right">Gemini AI Analysis</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <article className="md:col-span-8 prose prose-slate md:prose-lg max-w-none prose-p:text-slate-600 prose-p:leading-[1.8] prose-p:font-medium prose-headings:font-black prose-headings:tracking-tighter prose-img:rounded-[2rem] prose-img:shadow-xl">
+                        <div className="w-full">
+                            <article className="prose prose-slate md:prose-lg max-w-none prose-p:text-slate-600 prose-p:leading-[1.8] prose-p:font-medium prose-headings:font-black prose-headings:tracking-tighter prose-img:rounded-[2rem] prose-img:shadow-xl">
                                 <div className="space-y-6">
                                     {contentBlocks.map((block, idx) => (
                                         <div key={idx} className="relative group/para">
@@ -467,46 +449,66 @@ const ArticleDetail = () => {
                     </div>
 
                     <aside className="lg:col-span-4 space-y-12">
-                        <div>
-                            <h4 className="font-black text-slate-900 uppercase tracking-[0.2em] text-xs mb-8 flex items-center gap-3 text-blue-600">
-                                <TrendingUp size={16} />
-                                Có thể bạn quan tâm
-                            </h4>
-                            <div className="space-y-8">
-                                {related.map((item) => (
-                                    <div key={item.id} className="group flex gap-4 items-center cursor-pointer" onClick={() => navigate(`/article/${item.id}`)}>
-                                        <div className="w-20 h-20 bg-slate-100 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-50 shadow-sm group-hover:shadow-lg transition-all">
-                                            <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
-                                        </div>
-                                        <div>
-                                            <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest block mb-1">{item.category}</span>
-                                            <h5 className="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">{item.title}</h5>
-                                        </div>
+                        <div className="sticky top-24 space-y-8">
+                            <div className="bg-[#F2F7FF] rounded-[2.5rem] p-8 border border-blue-50 shadow-xl shadow-blue-100/20 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl group-hover:scale-150 transition-transform"></div>
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-2 mb-6">
+                                        <Sparkles size={18} className="text-blue-600 animate-pulse" />
+                                        <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">Tóm tắt thông minh AI</span>
                                     </div>
-                                ))}
+                                    {isSummaryLoading ? (
+                                        <div className="flex flex-col gap-4 mb-8">
+                                            <div className="h-4 bg-blue-100/50 animate-pulse rounded-full w-full"></div>
+                                            <div className="h-4 bg-blue-100/50 animate-pulse rounded-full w-[90%]"></div>
+                                            <div className="h-4 bg-blue-100/50 animate-pulse rounded-full w-[80%]"></div>
+                                        </div>
+                                    ) : (
+                                        <div 
+                                            className="text-xs font-bold text-slate-600 leading-relaxed italic mb-8 whitespace-pre-wrap ai-summary-content max-h-[400px] overflow-y-auto no-scrollbar"
+                                            dangerouslySetInnerHTML={{ __html: aiSummary || article.description || 'Đang cập nhật tóm tắt thông minh cho bài viết này...' }}
+                                        />
+                                    )}
+                                    
+                                    <VButton 
+                                        variant="primary" fullWidth 
+                                        icon={MessageCircle} 
+                                        className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
+                                        onClick={() => {
+                                            const event = new CustomEvent('openChatbotWithContext', { 
+                                                detail: { 
+                                                    title: article?.title,
+                                                    summary: aiSummary || article?.description || 'Chưa có thông tin tóm tắt.'
+                                                } 
+                                            });
+                                            window.dispatchEvent(event);
+                                        }}
+                                    >
+                                        Hỏi AI chi tiết hơn
+                                    </VButton>
+                                    
+                                    <p className="text-[9px] font-black italic text-blue-400 uppercase tracking-widest mt-6 text-center">Powered by Vertex AI</p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden group shadow-2xl shadow-blue-200/20">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                            <div className="relative z-10">
-                                <h3 className="text-2xl font-black mb-4 tracking-tighter">Bạn muốn tóm tắt thêm?</h3>
-                                <VButton 
-                                    variant="primary" fullWidth 
-                                    icon={ArrowRight} 
-                                    className="bg-blue-600 hover:bg-blue-700"
-                                    onClick={() => {
-                                        const event = new CustomEvent('openChatbotWithContext', { 
-                                            detail: { 
-                                                title: article?.title,
-                                                summary: aiSummary || article?.description || 'Chưa có thông tin tóm tắt.'
-                                            } 
-                                        });
-                                        window.dispatchEvent(event);
-                                    }}
-                                >
-                                    Chat với AI ngay
-                                </VButton>
+                            <div>
+                                <h4 className="font-black text-slate-900 uppercase tracking-[0.2em] text-xs mb-8 flex items-center gap-3 text-blue-600">
+                                    <TrendingUp size={16} />
+                                    Có thể bạn quan tâm
+                                </h4>
+                                <div className="space-y-8">
+                                    {related.map((item) => (
+                                        <div key={item.id} className="group flex gap-4 items-center cursor-pointer" onClick={() => navigate(`/article/${item.id}`)}>
+                                            <div className="w-20 h-20 bg-slate-100 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-50 shadow-sm group-hover:shadow-lg transition-all">
+                                                <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
+                                            </div>
+                                            <div>
+                                                <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest block mb-1">{item.category}</span>
+                                                <h5 className="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">{item.title}</h5>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </aside>

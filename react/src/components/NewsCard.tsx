@@ -76,18 +76,18 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
         <div className="absolute top-6 right-6 flex flex-col gap-3 z-10">
           <VButton 
             variant={isFav ? 'primary' : 'outline'}
-            size="sm"
-            icon={Heart}
             onClick={handleToggleLike}
             loading={isLiking}
-            className={`w-11 h-11 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFav ? 'bg-red-500 border-red-500' : 'bg-white/10 border-white/20'}`}
+            icon={Heart}
+            iconSize={22}
+            className={`w-11 h-11 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFav ? 'bg-red-500 border-red-500 text-white' : 'bg-white/10 border-white/20 text-white'}`}
           />
           <VButton 
             variant="outline"
-            size="sm"
-            icon={MessageCircle}
             onClick={handleCommentClick}
-            className="w-11 h-11 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/10 border-white/20"
+            icon={MessageCircle}
+            iconSize={22}
+            className="w-11 h-11 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/10 border-white/20 text-white"
           />
         </div>
 
@@ -134,23 +134,21 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
         <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
           <VButton 
             variant={isFav ? 'primary' : 'outline'}
-            size="sm"
-            icon={Heart}
             onClick={handleToggleLike}
             loading={isLiking}
-            className={`w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFav ? 'bg-red-500 border-red-500 shadow-xl shadow-red-200' : 'bg-white/80 border-white/40 shadow-lg'}`}
+            icon={Heart}
+            iconSize={20}
+            className={`w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFav ? 'bg-red-500 border-red-500 shadow-xl shadow-red-200 text-white' : 'bg-white/80 border-white/40 shadow-lg text-slate-800'}`}
           />
           <VButton 
             variant="outline"
-            size="sm"
-            icon={MessageCircle}
             onClick={handleCommentClick}
-            className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 shadow-lg"
+            icon={MessageCircle}
+            iconSize={20}
+            className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 shadow-lg text-slate-800"
           />
           <VButton 
             variant="outline"
-            size="sm"
-            icon={Share2}
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -165,7 +163,9 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
                     alert('🚀 Đã sao chép liên kết!');
                 }
             }}
-            className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 shadow-lg"
+            icon={Share2}
+            iconSize={20}
+            className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 shadow-lg text-slate-800"
             title="Chia sẻ"
           />
         </div>

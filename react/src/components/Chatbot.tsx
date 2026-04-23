@@ -81,9 +81,12 @@ const Chatbot = () => {
         }
       });
 
+      let botContent = response.data.message || 'Xin lỗi, tôi gặp sự cố khi xử lý yêu cầu của bạn.';
+      botContent = botContent.replace(/```html|```/g, '').trim();
+
       const botMessage: Message = {
         role: 'bot',
-        content: response.data.message || 'Xin lỗi, tôi gặp sự cố khi xử lý yêu cầu của bạn.',
+        content: botContent,
         timestamp: new Date()
       };
 
@@ -181,12 +184,12 @@ const Chatbot = () => {
                     }`}>
                       {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                     </div>
-                    <div className={`p-4 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                    <div className={`p-4 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
                       msg.role === 'user'
                         ? 'bg-blue-600 text-white rounded-tr-none shadow-blue-100/30'
                         : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none'
                     }`}>
-                      {msg.content}
+                      <div dangerouslySetInnerHTML={{ __html: msg.content }} />
                       <div className={`text-[10px] mt-2 opacity-50 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                         {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
