@@ -46,7 +46,11 @@ if ($method === 'GET' || $action_type === 'list') {
     
     $comments = getAll("
         SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, 
-               CASE WHEN u.avatar LIKE 'http%' THEN u.avatar ELSE CONCAT('" . _HOST_URL . "/', u.avatar) END as avatar,
+               CASE 
+                 WHEN u.avatar LIKE 'http%' THEN u.avatar 
+                 WHEN u.avatar LIKE 'data:%' THEN u.avatar
+                 ELSE CONCAT('" . _HOST_URL . "/', u.avatar) 
+               END as avatar,
                (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id) as like_count,
                (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id AND user_id = $user_id) as is_liked
         FROM comments c

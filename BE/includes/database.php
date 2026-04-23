@@ -13,6 +13,15 @@ if ($conn->connect_error) {
 }
 $conn->set_charset('utf8mb4');
 
+function query($sql) {
+    global $conn;
+    $rel = $conn->query($sql);
+    if(!$rel) {
+        die("Lỗi query: " . $conn->error . " | SQL: " . $sql);
+    }
+    return $rel;
+}
+
 function getAll($sql) {
     global $conn;
     $result = $conn->query($sql);
@@ -47,11 +56,19 @@ function getOne($sql) {
 function insert($table, $data) {
     global $conn;
     $columns = implode(", ", array_keys($data));
-    $values  = "'" . implode("','", array_map([$conn, 'real_escape_string'], $data)) . "'";
+    $valueArr = [];
+    foreach ($data as $value) {
+        if ($value === null) {
+            $valueArr[] = "NULL";
+        } else {
+            $valueArr[] = "'" . $conn->real_escape_string((string)$value) . "'";
+        }
+    }
+    $values = implode(", ", $valueArr);
     $sql = "INSERT INTO $table ($columns) VALUES ($values)";
     $rel = $conn->query($sql);
     if(!$rel) {
-        die("Lỗi insert: " . $conn->error);
+        die("Lỗi insert: " . $conn->error . " | SQL: " . $sql);
     }
     return $rel;
 }

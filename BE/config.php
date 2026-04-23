@@ -16,8 +16,15 @@ define('_DB', $envConfig['DB_NAME'] ?? 'crawl_news');
 define('_USER', $envConfig['DB_USER'] ?? 'root');
 define('_PASS', $envConfig['DB_PASS'] ?? '');
 
-$projectPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-define('_HOST_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $projectPath);
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$currentPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+if (strpos($currentPath, '/modules') !== false) {
+    $projectRoot = substr($currentPath, 0, strpos($currentPath, '/modules'));
+} else {
+    $projectRoot = $currentPath;
+}
+define('_HOST_URL', $protocol . $host . $projectRoot);
 define('_FRONTEND_URL', 'http://localhost:3000');
 define('_HOST_URL_TEMPLATES', _HOST_URL . '/templates');
 

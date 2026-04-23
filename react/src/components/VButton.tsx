@@ -26,12 +26,12 @@ const VButton: React.FC<VButtonProps> = ({
   const baseStyles = 'inline-flex items-center justify-center font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 rounded-2xl gap-2';
   
   const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-100',
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
     secondary: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
     outline: 'bg-transparent border-2 border-slate-100 text-slate-600 hover:border-blue-200 hover:text-blue-600',
     ghost: 'bg-transparent text-slate-400 hover:bg-slate-50 hover:text-slate-600',
     danger: 'bg-red-50 text-red-600 hover:bg-red-100',
-    dark: 'bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200'
+    dark: 'bg-slate-900 text-white hover:bg-slate-800'
   };
 
   const sizes = {

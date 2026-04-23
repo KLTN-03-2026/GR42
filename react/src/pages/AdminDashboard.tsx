@@ -1,57 +1,103 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from 'recharts';
 import { 
-  Users, Newspaper, Eye, ArrowUpRight, ArrowDownRight, Globe, Loader2, Zap, Sparkles
+  Users, Newspaper, MessageSquare, LineChart, Plus, UserPlus, 
+  Activity, ChevronRight, Clock, User, MessageCircle, Zap,
+  Loader2
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { API_BASE_URL } from '../config';
+import VButton from '../components/VButton';
 
 const COLORS = ['#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'];
 
-const StatCard = ({ title, value, icon: Icon, color }: any) => (
-  <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-blue-100 flex items-center gap-6">
-    <div className={`p-4 rounded-2xl ${color} bg-opacity-10`}>
-      <Icon size={24} />
+const normalizeImageUrl = (url: string | undefined) => {
+    if (!url) return 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop';
+    if (url.startsWith('//')) return `https:${url}`;
+    if (url.startsWith('/')) return `${API_BASE_URL.replace('/BE', '')}${url}`;
+    return url;
+};
+
+const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay }}
+    className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:shadow-xl hover:border-blue-100 group relative overflow-hidden"
+  >
+    <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-[0.03] rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-700`}></div>
+    <div className="flex items-center gap-6 relative z-10">
+      <div className={`w-14 h-14 rounded-2xl ${color} bg-opacity-10 flex items-center justify-center text-current`}>
+        <Icon size={28} className={color.replace('bg-', 'text-')} />
+      </div>
+      <div>
+        <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">{title}</h3>
+        <p className="text-3xl font-black text-slate-900 tracking-tight">
+          {typeof value === 'number' ? value.toLocaleString() : (value || '...')}
+        </p>
+      </div>
     </div>
-    <div>
-      <h3 className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">{title}</h3>
-      <p className="text-2xl font-bold text-slate-900 tracking-tight">
-        {typeof value === 'number' ? value.toLocaleString() : (value || '...')}
-      </p>
-    </div>
-  </div>
+  </motion.div>
 );
 
 const AdminDashboard = () => {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any>(null);
+    const [crawling, setCrawling] = useState(false);
     const token = localStorage.getItem('auth_token');
+    const userName = localStorage.getItem('user_name') || 'Admin';
+
+    const fetchStats = useCallback(async () => {
+        try {
+            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
+            const res = await axios.get(`${host}/BE/modules/api/admin/admin_stats.php?token=${token}`);
+            if (res.data.status === 'success') {
+                setData(res.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching admin stats:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [token]);
 
     useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-                const res = await axios.get(`${host}/BE/modules/api/admin/admin_stats.php?token=${token}`);
-                if (res.data.status === 'success') {
-                    setData(res.data.data);
-                }
-            } catch (error) {
-                console.error('Error fetching admin stats:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchStats();
-    }, [token]);
+    }, [fetchStats]);
+
+    const handleRunCrawl = async () => {
+        if (!window.confirm('Bạn có chắc chắn muốn tiến hành thu thập dữ liệu mới?')) return;
+        
+        try {
+            setCrawling(true);
+            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
+            const res = await axios.get(`${host}/BE/modules/api/crawl_database.php`);
+            
+            if (res.data.status === 'success') {
+                alert(`Thành công! Đã thêm: ${res.data.new} - Cập nhật: ${res.data.updated} bài báo.`);
+                fetchStats();
+            } else {
+                alert('Lỗi: ' + (res.data.message || 'Thất bại'));
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Lỗi kết nối máy chủ!');
+        } finally {
+            setCrawling(false);
+        }
+    };
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-32">
-                <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Đang tải dữ liệu...</p>
+                <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-6 opacity-20" />
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Đang khởi tạo dữ liệu quản trị...</p>
             </div>
         );
     }
@@ -67,112 +113,250 @@ const AdminDashboard = () => {
     ];
 
     return (
-        <div className="space-y-8 max-w-[1400px] mx-auto pb-10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Trung tâm Quản trị</h1>
-                    <p className="text-slate-500 text-sm mt-1">Tổng quan hoạt động hệ thống tin tức iAI</p>
-                </div>
-                <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
-                    <div className="px-4 text-right">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">{localStorage.getItem('user_role')}</p>
-                        <p className="text-sm font-bold text-slate-900">{localStorage.getItem('user_name')}</p>
+        <div className="space-y-8 max-w-[1400px] mx-auto pb-20 px-4 md:px-0">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-blue-200"
+            >
+                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-400/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
+                
+                <div className="relative z-10 max-w-2xl">
+                    <div className="flex items-center gap-3 mb-6">
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-[0.2em]">
+                            Quản trị viên Hệ thống
+                        </span>
+                        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
                     </div>
-                    <img 
-                        src={localStorage.getItem('user_avatar') || `https://api.dicebear.com/7.x/avataaars/svg?seed=Admin`} 
-                        className="w-10 h-10 rounded-lg object-cover bg-slate-100" 
-                        alt="Admin" 
-                    />
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+                        Xin chào, {userName}! 👋
+                    </h1>
+                    <p className="text-blue-100 font-medium text-lg opacity-80 leading-relaxed">
+                        Chào mừng bạn quay trở lại. Hệ thống iAI News đang hoạt động ổn định. 
+                        Hôm nay có <span className="text-white font-black underline decoration-blue-400 decoration-4 underline-offset-4">12 bài báo mới</span> đang chờ phê duyệt.
+                    </p>
                 </div>
-            </div>
+            </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <StatCard title="Tổng số Thành viên" value={data?.stats.total_users} icon={Users} color="text-blue-600 bg-blue-600" />
-                <StatCard title="Tổng số Bài báo" value={data?.stats.total_news} icon={Newspaper} color="text-indigo-600 bg-indigo-600" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard title="Tổng Thành viên" value={data?.stats.total_users} icon={Users} color="bg-blue-500" delay={0.1} />
+                <StatCard title="Tổng Bài báo" value={data?.stats.total_news} icon={Newspaper} color="bg-indigo-500" delay={0.2} />
+                <StatCard title="Bình luận mới" value={data?.stats.total_comments} icon={MessageSquare} color="bg-violet-500" delay={0.3} />
+                <StatCard title="Truy cập hôm nay" value={data?.stats.today_visits} icon={LineChart} color="bg-sky-500" delay={0.4} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div className="lg:col-span-8 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Tần suất tin tức theo tuần</h3>
-                        <div className="flex gap-2 bg-slate-50 p-1 rounded-lg">
-                            <button className="px-3 py-1 bg-white shadow-sm rounded-md text-[10px] font-bold">7 ngày</button>
-                            <button className="px-3 py-1 text-[10px] font-bold text-slate-400">Tháng</button>
+                <div className="lg:col-span-8 space-y-8">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm"
+                    >
+                        <div className="flex items-center justify-between mb-10">
+                            <div>
+                                <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider mb-1">Tần suất đăng bài</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dữ liệu cập nhật theo tuần</p>
+                            </div>
+                            <div className="flex gap-2 bg-slate-50 p-1.5 rounded-2xl">
+                                <button className="px-4 py-2 bg-white shadow-sm rounded-xl text-[10px] font-black uppercase tracking-widest text-blue-600">7 Ngày</button>
+                                <button className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Tháng</button>
+                            </div>
                         </div>
-                    </div>
-                    <div className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={barData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                        <div className="h-[350px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={barData}>
+                                    <defs>
+                                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#3b82f6" />
+                                            <stop offset="100%" stopColor="#60a5fa" />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }} />
+                                    <Tooltip 
+                                        cursor={{ fill: '#f8fafc' }}
+                                        contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '15px' }}
+                                        labelStyle={{ fontWeight: 900, marginBottom: '5px', textTransform: 'uppercase', fontSize: '10px' }}
+                                    />
+                                    <Bar dataKey="value" fill="url(#barGradient)" radius={[8, 8, 0, 0]} barSize={45} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </motion.div>
 
-                <div className="lg:col-span-4 bg-slate-900 p-8 rounded-2xl text-white shadow-sm">
-                    <h3 className="font-bold uppercase tracking-wider text-sm mb-8 text-slate-400 text-center">Phân bố danh mục</h3>
-                    <div className="h-[220px] relative flex items-center justify-center">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie data={chartData} innerRadius={60} outerRadius={85} paddingAngle={5} dataKey="value">
-                                    {chartData.map((entry: any, index: number) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        <div className="absolute flex flex-col items-center pointer-events-none">
-                            <span className="text-2xl font-bold">{data?.stats.total_news}</span>
-                            <span className="text-[9px] font-bold uppercase text-slate-400">Tin bài</span>
-                        </div>
-                    </div>
-                    <div className="mt-8 space-y-3">
-                        {data?.categories.map((item: any, index: number) => (
-                            <div key={item.category} className="flex items-center justify-between text-xs">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                                    <span className="text-slate-300 uppercase font-medium">{item.category}</span>
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
+                                    <Zap size={20} />
                                 </div>
-                                <span className="font-bold">{item.count}</span>
+                                <div>
+                                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider">Cập nhật tin tức</h3>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Các bài báo mới nhất trong hệ thống</p>
+                                </div>
                             </div>
-                        ))}
+                            <VButton variant="ghost" size="sm" onClick={() => navigate('/admin/news')}>Xem tất cả</VButton>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                            {data?.recent_news.map((item: any, idx: number) => (
+                                <motion.div 
+                                    key={item.id} 
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.6 + (idx * 0.05) }}
+                                    className="group cursor-pointer"
+                                    onClick={() => navigate(`/admin/news/edit/${item.id}`)}
+                                >
+                                    <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 mb-4 border border-slate-50 shadow-sm relative">
+                                        <img 
+                                            src={normalizeImageUrl(item.image)} 
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                            alt="" 
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop';
+                                            }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                                            <span className="text-[8px] font-black text-white uppercase tracking-widest">Chỉnh sửa</span>
+                                        </div>
+                                    </div>
+                                    <h4 className="text-[11px] font-black text-slate-800 line-clamp-2 leading-tight uppercase mb-2 group-hover:text-blue-600 transition-colors">{item.title}</h4>
+                                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold uppercase tracking-tighter">
+                                        <span>{item.source}</span>
+                                        <span className="flex items-center gap-1"><Clock size={10} /> {item.pubDate.split(' ')[0]}</span>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-                            <Zap size={20} />
+                <div className="lg:col-span-4 space-y-8">
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                        <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider mb-8 flex items-center gap-3">
+                            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                            Thao tác nhanh
+                        </h3>
+                        <div className="space-y-4">
+                            <QuickActionBtn 
+                                icon={Plus} 
+                                label="Thêm Bài Báo Mới" 
+                                color="bg-blue-600" 
+                                onClick={() => navigate('/admin/news/add')} 
+                            />
+                            <QuickActionBtn 
+                                icon={UserPlus} 
+                                label="Thêm Người Dùng" 
+                                color="bg-indigo-600" 
+                                onClick={() => navigate('/admin/users/add')} 
+                            />
+                            <QuickActionBtn 
+                                icon={MessageCircle} 
+                                label="Duyệt Bình Luận" 
+                                color="bg-violet-600" 
+                                badge={12}
+                                onClick={() => navigate('/admin/comments')} 
+                            />
+                            <button 
+                                onClick={handleRunCrawl}
+                                disabled={crawling}
+                                className="w-full flex items-center justify-between p-5 rounded-[1.5rem] bg-slate-50 border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-all group disabled:opacity-50"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-100 group-hover:scale-110 transition-transform ${crawling ? 'animate-spin' : ''}`}>
+                                        <Activity size={24} />
+                                    </div>
+                                    <span className="font-black text-xs text-slate-700 uppercase tracking-widest group-hover:text-emerald-700 transition-colors">
+                                        {crawling ? 'Đang thu thập...' : 'Chạy Thu Thập Dữ Liệu'}
+                                    </span>
+                                </div>
+                                <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+                            </button>
                         </div>
-                        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Cập nhật gần nhất</h3>
                     </div>
-                    <button className="text-xs font-bold text-blue-600 hover:underline">Xem kho tin</button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                    {data?.recent_news.map((item: any) => (
-                        <div key={item.id} className="group">
-                            <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-100 shadow-sm">
-                                <img src={item.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="" />
-                            </div>
-                            <h4 className="text-xs font-bold text-slate-800 line-clamp-2 leading-tight uppercase mb-2">{item.title}</h4>
-                            <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase">
-                                <span>{item.source}</span>
-                                <span>{item.pubDate.split(' ')[0]}</span>
+
+                    <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-slate-200">
+                        <h3 className="font-black uppercase tracking-[0.2em] text-[10px] mb-8 text-slate-400 text-center">Hoạt động gần đây</h3>
+                        <div className="space-y-6">
+                            {data?.recent_activity.map((act: any, idx: number) => (
+                                <motion.div 
+                                    key={idx} 
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.8 + (idx * 0.1) }}
+                                    className="flex gap-4 group"
+                                >
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${act.type === 'user' ? 'bg-blue-500/10 text-blue-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                                        {act.type === 'user' ? <User size={18} /> : <MessageCircle size={18} />}
+                                    </div>
+                                    <div className="flex-1 overflow-hidden">
+                                        <h4 className="text-xs font-black uppercase tracking-wider mb-1 line-clamp-1">{act.title}</h4>
+                                        <p className="text-[10px] text-slate-400 font-medium mb-1 line-clamp-1 opacity-60 italic">{act.subtitle}</p>
+                                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                                            <Clock size={10} /> {new Date(act.date).toLocaleString('vi-VN')}
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden group">
+                        <h3 className="font-black uppercase tracking-widest text-[10px] mb-8 text-slate-400 text-center">Phân bố danh mục</h3>
+                        <div className="h-[250px] relative flex items-center justify-center">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={chartData} innerRadius={70} outerRadius={95} paddingAngle={8} dataKey="value" stroke="none">
+                                        {chartData.map((entry: any, index: number) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                            <div className="absolute flex flex-col items-center pointer-events-none group-hover:scale-110 transition-transform duration-500">
+                                <span className="text-3xl font-black text-slate-900 tracking-tighter">{data?.stats.total_news}</span>
+                                <span className="text-[8px] font-black uppercase text-slate-400 tracking-[0.3em]">Tin bài</span>
                             </div>
                         </div>
-                    ))}
+                        <div className="mt-8 grid grid-cols-2 gap-3">
+                            {data?.categories.map((item: any, index: number) => (
+                                <div key={item.category} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-transparent hover:border-blue-100 transition-colors">
+                                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                                    <span className="text-[9px] text-slate-600 uppercase font-black tracking-tight flex-1 line-clamp-1">{item.category}</span>
+                                    <span className="text-[9px] font-black text-slate-900">{item.count}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
+
+const QuickActionBtn = ({ icon: Icon, label, color, onClick, badge }: any) => (
+    <button 
+        onClick={onClick}
+        className="w-full flex items-center justify-between p-5 rounded-[1.5rem] bg-slate-50 border border-slate-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
+    >
+        <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-2xl ${color} text-white flex items-center justify-center shadow-lg shadow-blue-100 group-hover:scale-110 transition-transform`}>
+                <Icon size={24} />
+            </div>
+            <div className="flex flex-col items-start">
+                <span className="font-black text-xs text-slate-700 uppercase tracking-widest group-hover:text-blue-700 transition-colors">{label}</span>
+                {badge && <span className="text-[8px] font-black bg-red-500 text-white px-2 py-0.5 rounded-full mt-1">+{badge} Mới</span>}
+            </div>
+        </div>
+        <ChevronRight size={18} className="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+    </button>
+);
 
 export default AdminDashboard;
 
