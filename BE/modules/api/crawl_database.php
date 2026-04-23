@@ -31,12 +31,20 @@ function cleanText($str)
     return trim($decoded);
 }
 
-function cleanContent($html)
+function cleanContent($html, $source = '')
 {
     if (!$html)
         return '';
-    $html = str_replace('""', '"', $html);
-    
+    $html = trim(str_replace('""', '"', $html));
+
+    if ($source === 'vietnamnet') {
+        // Xóa phần đầu bị dính chuỗi thẻ lúc cào
+        $html = preg_replace('/^(id="maincontent"|class="content-detail"|class="maincontent main-content")[^>]*>/i', '', $html);
+        // Xóa các khối rác, tin liên quan (đây chính là nơi chứa các hình ảnh bị dư thừa)
+        $html = preg_replace('/<div[^>]*class="[^"]*(ArticleRelate|article-relate|news-feature|related-news|insert-wiki-content)[^"]*"[^>]*>[\s\S]*?<\/div>/i', '', $html);
+        $html = preg_replace('/<table[^>]*class="[^"]*(vnn-quote)[^"]*"[^>]*>[\s\S]*?<\/table>/i', '', $html);
+    }
+
     libxml_use_internal_errors(true);
     $dom = new DOMDocument();
     $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
@@ -46,17 +54,27 @@ function cleanContent($html)
         $node->parentNode->removeChild($node);
     }
 
+    // Cắt bỏ phần "Xem thêm về:"
+    foreach ($xpath->query('//*[contains(text(), "Xem thêm về:")]') as $node) {
+        if ($node->parentNode) {
+            $node->parentNode->removeChild($node);
+        }
+    }
+
+
+
     $result = '';
-    
+
     $body = $dom->getElementsByTagName('body')->item(0);
     if ($body) {
         $result = processNodes($body, $xpath);
     }
-    
+
     return $result;
 }
 
-function processNodes($parentNode, $xpath) {
+function processNodes($parentNode, $xpath)
+{
     $content = '';
     foreach ($parentNode->childNodes as $node) {
         if ($node->nodeName === 'p') {
@@ -76,7 +94,7 @@ function processNodes($parentNode, $xpath) {
                 $src = $img->getAttribute('data-original')
                     ?: $img->getAttribute('data-src')
                     ?: $img->getAttribute('src');
-                
+
                 if ($src) {
                     $caption = '';
                     $capNode = $xpath->query('.//figcaption|.//p[contains(@class, "caption")]|.//div[contains(@class, "caption")]', $node)->item(0);
@@ -178,7 +196,7 @@ if (isset($data['table']['rows']) && is_array($data['table']['rows'])) {
         $source = cleanText($row['c'][5]['v'] ?? '');
         $category = cleanText($row['c'][7]['v'] ?? '');
         $contentRaw = isset($row['c'][8]['v']) ? $row['c'][8]['v'] : '';
-        $content = cleanContent($contentRaw);
+        $content = cleanContent($contentRaw, $source);
         $savedtime = date("Y-m-d H:i:s");
         $stmt->bind_param("issssssss", $id, $title, $link, $image, $pubdate, $source, $savedtime, $category, $content);
 
