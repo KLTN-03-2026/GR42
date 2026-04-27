@@ -21,14 +21,14 @@ function sendMail($emailTo, $subject, $content)
     try {
         $mail->SMTPDebug = SMTP::DEBUG_OFF;
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
+        $mail->Host = _MAIL_HOST;
         $mail->SMTPAuth = true;
-        $mail->Username = 'tai0935058232@gmail.com';
-        $mail->Password = 'bnigrquipuxswkxj';
+        $mail->Username = _MAIL_USERNAME;
+        $mail->Password = _MAIL_PASSWORD;
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port = 465;
+        $mail->Port = _MAIL_PORT;
 
-        $mail->setFrom('tai0935058232@gmail.com', 'Tai Course');
+        $mail->setFrom(_MAIL_USERNAME, _MAIL_FROM_NAME);
         $mail->addAddress($emailTo);
         $mail->CharSet = 'UTF-8';
         $mail->isHTML(true);

@@ -40,3 +40,10 @@ define('_JSON_URL_SHEET', $envConfig['JSON_URL_SHEET'] ?? '');
 
 /*Sepay Token*/
 define('_SEPAY_TOKEN', $envConfig['SEPAY_TOKEN'] ?? '');
+
+/*Mailer Config*/
+define('_MAIL_HOST', $envConfig['MAIL_HOST'] ?? 'smtp.gmail.com');
+define('_MAIL_USERNAME', $envConfig['MAIL_USERNAME'] ?? '');
+define('_MAIL_PASSWORD', $envConfig['MAIL_PASSWORD'] ?? '');
+define('_MAIL_PORT', $envConfig['MAIL_PORT'] ?? 465);
+define('_MAIL_FROM_NAME', $envConfig['MAIL_FROM_NAME'] ?? 'Tai Course');
