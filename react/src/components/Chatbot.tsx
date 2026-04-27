@@ -236,7 +236,6 @@ const Chatbot = () => {
                   <Send size={18} />
                 </button>
               </div>
-              <p className="text-[9px] text-center text-slate-400 mt-2 font-medium tracking-tight">KLTN Chatbot powered by Gemini AI Model</p>
             </div>
           </motion.div>
         )}

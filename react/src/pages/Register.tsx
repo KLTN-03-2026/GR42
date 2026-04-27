@@ -56,7 +56,7 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-white flex overflow-hidden font-inter">
       <div className="hidden lg:flex lg:w-1/2 relative bg-white items-center justify-center overflow-hidden">
-        {/* Animated Background Elements */}
+        {}
         <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAFC] via-white to-[#EFF6FF]"></div>
         <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[120px] animate-pulse"></div>
         <div className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-amber-400/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
@@ -99,7 +99,6 @@ const Register = () => {
 
           <div className="mb-12">
             <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Tạo tài khoản mới</h2>
-            <p className="text-slate-400 font-bold text-sm tracking-tight uppercase">Khám phá vũ trụ tin tức cùng Gemini AI</p>
           </div>
 
           {successMsg ? (

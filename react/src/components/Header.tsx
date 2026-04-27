@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import VAvatar from './VAvatar';
+import VModal from './VModal';
 import { encodeId } from '../utils/idEncoder';
 
 const Header = () => {
@@ -175,16 +176,13 @@ const Header = () => {
             {authToken ? (
               <div className="flex items-center gap-3 pl-4 border-l border-slate-100">
                 <Link 
-                  to="/profile" 
+                  to={userRole === 'admin' ? "/admin" : "/profile"} 
                   className="flex items-center gap-3 group"
                 >
                   <VAvatar src={userAvatar} name={userName || 'U'} size="md" className="hover:ring-2 hover:ring-blue-100 transition-all active:scale-95" />
                   <div className="hidden lg:block text-left">
                     <div className="flex items-center gap-1.5">
                         <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{userName || 'Người dùng'}</p>
-                        {userRole === 'admin' && (
-                            <span className="px-1.5 py-0.5 bg-blue-600 text-white text-[8px] font-black rounded-md uppercase tracking-tighter">Admin</span>
-                        )}
                     </div>
                   </div>
                 </Link>
@@ -195,7 +193,7 @@ const Header = () => {
                     className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-100 transition-all active:scale-95 border border-amber-100"
                   >
                     <ShieldCheck size={14} />
-                    Quản trị
+                    Quản lý
                   </Link>
                 )}
                 
@@ -221,49 +219,16 @@ const Header = () => {
         </div>
       </header>
 
-      <AnimatePresence>
-        {showLogoutConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowLogoutConfirm(false)}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-sm bg-white rounded-[2rem] p-8 shadow-2xl"
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-6">
-                  <AlertTriangle size={32} />
-                </div>
-                <h3 className="text-xl font-black text-slate-900 mb-2">Đăng xuất?</h3>
-                <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">
-                  Bạn có chắc chắn muốn rời khỏi phiên làm việc hiện tại không?
-                </p>
-                <div className="grid grid-cols-2 gap-4 w-full">
-                  <button 
-                    onClick={() => setShowLogoutConfirm(false)}
-                    className="py-4 bg-slate-100 text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all active:scale-95"
-                  >
-                    Hủy
-                  </button>
-                  <button 
-                    onClick={handleLogout}
-                    className="py-4 bg-red-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-lg shadow-red-100 active:scale-95"
-                  >
-                    Đăng xuất
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <VModal
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        type="danger"
+        title="Xác nhận đăng xuất"
+        message="Bạn có chắc chắn muốn đăng xuất không?"
+        confirmText="Đăng xuất"
+        cancelText="Hủy"
+      />
     </>
   );
 };

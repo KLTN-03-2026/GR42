@@ -26,7 +26,7 @@ const categories = [
 
 const normalizeImageUrl = (url: string | undefined) => {
     if (!url) return 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop';
-    if (url.startsWith('//')) return `https:${url}`;
+    if (url.startsWith('http')) return url;
     if (url.startsWith('/')) return `${API_BASE_URL.replace('/BE', '')}${url}`;
     return url;
 };

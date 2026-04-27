@@ -6,12 +6,12 @@ const RelatedNews = ({ articleId }: { articleId: number }) => {
   const [isAiProcessing, setIsAiProcessing] = useState(false);
 
   useEffect(() => {
-    // GỌI CODE Ở ĐÂY:
+    
     fetch(`${API_BASE_URL}/modules/news/API_keyGemini.php?id=${articleId}`)
       .then(res => res.json())
       .then(data => {
-        setRelated(data.related); // Lưu danh sách bài báo vào state
-        setIsAiProcessing(data.aiPending); // Kiểm tra xem AI đã xong chưa
+        setRelated(data.related); 
+        setIsAiProcessing(data.aiPending); 
       })
       .catch(err => console.error("Lỗi gọi API:", err));
   }, [articleId]);

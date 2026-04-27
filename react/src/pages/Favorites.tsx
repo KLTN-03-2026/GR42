@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import NewsCard, { NewsItem } from '../components/NewsCard';
 import { Heart, Loader2, Newspaper, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -8,6 +8,8 @@ import { API_BASE_URL } from '../config';
 
 const Favorites = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const isAdminPath = location.pathname.startsWith('/admin');
     const [news, setNews] = useState<NewsItem[]>([]);
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem('auth_token');
@@ -30,10 +32,8 @@ const Favorites = () => {
                     }
                 });
 
-                console.log('Standalone Favorites Response:', response.data);
-
                 if (response.data.status === 'success') {
-                    // Inject is_favourite = true for all since they are from favorites list
+                    
                     const favNews = response.data.data.map((item: any) => ({
                         ...item,
                         is_favourite: true
@@ -60,15 +60,9 @@ const Favorites = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-12">
-            <header className="mb-16">
-                <button 
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 hover:text-blue-600 transition-colors"
-                >
-                    <ArrowLeft size={14} />
-                    Quay lại
-                </button>
+        <div className={`${isAdminPath ? '' : 'max-w-7xl mx-auto px-6 py-12 min-h-screen bg-[#F9F9FC]'}`}>
+            <header className={`${isAdminPath ? 'mb-8' : 'mb-16'}`}>
+                
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter mb-4 flex items-center gap-4">

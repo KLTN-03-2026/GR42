@@ -26,33 +26,52 @@ const Login = () => {
   }, [token, userRole, navigate, location]);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
-    const name = params.get('name');
-    const avatar = params.get('avatar');
-    const role = params.get('role');
+    const urlError = params.get('error');
+
+    if (urlError) {
+      setError(decodeURIComponent(urlError));
+      return;
+    }
 
     if (token) {
-      localStorage.setItem('auth_token', token);
-      if (name) {
-        localStorage.setItem('user_name', decodeURIComponent(name));
-      }
-      if (avatar) {
-        localStorage.setItem('user_avatar', decodeURIComponent(avatar));
-      }
-      if (role) {
-        localStorage.setItem('user_role', role);
-      }
-      const email = params.get('email');
-      if (email) {
-        localStorage.setItem('user_email', decodeURIComponent(email));
-      }
-      
-      if (role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
+      const fetchUserData = async () => {
+        setLoading(true);
+        try {
+          const url = `${API_BASE_URL}/?module=api&action=user&token=${token}`;
+          const response = await fetch(url);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+
+          if (result.status === 'success') {
+            const userData = result.data.profile;
+            localStorage.setItem('auth_token', token);
+            localStorage.setItem('user_name', userData.fullname);
+            localStorage.setItem('user_avatar', userData.avatar || '');
+            localStorage.setItem('user_role', userData.role);
+            localStorage.setItem('user_email', userData.email);
+
+            if (userData.role === 'admin') {
+              navigate('/admin');
+            } else {
+              navigate('/');
+            }
+          } else {
+            setError(result.message || result.msg || 'Không thể lấy thông tin người dùng');
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ khi xác thực Google');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchUserData();
     }
   }, [location, navigate]);
 
@@ -105,7 +124,7 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     const client_id = "406500628615-c725efu1d7ijrg41ekuuv0m32uvqdafo.apps.googleusercontent.com";
-    const redirect_uri = `${window.location.protocol}//${window.location.hostname}${PROJECT_FOLDER}/BE/?module=auth&action=google_callback`;
+    const redirect_uri = `${API_BASE_URL}/?module=auth&action=google_callback`;
     const scope = "email profile";
     const google_login_url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=select_account&state=react`;
     window.location.href = google_login_url;
@@ -156,7 +175,7 @@ const Login = () => {
 
           <div className="mb-12 text-center">
             <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Chào mừng quay trở lại</h2>
-            <p className="text-slate-400 font-bold text-sm tracking-tight uppercase">Vui lòng nhập thông tin để đăng nhập</p>
+            <p className="text-slate-400 font-bold text-sm tracking-tight">Vui lòng nhập thông tin để đăng nhập</p>
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit}>

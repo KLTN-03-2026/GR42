@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { 
-  Search, Plus, Eye, Trash2, Loader2, ChevronLeft, ChevronRight, ExternalLink, ShieldCheck
+  Search, Plus, Eye, Trash2, Loader2, ChevronLeft, ChevronRight, ExternalLink, ShieldCheck,
+  CloudDownload, CheckCircle2, AlertCircle, PlusCircle,
+  Newspaper
 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
+import VModal from '../components/VModal';
+import VButton from '../components/VButton';
 
 const AdminNewsList = () => {
+    const navigate = useNavigate();
     const [news, setNews] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -13,12 +19,28 @@ const AdminNewsList = () => {
     const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10, total_pages: 0 });
     const token = localStorage.getItem('auth_token');
 
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [newsToDelete, setNewsToDelete] = useState<{id: number, title: string} | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+    const [crawling, setCrawling] = useState(false);
+    const [isCrawlSuccessModalOpen, setIsCrawlSuccessModalOpen] = useState(false);
+    const [crawlResults, setCrawlResults] = useState<{new: number, updated: number, skipped: number, total: number} | null>(null);
+
     const fetchNews = async (page = 1, search = '', cat = '') => {
         try {
             setLoading(true);
-            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-            const res = await axios.get(`${host}/BE/modules/api/admin/admin_news.php`, {
-                params: { token, page, search, category: cat, limit: 10 }
+            const res = await axios.get(`${API_BASE_URL}/index.php`, {
+                params: { 
+                    module: 'api',
+                    action: 'admin/admin_news',
+                    token, 
+                    page, 
+                    search, 
+                    category: cat, 
+                    limit: 10 
+                }
             });
             if (res.data.status === 'success') {
                 setNews(res.data.data);
@@ -28,6 +50,71 @@ const AdminNewsList = () => {
             console.error('Error fetching admin news:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = (id: number, title: string) => {
+        setNewsToDelete({ id, title });
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!newsToDelete) return;
+        
+        try {
+            setDeleting(true);
+            const res = await axios.post(`${API_BASE_URL}/index.php?module=api&action=admin/admin_news&token=${token}`, {
+                action: 'delete',
+                id: newsToDelete.id
+            });
+            if (res.data.status === 'success') {
+                setIsDeleteModalOpen(false);
+                setIsSuccessModalOpen(true);
+                fetchNews(pagination.page, searchTerm, filterCategory);
+            } else {
+                alert('Lỗi: ' + res.data.msg);
+            }
+        } catch (error) {
+            console.error('Error deleting news:', error);
+            alert('Lỗi kết nối máy chủ!');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const handleView = (id: number) => {
+        window.open(`/article/${id}`, '_blank');
+    };
+
+    const handleCrawl = async () => {
+        if (!window.confirm('Bạn có chắc chắn muốn tiến hành thu thập dữ liệu mới? Quá trình này có thể mất vài phút.')) return;
+        
+        try {
+            setCrawling(true);
+            const res = await axios.get(`${API_BASE_URL}/index.php`, {
+                params: {
+                    module: 'api',
+                    action: 'crawl_database'
+                }
+            });
+            
+            if (res.data.status === 'success') {
+                setCrawlResults({
+                    new: res.data.new,
+                    updated: res.data.updated,
+                    skipped: res.data.skipped,
+                    total: res.data.total
+                });
+                setIsCrawlSuccessModalOpen(true);
+                fetchNews(1, searchTerm, filterCategory);
+            } else {
+                alert('Lỗi: ' + (res.data.message || 'Thất bại khi thu thập dữ liệu'));
+            }
+        } catch (error) {
+            console.error('Error crawling news:', error);
+            alert('Lỗi kết nối máy chủ khi thu thập dữ liệu!');
+        } finally {
+            setCrawling(false);
         }
     };
 
@@ -60,17 +147,52 @@ const AdminNewsList = () => {
     };
 
     return (
-        <div className="space-y-6 max-w-[1400px] mx-auto pb-10 px-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Quản lý Tin tức</h1>
-                    <p className="text-slate-500 text-sm mt-1">Tổng cộng {pagination.total.toLocaleString()} bài báo trong hệ thống.</p>
+        <div className="space-y-8 pb-10">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                        Quản lý bài báo
+                    </h1>
+                    <p className="text-xs font-bold text-slate-400 tracking-widest">Danh sách tin tức và công cụ thu thập dữ liệu tự động</p>
                 </div>
-                <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
-                    <Plus size={18} />
-                    <span>Cào dữ liệu mới</span>
-                </button>
-            </div>
+                
+                <div className="flex items-center gap-4">
+                    <div className="bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+                        <div className="text-right whitespace-nowrap">
+                            <p className="text-[10px] font-bold text-slate-400 tracking-tight">
+                                Tổng cộng
+                            </p>
+                            <p className="text-xl font-black text-slate-900">
+                                {pagination.total.toLocaleString()}
+                            </p>
+                        </div>
+                        <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                            <Newspaper size={20} />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <VButton 
+                            variant="secondary" 
+                            size="md" 
+                            icon={CloudDownload}
+                            onClick={handleCrawl}
+                            loading={crawling}
+                        >
+                            {crawling ? 'Đang thu thập...' : 'Thu thập dữ liệu'}
+                        </VButton>
+                        <VButton 
+                            variant="primary" 
+                            size="md" 
+                            icon={PlusCircle}
+                            onClick={() => navigate('/admin/news/add')}
+                            className="shadow-lg shadow-blue-100"
+                        >
+                            Thêm bài báo
+                        </VButton>
+                    </div>
+                </div>
+            </header>
 
             <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col lg:flex-row gap-4 items-center">
                 <div className="relative flex-1 w-full">
@@ -80,9 +202,9 @@ const AdminNewsList = () => {
                         placeholder="Tìm kiếm tiêu đề, nguồn..."
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        className="w-full bg-slate-50 border border-transparent rounded-lg pl-11 pr-4 py-2.5 text-sm focus:bg-white focus:border-blue-200 outline-none transition-all"
+                        className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 text-sm font-bold text-slate-900 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all outline-none"
                     />
-                    {loading && <div className="absolute right-4 top-1/2 -translate-y-1/2"><Loader2 size={16} className="text-blue-600 animate-spin" /></div>}
+                    {loading && <div className="absolute right-6 top-1/2 -translate-y-1/2"><Loader2 size={18} className="text-blue-600 animate-spin" /></div>}
                 </div>
 
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
@@ -142,8 +264,20 @@ const AdminNewsList = () => {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Eye size={18} /></button>
-                                            <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18} /></button>
+                                            <button 
+                                                onClick={() => handleView(item.id)}
+                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="Xem bài báo"
+                                            >
+                                                <Eye size={18} />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDelete(item.id, item.title)}
+                                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Xóa bài báo"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -187,6 +321,55 @@ const AdminNewsList = () => {
                     </div>
                 </div>
             </div>
+
+            {}
+            <VModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                loading={deleting}
+                type="danger"
+                title="Xác nhận xóa"
+                message={`Bạn có chắc chắn muốn xóa bài báo "${newsToDelete?.title}"? Hành động này không thể hoàn tác.`}
+                confirmText="Xóa vĩnh viễn"
+                cancelText="Quay lại"
+            />
+
+            {}
+            <VModal
+                isOpen={isSuccessModalOpen}
+                onClose={() => setIsSuccessModalOpen(false)}
+                type="info"
+                title="Thành công"
+                message="Bài báo đã được xóa khỏi hệ thống."
+                confirmText="Đóng"
+                onConfirm={() => setIsSuccessModalOpen(false)}
+            />
+
+            {}
+            <VModal
+                isOpen={isCrawlSuccessModalOpen}
+                onClose={() => setIsCrawlSuccessModalOpen(false)}
+                type="info"
+                title="Thu thập dữ liệu hoàn tất"
+                confirmText="Tuyệt vời"
+                onConfirm={() => setIsCrawlSuccessModalOpen(false)}
+                message={
+                    <div className="space-y-4">
+                        <p className="text-sm text-slate-500">Quá trình đồng bộ hóa dữ liệu từ nguồn tin đã hoàn thành thành công.</p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-center">
+                                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Bài viết mới</p>
+                                <p className="text-2xl font-black text-emerald-700">{crawlResults?.new || 0}</p>
+                            </div>
+                            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tổng dữ liệu</p>
+                                <p className="text-2xl font-black text-white">{crawlResults?.total || 0}</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            />
         </div>
     );
 };
@@ -200,5 +383,4 @@ function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T 
 }
 
 export default AdminNewsList;
-
 

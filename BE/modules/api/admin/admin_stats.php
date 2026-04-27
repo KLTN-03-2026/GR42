@@ -8,7 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once '../../includes/database.php';
+require_once __DIR__ . '/../cors.php';
+require_once __DIR__ . '/../../../includes/database.php';
 
 $token = $_GET['token'] ?? '';
 
@@ -17,7 +18,6 @@ if (empty($token)) {
     exit;
 }
 
-// Verify admin token
 $checkToken = getOne("SELECT user_id FROM token_login WHERE token = '$token'");
 if (!$checkToken) {
     echo json_encode(['status' => 'error', 'msg' => 'Phiên làm việc hết hạn']);
@@ -35,6 +35,8 @@ if (!$user || $user['role'] !== 'admin') {
 $totalUsers = getOne("SELECT COUNT(*) as count FROM users")['count'];
 $totalNews = getOne("SELECT COUNT(*) as count FROM crawl_news")['count'];
 $totalComments = getOne("SELECT COUNT(*) as count FROM comments")['count'];
+$todayNews = getOne("SELECT COUNT(*) as count FROM crawl_news WHERE DATE(savedtime) = CURDATE()")['count'];
+$todayComments = getOne("SELECT COUNT(*) as count FROM comments WHERE DATE(created_at) = CURDATE()")['count'];
 
 $categories = getAll("SELECT category, COUNT(*) as count FROM crawl_news GROUP BY category ORDER BY count DESC LIMIT 5");
 
@@ -47,6 +49,14 @@ $recentActivity = getAll("
     ORDER BY date DESC LIMIT 5
 ");
 
+$weeklyNews = getAll("
+    SELECT DATE(savedtime) as date, COUNT(*) as count 
+    FROM crawl_news 
+    WHERE savedtime >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    GROUP BY DATE(savedtime)
+    ORDER BY date ASC
+");
+
 echo json_encode([
     'status' => 'success',
     'data' => [
@@ -54,10 +64,13 @@ echo json_encode([
             'total_users' => (int)$totalUsers,
             'total_news' => (int)$totalNews,
             'total_comments' => (int)$totalComments,
-            'today_visits' => 4521 // Placeholder for now
+            'today_news' => (int)$todayNews,
+            'today_comments' => (int)$todayComments,
+            'today_visits' => 4521 
         ],
         'categories' => $categories,
         'recent_news' => $recentNews,
-        'recent_activity' => $recentActivity
+        'recent_activity' => $recentActivity,
+        'weekly_news' => $weeklyNews
     ]
 ]);

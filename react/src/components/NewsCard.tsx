@@ -25,7 +25,7 @@ interface NewsCardProps {
 
 const normalizeImageUrl = (url: string | undefined) => {
   if (!url || url === '' || url.includes('placeholder')) return null;
-  if (url.startsWith('//')) return `https:${url}`;
+  if (url.startsWith('http')) return url;
   if (url.startsWith('/')) return `${API_BASE_URL.replace('/BE', '')}${url}`;
   return url;
 };

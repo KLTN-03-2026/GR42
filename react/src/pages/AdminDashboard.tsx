@@ -18,7 +18,6 @@ const COLORS = ['#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'];
 
 const normalizeImageUrl = (url: string | undefined) => {
     if (!url) return 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop';
-    if (url.startsWith('//')) return `https:${url}`;
     if (url.startsWith('/')) return `${API_BASE_URL.replace('/BE', '')}${url}`;
     return url;
 };
@@ -55,8 +54,13 @@ const AdminDashboard = () => {
 
     const fetchStats = useCallback(async () => {
         try {
-            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-            const res = await axios.get(`${host}/BE/modules/api/admin/admin_stats.php?token=${token}`);
+            const res = await axios.get(`${API_BASE_URL}/index.php`, {
+                params: {
+                    module: 'api',
+                    action: 'admin/admin_stats',
+                    token: token
+                }
+            });
             if (res.data.status === 'success') {
                 setData(res.data.data);
             }
@@ -107,10 +111,14 @@ const AdminDashboard = () => {
         value: parseInt(c.count)
     })) || [];
 
-    const barData = [
-        { name: 'T2', value: 400 }, { name: 'T3', value: 300 }, { name: 'T4', value: 600 },
-        { name: 'T5', value: 800 }, { name: 'T6', value: 500 }, { name: 'T7', value: 900 }, { name: 'CN', value: 700 },
-    ];
+    const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    const barData = data?.weekly_news?.map((item: any) => {
+        const date = new Date(item.date);
+        return {
+            name: dayNames[date.getDay()],
+            value: parseInt(item.count)
+        };
+    }) || [];
 
     return (
         <div className="space-y-8 max-w-[1400px] mx-auto pb-20 px-4 md:px-0">
@@ -125,17 +133,13 @@ const AdminDashboard = () => {
                 <div className="relative z-10 max-w-2xl">
                     <div className="flex items-center gap-3 mb-6">
                         <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-[0.2em]">
-                            Quản trị viên Hệ thống
+                            Quản lý Hệ thống
                         </span>
                         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4">
                         Xin chào, {userName}! 👋
                     </h1>
-                    <p className="text-blue-100 font-medium text-lg opacity-80 leading-relaxed">
-                        Chào mừng bạn quay trở lại. Hệ thống iAI News đang hoạt động ổn định. 
-                        Hôm nay có <span className="text-white font-black underline decoration-blue-400 decoration-4 underline-offset-4">12 bài báo mới</span> đang chờ phê duyệt.
-                    </p>
                 </div>
             </motion.div>
 
@@ -257,7 +261,7 @@ const AdminDashboard = () => {
                                 icon={MessageCircle} 
                                 label="Duyệt Bình Luận" 
                                 color="bg-violet-600" 
-                                badge={12}
+                                badge={data?.stats.today_comments}
                                 onClick={() => navigate('/admin/comments')} 
                             />
                             <button 
@@ -275,32 +279,6 @@ const AdminDashboard = () => {
                                 </div>
                                 <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
                             </button>
-                        </div>
-                    </div>
-
-                    <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-slate-200">
-                        <h3 className="font-black uppercase tracking-[0.2em] text-[10px] mb-8 text-slate-400 text-center">Hoạt động gần đây</h3>
-                        <div className="space-y-6">
-                            {data?.recent_activity.map((act: any, idx: number) => (
-                                <motion.div 
-                                    key={idx} 
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.8 + (idx * 0.1) }}
-                                    className="flex gap-4 group"
-                                >
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${act.type === 'user' ? 'bg-blue-500/10 text-blue-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
-                                        {act.type === 'user' ? <User size={18} /> : <MessageCircle size={18} />}
-                                    </div>
-                                    <div className="flex-1 overflow-hidden">
-                                        <h4 className="text-xs font-black uppercase tracking-wider mb-1 line-clamp-1">{act.title}</h4>
-                                        <p className="text-[10px] text-slate-400 font-medium mb-1 line-clamp-1 opacity-60 italic">{act.subtitle}</p>
-                                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                                            <Clock size={10} /> {new Date(act.date).toLocaleString('vi-VN')}
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            ))}
                         </div>
                     </div>
 
@@ -359,5 +337,4 @@ const QuickActionBtn = ({ icon: Icon, label, color, onClick, badge }: any) => (
 );
 
 export default AdminDashboard;
-
 

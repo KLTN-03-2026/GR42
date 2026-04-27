@@ -14,6 +14,43 @@ if (!$checkToken) die(json_encode(['status' => 'error', 'msg' => 'Token không h
 $admin = getOne("SELECT role FROM users WHERE id = " . $checkToken['user_id']);
 if (!$admin || $admin['role'] !== 'admin') die(json_encode(['status' => 'error', 'msg' => 'Không có quyền truy cập']));
 
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $action = $input['action'] ?? '';
+    
+    if ($action === 'delete') {
+        $id = (int)($input['id'] ?? 0);
+        if ($id > 0) {
+            delete('crawl_news', "id = $id");
+            echo json_encode(['status' => 'success', 'msg' => 'Đã xóa bài báo']);
+            exit;
+        }
+    }
+
+    if ($action === 'add') {
+        $dataInsert = [
+            'title' => $input['title'] ?? '',
+            'category' => $input['category'] ?? '',
+            'content' => $input['content'] ?? '',
+            'source' => $input['source'] ?? 'Admin',
+            'link' => $input['link'] ?? '',
+            'image' => $input['thumbnail'] ?? '',
+            'pubDate' => $input['pubDate'] ?? date('Y-m-d H:i:s'),
+            'savedtime' => date('Y-m-d H:i:s')
+        ];
+        
+        if (insert('crawl_news', $dataInsert)) {
+            echo json_encode(['status' => 'success', 'msg' => 'Đã thêm bài báo mới']);
+            exit;
+        } else {
+            echo json_encode(['status' => 'error', 'msg' => 'Lỗi khi thêm bài báo vào database']);
+            exit;
+        }
+    }
+}
+
 $page     = (int)($_GET['page'] ?? 1);
 $limit    = (int)($_GET['limit'] ?? 10);
 $search   = $_GET['search'] ?? '';

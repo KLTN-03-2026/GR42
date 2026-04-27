@@ -23,7 +23,7 @@ const VButton: React.FC<VButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 rounded-2xl gap-2';
+  const baseStyles = 'inline-flex items-center justify-center font-bold transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 rounded-2xl gap-2';
   
   const variants = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700',
@@ -35,9 +35,9 @@ const VButton: React.FC<VButtonProps> = ({
   };
 
   const sizes = {
-    sm: 'px-4 py-2 text-[10px]',
-    md: 'px-8 py-4 text-xs',
-    lg: 'px-12 py-5 text-sm'
+    sm: 'px-5 py-2.5 text-xs',
+    md: 'px-8 py-4 text-sm',
+    lg: 'px-12 py-5 text-base'
   };
 
   const paddingClass = className.match(/p[xy]?-\d+/)?.[0] || '';

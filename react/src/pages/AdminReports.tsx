@@ -59,21 +59,31 @@ const AdminReports = () => {
     };
 
     return (
-        <div className="p-8">
-            <div className="flex justify-between items-center mb-10">
+        <div className="space-y-8 pb-10">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase flex items-center gap-3">
-                        <ShieldAlert className="text-blue-600" size={32} />
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">
                         Quản lý báo cáo bài viết
-                    </h2>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Danh sách các bài viết bị người dùng báo cáo vi phạm</p>
+                    </h1>
+                    <p className="text-xs font-bold text-slate-400 tracking-widest">Xử lý các bài viết bị người dùng báo cáo vi phạm</p>
                 </div>
+                
                 <div className="flex items-center gap-4">
-                    <div className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest border border-blue-100">
-                        {reports.length} Báo cáo
+                    <div className="bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+                        <div className="text-right whitespace-nowrap">
+                            <p className="text-[10px] font-bold text-slate-400 tracking-tight">
+                                Tổng báo cáo
+                            </p>
+                            <p className="text-xl font-black text-slate-900">
+                                {reports.length.toLocaleString()}
+                            </p>
+                        </div>
+                        <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                            <ShieldAlert size={20} />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
@@ -86,7 +96,7 @@ const AdminReports = () => {
                         <Bell size={40} />
                     </div>
                     <h3 className="text-xl font-black text-slate-900 mb-2">Chưa có báo cáo nào</h3>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tuyệt vời! Hiện tại không có bài viết nào bị báo cáo.</p>
+                    <p className="text-xs font-bold text-slate-400 tracking-widest">Tuyệt vời! Hiện tại không có bài viết nào bị báo cáo.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-6">

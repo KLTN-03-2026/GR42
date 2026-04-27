@@ -70,6 +70,7 @@ if (isPost()) {
             'email' => $email,
             'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($fullname) . '&background=random&color=fff',
             'active_token' => $active_token,
+            'status' => 1,
             'created_at' => date('Y-m-d H:i:s')
         ];
 
@@ -78,28 +79,19 @@ if (isPost()) {
             $emailTo = $email;
             $subject = 'Kich hoat tai khoan he thong Tai!!';
             $content = 'Chuc mung ban da dang ky thanh cong tai khoan tai Tai. </br>';
-            $content .= 'De kich hoat tai khoan ban hay click vao duong link ben duoi: </br>';
-            $content .= _HOST_URL . '/?module=auth&action=active&token=' . $active_token . '</br>';
+            $content .= 'Tai khoan cua ban da duoc kich hoat va co the su dung ngay lap tuc. </br>';
             $content .= 'Cam on ban da ung ho Tai!!!';
 
             try {
                 ob_clean();
                 sendMail($emailTo, $subject, $content);
-                $smtpOutput = ob_get_clean();
-
-                if (!empty($smtpOutput) && strpos($smtpOutput, 'Gui that bai') !== false) {
-                    $response['status'] = 'success';
-                    $response['msg'] = 'Dang ky thanh cong! Ban co the dang nhap ngay.';
-                    update('users', ['status' => 1], "email = '" . $conn->real_escape_string($email) . "'");
-                } else {
-                    $response['status'] = 'success';
-                    $response['msg'] = 'Dang ky thanh công! Vui lòng kiem tra email de kich hoat.';
-                }
+                ob_get_clean();
             } catch (Exception $e) {
-                $response['status'] = 'success';
-                $response['msg'] = 'Dang ky thanh cong! Ban co the dang nhap ngay.';
-                update('users', ['status' => 1], "email = '" . $conn->real_escape_string($email) . "'");
+                
             }
+
+            $response['status'] = 'success';
+            $response['msg'] = 'Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.';
         }
     } else {
         $response['msg'] = 'Vui long kiem tra lai thong tin nhap vao';

@@ -66,7 +66,7 @@ if (isset($_GET['code'])) {
                 }
             } else {
                 $userId = $checkUser['id'];
-                // Update avatar if it's empty
+                
                 if (empty($checkUser['avatar']) && !empty($userinfo['picture'])) {
                     update('users', ['avatar' => $userinfo['picture']], "id = '$userId'");
                 }
@@ -79,7 +79,11 @@ if (isset($_GET['code'])) {
                 'user_id' => $userId,
                 'created_at' => date('Y-m-d H:i:s')
             ];
-            insert('token_login', $tokenData);
+            $res = $conn->query("INSERT INTO token_login (token, user_id, created_at) VALUES ('$token', $userId, NOW())");
+            if (!$res) {
+                header('Location: ' . _FRONTEND_URL . '/login?error=' . urlencode('Lỗi tạo token: ' . $conn->error));
+                exit;
+            }
             $userFinal = getOne("SELECT avatar, role FROM users WHERE id = '$userId'");
             $avatar = $userFinal['avatar'] ?? '';
             $role = $userFinal['role'] ?? 'user';
@@ -90,7 +94,7 @@ if (isset($_GET['code'])) {
             $state = $_GET['state'] ?? '';
 
             if ($state === 'react') {
-                $redirectUrl = _FRONTEND_URL . "/login?token=" . $token . "&name=" . urlencode($name) . "&avatar=" . urlencode($avatar) . "&role=" . $role . "&email=" . urlencode($email);
+                $redirectUrl = _FRONTEND_URL . "/login?token=" . $token;
             } else {
                 $redirectUrl = _HOST_URL . "/?module=news&action=list";
             }

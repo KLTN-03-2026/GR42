@@ -12,7 +12,6 @@
   }
 }
 
-/* Fallback for typography if plugin is missing */
 .prose {
   @apply text-slate-600 leading-relaxed max-w-none;
 }
@@ -56,12 +55,10 @@
   }
 }
 
-
 * {
   box-sizing: border-box;
 }
 
-/* Hide native browser password reveal buttons as we use custom ones */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
