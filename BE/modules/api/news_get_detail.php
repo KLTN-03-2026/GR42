@@ -19,10 +19,17 @@ if (!$news) {
 }
 
 $is_favourite = false;
+$user_is_vip = 0;
 if (!empty($token)) {
     $checkToken = getOne("SELECT user_id FROM token_login WHERE token = '$token'");
     if (!empty($checkToken)) {
         $user_id = $checkToken['user_id'];
+        
+        $userInfo = getOne("SELECT is_vip FROM users WHERE id = $user_id");
+        if (!empty($userInfo)) {
+            $user_is_vip = $userInfo['is_vip'];
+        }
+
         $fav = getOne("
             SELECT f.id 
             FROM favourite_news f 
@@ -72,6 +79,8 @@ echo json_encode([
         'link' => $news['link'],
         'category' => $news['category'],
         'is_favourite' => $is_favourite,
+        'user_id' => $user_id,
+        'is_vip' => $user_is_vip,
         'comments' => $comments,
         'related' => $related
     ]

@@ -37,3 +37,6 @@ define('_GOOGLE_CLIENT_ID', $envConfig['GOOGLE_CLIENT_ID'] ?? '');
 define('_GOOGLE_CLIENT_SECRET', $envConfig['GOOGLE_CLIENT_SECRET'] ?? '');
 /*Json URL GGSHEET*/
 define('_JSON_URL_SHEET', $envConfig['JSON_URL_SHEET'] ?? '');
+
+/*Sepay Token*/
+define('_SEPAY_TOKEN', $envConfig['SEPAY_TOKEN'] ?? '');
