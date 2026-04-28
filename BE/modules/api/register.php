@@ -77,10 +77,10 @@ if (isPost()) {
         $insertStatus = insert('users', $dbData);
         if ($insertStatus) {
             $emailTo = $email;
-            $subject = 'Kich hoat tai khoan he thong Tai!!';
-            $content = 'Chuc mung ban da dang ky thanh cong tai khoan tai Tai. </br>';
+            $subject = 'Kich hoat tai khoan he thong Vertex!!';
+            $content = 'Chuc mung ban da dang ky thanh cong tai khoan tai Vertex. </br>';
             $content .= 'Tai khoan cua ban da duoc kich hoat va co the su dung ngay lap tuc. </br>';
-            $content .= 'Cam on ban da ung ho Tai!!!';
+            $content .= 'Cam on ban da ung ho Vertex!!!';
 
             try {
                 ob_clean();

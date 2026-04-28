@@ -4,21 +4,26 @@ require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../includes/database.php';
 
+set_time_limit(0);
+ini_set('memory_limit', '512M');
+
 $conn->set_charset("utf8mb4");
 function fetchUrl($url)
 {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 15,
+        CURLOPT_TIMEOUT => 30, 
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_SSL_VERIFYPEER => false,
     ]);
     $data = curl_exec($ch);
     $error = curl_error($ch);
-    unset($ch);
+    $info = curl_getinfo($ch);
+    curl_close($ch);
+
     if ($data === false) {
-        return false;
+        return ["error" => $error, "info" => $info];
     }
     return $data;
 }
@@ -38,9 +43,7 @@ function cleanContent($html, $source = '')
     $html = trim(str_replace('""', '"', $html));
 
     if ($source === 'vietnamnet') {
-        // Xóa phần đầu bị dính chuỗi thẻ lúc cào
         $html = preg_replace('/^(id="maincontent"|class="content-detail"|class="maincontent main-content")[^>]*>/i', '', $html);
-        // Xóa các khối rác, tin liên quan (đây chính là nơi chứa các hình ảnh bị dư thừa)
         $html = preg_replace('/<div[^>]*class="[^"]*(ArticleRelate|article-relate|news-feature|related-news|insert-wiki-content)[^"]*"[^>]*>[\s\S]*?<\/div>/i', '', $html);
         $html = preg_replace('/<table[^>]*class="[^"]*(vnn-quote)[^"]*"[^>]*>[\s\S]*?<\/table>/i', '', $html);
     }
@@ -53,8 +56,6 @@ function cleanContent($html, $source = '')
     foreach ($xpath->query('//script|//style|//table|//iframe|//form|//nav|//header|//footer') as $node) {
         $node->parentNode->removeChild($node);
     }
-
-    // Cắt bỏ phần "Xem thêm về:"
     foreach ($xpath->query('//*[contains(text(), "Xem thêm về:")]') as $node) {
         if ($node->parentNode) {
             $node->parentNode->removeChild($node);
@@ -137,6 +138,14 @@ function makeThumbnailUrl($url)
 $jsonUrl = _JSON_URL_SHEET;
 $response = fetchUrl($jsonUrl);
 
+if (is_array($response) && isset($response['error'])) {
+    die(json_encode([
+        "status" => "error",
+        "message" => "CURL Error: " . $response['error'],
+        "http_code" => $response['info']['http_code'] ?? 'unknown'
+    ]));
+}
+
 if (!$response || strlen($response) < 50) {
     die(json_encode([
         "status" => "error",
@@ -155,11 +164,9 @@ if (!$data) {
         "message" => "JSON decode loi tu chuoi Google Sheet"
     ]));
 }
-
-// $conn->query("DELETE FROM crawl_news"); // Commented out to preserve favorites and comments
-$sql = "INSERT INTO crawl_news (id, title, link, image, pubdate, source, savedtime, category, content) 
+$sql = "INSERT INTO crawl_news (id, title, link, thumbnail, pubdate, source, savedtime, category, content) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE title = VALUES(title), link = VALUES(link),
-        image = VALUES(image), pubdate = VALUES(pubdate), source = VALUES(source), savedtime = VALUES(savedtime),
+        thumbnail = VALUES(thumbnail), pubdate = VALUES(pubdate), source = VALUES(source), savedtime = VALUES(savedtime),
         category = VALUES(category), content = VALUES(content)";
 $stmt = $conn->prepare($sql);
 
