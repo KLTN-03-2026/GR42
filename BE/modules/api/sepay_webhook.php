@@ -3,14 +3,11 @@ require_once dirname(__DIR__, 2) . '/config.php';
 require_once dirname(__DIR__, 2) . '/includes/database.php';
 require_once 'cors.php';
 
-// Chỉ nhận phương thức POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Method Not Allowed']);
     exit;
 }
-
-// Đọc dữ liệu JSON từ body
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
 
@@ -20,7 +17,6 @@ if (!$data) {
     exit;
 }
 
-// Lấy thông tin từ Sepay webhook
 $gateway = $data['gateway'] ?? null;
 $transactionDate = $data['transactionDate'] ?? null;
 $accountNumber = $data['accountNumber'] ?? null;
@@ -33,16 +29,25 @@ $accumulated = $data['accumulated'] ?? 0;
 $referenceCode = $data['referenceCode'] ?? null;
 $description = $data['description'] ?? null;
 
-// Kiểm tra xem mã giao dịch đã tồn tại chưa để tránh lưu trùng lặp
 $checkExist = getRows("SELECT id FROM transactions WHERE referenceCode = '$referenceCode' AND referenceCode != '' AND referenceCode IS NOT NULL");
 
 if ($checkExist > 0) {
     echo json_encode(['success' => true, 'message' => 'Transaction already processed']);
     exit;
 }
+$userIdToSave = null;
+if (preg_match('/VIP\s*(\d+)/i', $content, $matches)) {
+    $parsedId = (int)$matches[1];
+    if ($parsedId > 0) {
+        $checkUser = getRows("SELECT id FROM users WHERE id = $parsedId");
+        if ($checkUser > 0) {
+            $userIdToSave = $parsedId;
+        }
+    }
+}
 
-// Lưu giao dịch vào cơ sở dữ liệu
 $insertData = [
+    'user_id' => $userIdToSave,
     'gateway' => $gateway,
     'transactionDate' => $transactionDate,
     'accountNumber' => $accountNumber,
@@ -60,15 +65,8 @@ $insertData = [
 $result = insert('transactions', $insertData);
 
 if ($result) {
-    // TẠI ĐÂY BẠN CÓ THỂ THÊM LOGIC ĐỂ XỬ LÝ ĐƠN HÀNG HOẶC CỘNG TIỀN VÀO TÀI KHOẢN NGƯỜI DÙNG
-    // Ví dụ: Tìm user_id từ nội dung chuyển khoản ($content) và cập nhật số dư, hoặc nâng cấp VIP
-    
-    // Nâng cấp VIP nếu số tiền >= 30,000 và nội dung có chữ VIP [ID]
-    if ($transferAmount >= 30000 && preg_match('/VIP\s*(\d+)/i', $content, $matches)) {
-        $userIdToUpgrade = (int)$matches[1];
-        if ($userIdToUpgrade > 0) {
-            update('users', ['is_vip' => 1], "id = $userIdToUpgrade");
-        }
+    if ($transferAmount >= 30000 && $userIdToSave > 0) {
+        update('users', ['is_vip' => 1], "id = $userIdToSave");
     }
     
     echo json_encode(['success' => true, 'message' => 'Webhook received and saved successfully']);
