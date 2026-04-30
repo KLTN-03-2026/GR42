@@ -56,7 +56,7 @@ $totalResult = $stmtCount->get_result()->fetch_assoc();
 $total = $totalResult ? $totalResult['total'] : 0;
 $stmtCount->close();
 
-$sql = "SELECT n.*,
+$sql = "SELECT n.*, n.thumbnail as image, n.pubdate as pubDate,
        EXISTS (
            SELECT 1 
            FROM favourite_news f 
@@ -70,7 +70,7 @@ FROM (
     GROUP BY title
 ) as unique_news
 JOIN crawl_news n ON n.id = unique_news.id
-ORDER BY n.pubDate DESC
+ORDER BY n.pubdate DESC
 LIMIT ? OFFSET ?";
 
 $stmt = $conn->prepare($sql);

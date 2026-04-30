@@ -16,7 +16,7 @@ define('_DB', $envConfig['DB_NAME'] ?? 'crawl_news');
 define('_USER', $envConfig['DB_USER'] ?? 'root');
 define('_PASS', $envConfig['DB_PASS'] ?? '');
 
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ? "https://" : "http://";
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $currentPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 if (strpos($currentPath, '/modules') !== false) {

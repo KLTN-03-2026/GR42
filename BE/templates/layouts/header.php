@@ -22,9 +22,11 @@ if (empty($user)) {
     redirect('?module=auth&action=login');
     exit;
 }
+
+global $lang;
 ?>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="<?= $lang ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -47,6 +49,8 @@ if (empty($user)) {
         justify-content: flex-end;
         padding: 0 15px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 1050;
     }
 
     .user-info {
@@ -87,6 +91,13 @@ if (empty($user)) {
     .actions .btn:hover {
         background: rgba(255, 255, 255, 0.35);
     }
+
+    .skip-links {
+        display: none !important;
+    }
+    .app-footer {
+        display: none !important;
+    }
     </style>
 </head>
 
@@ -94,7 +105,7 @@ if (empty($user)) {
 
     <!-- Header -->
     <div class="header">
-        <a href="list.php" class="d-flex align-items-center mb-2 mb-md-0" aria-label="Trang chủ">
+        <a href="<?= _HOST_URL ?>/?module=news&action=list" class="d-flex align-items-center mb-2 mb-md-0" aria-label="Trang chủ">
             <img src="templates/assets/image/logo_news.jpg" alt="Logo tin tức" class="logo">
         </a>
         <form action="index.php" method="get" class="position-relative mb-2 mb-md-0 flex-grow-1 me-3" role="search">
@@ -104,9 +115,9 @@ if (empty($user)) {
             <div class="search-wrapper position-relative">
                 <input type="text" id="searchBox" name="keyword"
                     value="<?php echo htmlspecialchars($keyword ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                    class="form-control search-input" placeholder="Tìm kiếm tin tức..." autocomplete="off"
-                    onkeyup="suggestSearch()" aria-label="Tìm kiếm tin tức">
-                <button class="search-btn" type="submit" aria-label="Tìm kiếm">
+                    class="form-control search-input" placeholder="<?= __('search_placeholder') ?>" autocomplete="off"
+                    onkeyup="suggestSearch()" aria-label="<?= __('search_placeholder') ?>">
+                <button class="search-btn" type="submit" aria-label="<?= __('search') ?>">
                     <i class="fa fa-search"></i>
                 </button>
                 <div id="suggestionBox" role="listbox"></div>
@@ -114,14 +125,23 @@ if (empty($user)) {
         </form>
 
         <div class="user-info">
+            <div class="dropdown me-3">
+                <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fa fa-globe me-1"></i> <?= ($lang == 'vi') ? __('lang_vi') : __('lang_en') ?>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li><a class="dropdown-item" href="?<?= http_build_query(array_merge($_GET, ['lang' => 'vi'])) ?>"><?= __('lang_vi') ?></a></li>
+                    <li><a class="dropdown-item" href="?<?= http_build_query(array_merge($_GET, ['lang' => 'en'])) ?>"><?= __('lang_en') ?></a></li>
+                </ul>
+            </div>
             <img src="<?= !empty($user['avatar']) ? htmlspecialchars($user['avatar']) : './templates/uploads/avatar.jpg' ?>"
                 alt="User Image">
             <span><?= htmlspecialchars($user['fullname']) ?></span>
         </div>
         <div class="actions">
-            <a href="<?= _HOST_URL  ?>/?module=news&action=favourite_list" class="btn">Tin yêu thích</a>
-            <a href="<?= _HOST_URL  ?>/?module=users&action=profile" class="btn">Xem hồ sơ</a>
-            <a href="<?= _HOST_URL  ?>/?module=auth&action=logout" class="btn">Đăng xuất</a>
+            <a href="<?= _HOST_URL  ?>/?module=news&action=favourite_list" class="btn"><?= __('favorite_news') ?></a>
+            <a href="<?= _HOST_URL  ?>/?module=users&action=profile" class="btn"><?= __('profile') ?></a>
+            <a href="<?= _HOST_URL  ?>/?module=auth&action=logout" class="btn"><?= __('logout') ?></a>
         </div>
 
     </div>

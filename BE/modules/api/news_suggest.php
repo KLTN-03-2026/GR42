@@ -19,7 +19,7 @@ if (mb_strlen($query) < 2) {
     exit;
 }
 
-$stmt = $conn->prepare("SELECT title FROM crawl_news WHERE title LIKE ? ORDER BY pubDate DESC LIMIT 20");
+$stmt = $conn->prepare("SELECT title FROM crawl_news WHERE title LIKE ? ORDER BY pubdate DESC LIMIT 20");
 $likeQuery = "%" . $query . "%";
 $stmt->bind_param("s", $likeQuery);
 $stmt->execute();

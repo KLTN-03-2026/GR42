@@ -25,7 +25,7 @@ $user_id = (int)$checkToken['user_id'];
 
 if ($method === 'GET' || $action_type === 'list') {
     $favorites = getAll("
-        SELECT n.id, n.title, n.category, n.source, n.image, n.pubDate, 1 AS is_favourite
+        SELECT n.id, n.title, n.category, n.source, n.thumbnail as image, n.pubdate as pubDate, 1 AS is_favourite
         FROM favourite_news f
         JOIN crawl_news n ON f.news_id = n.id
         WHERE f.user_id = $user_id

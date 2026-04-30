@@ -12,6 +12,25 @@ require_once './includes/mailer/PHPMailer.php';
 require_once './includes/mailer/SMTP.php';
 require_once './includes/functions.php';
 
+// Cấu hình đa ngôn ngữ
+$lang = 'vi'; // Mặc định
+if (!empty($_SESSION['lang'])) {
+    $lang = $_SESSION['lang'];
+}
+
+// Cho phép đổi ngôn ngữ qua query string
+if (!empty($_GET['lang'])) {
+    $lang = $_GET['lang'];
+    $_SESSION['lang'] = $lang;
+}
+
+$langFile = './includes/languages/' . $lang . '.php';
+if (file_exists($langFile)) {
+    $translations = require_once $langFile;
+} else {
+    $translations = require_once './includes/languages/vi.php';
+}
+
 $pass = 123456789;
 $rel = password_hash($pass, PASSWORD_DEFAULT);
 $pass_user_input = '12345678239';

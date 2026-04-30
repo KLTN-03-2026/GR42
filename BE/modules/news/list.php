@@ -20,3 +20,4 @@ renderView('news/list', [
     'category' => $category,
     'keyword' => $keyword
 ]);
+layout('footer', $data);

@@ -103,9 +103,9 @@ if (isset($conn) && $conn) {
     $conn->set_charset("utf8mb4");
     $keyword = extractKeyword($prompt);
     if (empty($keyword)) {
-        $stmt = $conn->prepare("SELECT title, source, link, pubDate FROM crawl_news ORDER BY pubDate DESC LIMIT 5");
+        $stmt = $conn->prepare("SELECT title, source, link, pubdate as pubDate FROM crawl_news ORDER BY pubdate DESC LIMIT 5");
     } else {
-        $stmt = $conn->prepare("SELECT title, source, link, pubDate FROM crawl_news WHERE title LIKE ? ORDER BY pubDate DESC LIMIT 5");
+        $stmt = $conn->prepare("SELECT title, source, link, pubdate as pubDate FROM crawl_news WHERE title LIKE ? ORDER BY pubdate DESC LIMIT 5");
     }
     if ($stmt) {
         if (!empty($keyword)) {
