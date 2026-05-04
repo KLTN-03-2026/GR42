@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Heart, CheckCircle, Loader2, Newspaper, Heart as HeartIcon } from 'lucide-react';
+import { User, Heart, CheckCircle, Loader2, Newspaper, Heart as HeartIcon, Crown } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import NewsCard, { NewsItem } from '../components/NewsCard';
 import VButton from '../components/VButton';
 import { getCategoryInfo } from '../components/CategoryUI';
 import ProfileInfo from '../components/ProfileInfo';
+import UpgradeVIP from '../components/UpgradeVIP';
 
 const Profile = () => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const Profile = () => {
   const [loadingInterests, setLoadingInterests] = useState(false);
   const [apiCategories, setApiCategories] = useState<any[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [userData, setUserData] = useState<any>(null);
 
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loadingFavorites, setLoadingFavorites] = useState(false);
@@ -27,6 +29,7 @@ const Profile = () => {
   const sidebarItems = [
     { id: 'personal', name: 'Thông tin cá nhân', icon: User },
     { id: 'interests', name: 'Sở thích', icon: Heart },
+    { id: 'upgrade', name: 'Nâng cấp VIP', icon: Crown },
   ];
 
   useEffect(() => {
@@ -41,6 +44,7 @@ const Profile = () => {
         .then(res => { 
           if (res.data.status === 'success') {
             setSelectedInterests(res.data.data.interests);
+            setUserData(res.data.data.profile);
           }
         })
         .catch(err => console.error('Lỗi fetch user data:', err));
@@ -154,6 +158,8 @@ const Profile = () => {
               <div className="flex-1">
                 {subTab === 'personal' ? (
                   <ProfileInfo authToken={authToken} />
+                ) : subTab === 'upgrade' ? (
+                  <UpgradeVIP authToken={authToken} userData={userData} />
                 ) : (
                   <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-[2.5rem] p-12 border border-slate-100 shadow-sm">
                     <div className="mb-12">

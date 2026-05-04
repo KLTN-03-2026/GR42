@@ -20,7 +20,7 @@ if (!$checkToken) {
 $user_id = (int)$checkToken['user_id'];
 
 if ($method === 'GET' || $action === 'get_all') {
-    $profile = getOne("SELECT id, fullname, email, phone, address, avatar, role, created_at FROM users WHERE id = $user_id");
+    $profile = getOne("SELECT id, fullname, email, phone, address, avatar, role, is_vip, created_at FROM users WHERE id = $user_id");
     
     $avatar = $profile['avatar'] ?? '';
     if (!empty($avatar) && !preg_match('/^http/', $avatar) && !preg_match('/^data:/', $avatar)) {
