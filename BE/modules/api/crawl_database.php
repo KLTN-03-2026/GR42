@@ -13,7 +13,7 @@ function fetchUrl($url)
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 30, 
+        CURLOPT_TIMEOUT => 30,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_SSL_VERIFYPEER => false,
     ]);
@@ -164,9 +164,9 @@ if (!$data) {
         "message" => "JSON decode loi tu chuoi Google Sheet"
     ]));
 }
-$sql = "INSERT INTO crawl_news (id, title, link, thumbnail, pubdate, source, savedtime, category, content) 
+$sql = "INSERT INTO crawl_news (id, title, link, image, pubdate, source, savedtime, category, content) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE title = VALUES(title), link = VALUES(link),
-        thumbnail = VALUES(thumbnail), pubdate = VALUES(pubdate), source = VALUES(source), savedtime = VALUES(savedtime),
+        image = VALUES(image), pubdate = VALUES(pubdate), source = VALUES(source), savedtime = VALUES(savedtime),
         category = VALUES(category), content = VALUES(content)";
 $stmt = $conn->prepare($sql);
 
