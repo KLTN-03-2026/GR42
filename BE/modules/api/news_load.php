@@ -56,7 +56,7 @@ $totalResult = $stmtCount->get_result()->fetch_assoc();
 $total = $totalResult ? $totalResult['total'] : 0;
 $stmtCount->close();
 
-$sql = "SELECT n.*, n.thumbnail as image, n.pubdate as pubDate,
+$sql = "SELECT n.*, n.image, n.pubdate as pubDate,
        EXISTS (
            SELECT 1 
            FROM favourite_news f 

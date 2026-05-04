@@ -20,7 +20,7 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
   const ACCOUNT_NUMBER = '0935058232';
   const AMOUNT = 30000;
   const TRANSFER_CONTENT = `VIP ${userData?.id || ''}`;
-  
+
   // VietQR generation
   const qrUrl = `https://img.vietqr.io/image/mbbank-${ACCOUNT_NUMBER}-compact2.png?amount=${AMOUNT}&addInfo=${encodeURIComponent(TRANSFER_CONTENT)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
 
@@ -57,7 +57,7 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
         </div>
         <h3 className="text-3xl font-black text-slate-900 mb-2 font-inter uppercase tracking-tighter">Bạn đang là Thành viên VIP</h3>
         <p className="text-sm font-medium text-slate-500 max-w-md mx-auto">Cảm ơn bạn đã đồng hành cùng chúng tôi. Bạn có toàn quyền truy cập các tính năng cao cấp và đọc báo không giới hạn.</p>
-        
+
         <div className="mt-12 bg-slate-50 rounded-3xl p-8 max-w-lg mx-auto border border-slate-100">
           <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">Đặc quyền của bạn</h4>
           <ul className="space-y-4 text-left">
@@ -104,7 +104,7 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
         <div className="flex-[1.5] w-full space-y-6">
           <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100">
             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Thông tin chuyển khoản thủ công</h4>
-            
+
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
                 <span className="text-xs font-bold text-slate-500 uppercase">Ngân hàng</span>
@@ -118,7 +118,7 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
                 <span className="text-xs font-bold text-slate-500 uppercase">Số tài khoản</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xl font-black text-slate-900">{ACCOUNT_NUMBER}</span>
-                  <button 
+                  <button
                     onClick={() => navigator.clipboard.writeText(ACCOUNT_NUMBER)}
                     className="p-1.5 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors"
                     title="Sao chép"
@@ -135,7 +135,7 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
                 <span className="text-xs font-bold text-amber-700 uppercase mb-2 sm:mb-0">Nội dung chuyển khoản (Bắt buộc)</span>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-black text-amber-600 font-mono tracking-wider">{TRANSFER_CONTENT}</span>
-                  <button 
+                  <button
                     onClick={() => navigator.clipboard.writeText(TRANSFER_CONTENT)}
                     className="p-1.5 bg-amber-200 text-amber-700 rounded-md hover:bg-amber-300 transition-colors"
                     title="Sao chép"
@@ -148,17 +148,17 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
           </div>
 
           <div className="flex justify-between items-center bg-blue-50/50 p-6 rounded-2xl border border-blue-100/50">
-             <div className="text-xs font-bold text-slate-500">
-                Hệ thống sẽ tự động cập nhật VIP sau <br/>1-3 phút kể từ khi chuyển khoản thành công.
-             </div>
-             <VButton 
-               variant="primary" 
-               icon={checking ? Activity : undefined}
-               onClick={handleCheckStatus}
-               loading={checking}
-             >
-               Kiểm tra thanh toán
-             </VButton>
+            <div className="text-xs font-bold text-slate-500">
+              Hệ thống sẽ tự động cập nhật VIP sau 1-3 phút kể từ khi chuyển khoản thành công.
+            </div>
+            <VButton
+              variant="primary"
+              icon={checking ? Activity : undefined}
+              onClick={handleCheckStatus}
+              loading={checking}
+            >
+              Kiểm tra thanh toán
+            </VButton>
           </div>
         </div>
       </div>

@@ -18,7 +18,7 @@ $news_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $data = ['title' => 'Bình luận bài viết'];
 layout('header', $data);
 
-$stmt = $conn->prepare("SELECT *, thumbnail as image, pubdate as pubDate FROM crawl_news WHERE id = ?");
+$stmt = $conn->prepare("SELECT *, image, pubdate as pubDate FROM crawl_news WHERE id = ?");
 $stmt->bind_param("i", $news_id);
 $stmt->execute();
 $news = $stmt->get_result()->fetch_assoc();

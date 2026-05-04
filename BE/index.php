@@ -31,31 +31,25 @@ if (file_exists($langFile)) {
     $translations = require_once './includes/languages/vi.php';
 }
 
-$pass = 123456789;
-$rel = password_hash($pass, PASSWORD_DEFAULT);
-$pass_user_input = '12345678239';
-$rel2=password_verify($pass_user_input,$rel);
-
-
 $module = _MODULES;
 $action = _ACTION;
 
-if (!empty($_GET['module'])){
+if (!empty($_GET['module'])) {
     $module = $_GET['module'];
 }
 
-if (!empty($_GET['action'])){
+if (!empty($_GET['action'])) {
     $action = $_GET['action'];
 }
 
-$path = 'modules/'. $module. '/'. $action . '.php';
+$path = 'modules/' . $module . '/' . $action . '.php';
 
-if(!empty($path)){
-    if(file_exists($path)){
+if (!empty($path)) {
+    if (file_exists($path)) {
         require_once $path;
-    }else {
-       require_once './modules/errors/404.php';
+    } else {
+        require_once './modules/errors/404.php';
     }
-}else{
+} else {
     require_once './modules/errors/500.php';
 }

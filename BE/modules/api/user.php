@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/cors.php';
-define('_TAI', true);
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../includes/database.php';
+if (!defined('_TAI')) {
+    define('_TAI', true);
+    require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../../includes/database.php';
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $inputData = json_decode(file_get_contents('php://input'), true);

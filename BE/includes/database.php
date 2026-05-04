@@ -114,5 +114,4 @@ function delete($table, $condition = '') {
 function lastID() {
     global $conn;
     return $conn->insert_id;
-}
-?>
+}

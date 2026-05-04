@@ -11,7 +11,7 @@ if ($id <= 0) {
     exit;
 }
 
-$news = getOne("SELECT *, thumbnail as image, pubdate as pubDate FROM crawl_news WHERE id = $id");
+$news = getOne("SELECT *, image, pubdate as pubDate FROM crawl_news WHERE id = $id");
 
 if (!$news) {
     echo json_encode(['status' => 'error', 'msg' => 'Không tìm thấy bài báo']);
@@ -59,7 +59,7 @@ $comments = getAll("
 ");
 
 $related = getAll("
-    SELECT id, title, category, source, thumbnail as image, pubdate as pubDate 
+    SELECT id, title, category, source, image, pubdate as pubDate 
     FROM crawl_news 
     WHERE category = '{$conn->real_escape_string($news['category'])}' AND id <> $id 
     ORDER BY id DESC 

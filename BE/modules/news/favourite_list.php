@@ -13,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $user_id = $_SESSION['user_id'] ?? 1;
-$sql = "SELECT f.news_id, c.title, c.link, c.thumbnail as image, f.created_at 
+$sql = "SELECT f.news_id, c.title, c.link, c.image, f.created_at 
         FROM favourite_news f 
         JOIN crawl_news c ON f.news_id = c.id 
         WHERE f.user_id = " . intval($user_id) . " 

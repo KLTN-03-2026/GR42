@@ -89,4 +89,4 @@ if ($method === 'POST') {
         echo json_encode(['status' => 'error', 'message' => 'Lỗi gửi báo cáo']);
     }
 }
-?>
+

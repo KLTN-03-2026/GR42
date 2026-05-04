@@ -1,9 +1,11 @@
 <?php
 require_once __DIR__ . '/../cors.php';
-define('_TAI', true);
-require_once __DIR__ . '/../../../config.php';
-require_once __DIR__ . '/../../../includes/database.php';
-require_once __DIR__ . '/../../../includes/functions.php';
+if (!defined('_TAI')) {
+    define('_TAI', true);
+    require_once __DIR__ . '/../../../config.php';
+    require_once __DIR__ . '/../../../includes/database.php';
+    require_once __DIR__ . '/../../../includes/functions.php';
+}
 
 $token = $_GET['token'] ?? '';
 if (empty($token)) die(json_encode(['status' => 'error', 'msg' => 'Thiếu token']));
@@ -37,7 +39,7 @@ if ($method === 'POST') {
             'source' => $input['source'] ?? 'Admin',
             'link' => $input['link'] ?? '',
             'image' => $input['thumbnail'] ?? '',
-            'pubDate' => $input['pubDate'] ?? date('Y-m-d H:i:s'),
+            'pubdate' => $input['pubDate'] ?? date('Y-m-d H:i:s'),
             'savedtime' => date('Y-m-d H:i:s')
         ];
         
@@ -62,7 +64,7 @@ if (!empty($search))   $where .= " AND (title LIKE '%$search%' OR source LIKE '%
 if (!empty($category)) $where .= " AND category = '$category'";
 
 $total = getOne("SELECT COUNT(*) as count FROM crawl_news WHERE $where")['count'];
-$data  = getAll("SELECT id, title, category, source, link, image, pubDate FROM crawl_news WHERE $where ORDER BY id DESC LIMIT $offset, $limit");
+$data  = getAll("SELECT id, title, category, source, link, image, pubdate FROM crawl_news WHERE $where ORDER BY id DESC LIMIT $offset, $limit");
 
 echo json_encode([
     'status' => 'success',
