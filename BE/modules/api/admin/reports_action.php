@@ -7,6 +7,7 @@ $inputData = json_decode(file_get_contents('php://input'), true);
 $token = trim($inputData['token'] ?? '');
 $id = (int)($inputData['id'] ?? 0);
 $action = trim($inputData['action'] ?? '');
+$type = trim($inputData['type'] ?? 'article');
 
 if (empty($token) || $id <= 0) {
     die(json_encode(['status' => 'error', 'message' => 'Dữ liệu không hợp lệ']));
@@ -17,10 +18,12 @@ if (!$checkAdmin || $checkAdmin['role'] !== 'admin') {
     die(json_encode(['status' => 'error', 'message' => 'Không có quyền truy cập']));
 }
 
+$table = ($type === 'comment') ? 'comment_reports' : 'article_reports';
+
 if ($action === 'process') {
-    $res = update('article_reports', ['status' => 1], "id = $id");
+    $res = update($table, ['status' => 1], "id = $id");
 } else if ($action === 'delete') {
-    $res = delete('article_reports', "id = $id");
+    $res = delete($table, "id = $id");
 } else {
     die(json_encode(['status' => 'error', 'message' => 'Hành động không hợp lệ']));
 }

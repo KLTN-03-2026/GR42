@@ -33,6 +33,11 @@
                     <span>Quản lý Bình luận</span>
                 </a>
                 
+                <a href="?module=admin&action=reports" class="sidebar-link <?= ($current_action == 'reports') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-flag"></i>
+                    <span>Quản lý Báo cáo</span>
+                </a>
+                
                 <h6 class="sidebar-heading px-4 mt-4 mb-2 text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Doanh thu</h6>
                 <a href="?module=admin&action=transactions" class="sidebar-link <?= ($current_action == 'transactions') ? 'active' : '' ?>">
                     <i class="fa-solid fa-money-bill-transfer"></i>
@@ -51,6 +56,7 @@
                             elseif($current_module == 'users') echo "Quản lý Users";
                             elseif($current_module == 'news') echo "Quản lý Bài báo";
                             elseif($current_action == 'comments') echo "Quản lý Bình luận";
+                            elseif($current_action == 'reports') echo "Quản lý Báo cáo";
                             elseif($current_action == 'transactions') echo "Quản lý Thanh Toán";
                             else echo "Trang quản trị";
                         ?>

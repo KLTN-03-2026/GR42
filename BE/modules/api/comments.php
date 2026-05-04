@@ -26,18 +26,22 @@ $inputData = json_decode(file_get_contents('php://input'), true);
 $token = trim($_GET['token'] ?? ($inputData['token'] ?? ''));
 $action_type = trim($_GET['action_type'] ?? ($inputData['action_type'] ?? 'list'));
 
-if ($method === 'POST' && empty($token)) {
-    die(json_encode(['status' => 'error', 'message' => 'Thiếu token xác thực']));
-}
+
 
 $user_id = 0;
 if (!empty($token)) {
     $checkToken = getOne("SELECT user_id FROM token_login WHERE token = '$token'");
     if ($checkToken) {
         $user_id = (int)$checkToken['user_id'];
-    } else if ($method === 'POST') {
-        die(json_encode(['status' => 'error', 'message' => 'Token không hợp lệ']));
     }
+}
+
+if ($user_id <= 0 && !empty($_SESSION['user_id'])) {
+    $user_id = (int)$_SESSION['user_id'];
+}
+
+if ($method === 'POST' && $user_id <= 0) {
+    die(json_encode(['status' => 'error', 'message' => 'Bạn cần đăng nhập để thực hiện thao tác này']));
 }
 
 if ($method === 'GET' || $action_type === 'list') {

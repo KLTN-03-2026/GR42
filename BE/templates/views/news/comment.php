@@ -261,7 +261,10 @@
                         <strong>Nguồn: <?= htmlspecialchars($news['source'] ?? 'Tổng hợp') ?></strong> &nbsp;|&nbsp;
                         <span><?= htmlspecialchars(date('l, d/m/Y H:i', strtotime($news['pubDate']))) ?></span>
                     </div>
-                    <button class="btn-read-article" id="btnReadAll" title="Đọc toàn bộ bài viết">🔊 Đọc bài</button>
+                    <div class="article-actions">
+                        <button class="btn-read-article" id="btnReadAll" title="Đọc toàn bộ bài viết">🔊 Đọc bài</button>
+                        <button class="btn-report-article" id="btnReportArticle" style="background: #fff; color: #757575; border: 1px solid #ddd; padding: 6px 12px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-left: 10px;">Báo cáo</button>
+                    </div>
                 </div>
             </header>
 
@@ -309,7 +312,7 @@
                 e.preventDefault();
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData.entries());
-                fetch('modules/api/comment_add.php', {
+                fetch('index.php?module=api&action=comments&action_type=add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -370,13 +373,16 @@
 
                 </div>
 
-                <?php if ($c['user_id'] == $_SESSION['user_id'] || (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')): ?>
                 <div class="comment-actions">
+                    <?php if ($c['user_id'] == $_SESSION['user_id'] || (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')): ?>
                     <button class="btn-edit-comment">Sửa</button>
-
                     <button class="btn-delete-comment" data-comment-id="<?= $c['id'] ?>">Xóa</button>
+                    <?php endif; ?>
+                    
+                    <?php if ($c['user_id'] != $_SESSION['user_id']): ?>
+                    <button class="btn-report-comment" data-comment-id="<?= $c['id'] ?>" style="color: #757575;">Báo cáo</button>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
 
             </div>
             <?php endwhile; ?>
@@ -477,18 +483,58 @@
             button.addEventListener('click', () => {
                 if (!confirm('Bạn có chắc chắn muốn xóa bình luận này?')) return;
                 const commentId = button.dataset.commentId;
-                fetch('modules/api/comment_delete.php', {
+                fetch('index.php?module=api&action=comments&action_type=delete', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        comment_id: commentId
+                        id: commentId
                     })
                 }).then(r => r.json()).then(res => {
                     if (res.status === 'success') location.reload();
                     else alert(res.message);
                 });
+            });
+        });
+
+        // Báo cáo bình luận
+        document.querySelectorAll('.btn-report-comment').forEach(button => {
+            button.addEventListener('click', () => {
+                const commentId = button.dataset.commentId;
+                const reason = prompt('Lý do báo cáo bình luận này:');
+                if (!reason) return;
+
+                fetch('index.php?module=api&action=reports', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        comment_id: commentId,
+                        reason: reason,
+                        details: 'Báo cáo từ giao diện PHP Template'
+                    })
+                }).then(r => r.json()).then(res => {
+                    alert(res.message);
+                });
+            });
+        });
+
+        // Báo cáo bài báo
+        document.getElementById('btnReportArticle')?.addEventListener('click', () => {
+            const newsId = document.querySelector('input[name="news_id"]').value;
+            const reason = prompt('Lý do báo cáo bài báo này:');
+            if (!reason) return;
+
+            fetch('index.php?module=api&action=reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    news_id: newsId,
+                    reason: reason,
+                    details: 'Báo cáo từ giao diện PHP Template'
+                })
+            }).then(r => r.json()).then(res => {
+                alert(res.message);
             });
         });
     });

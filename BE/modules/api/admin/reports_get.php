@@ -14,11 +14,21 @@ if (!$checkAdmin || $checkAdmin['role'] !== 'admin') {
 }
 
 $reports = getAll("
-    SELECT r.*, u.fullname as reporter_name, n.title as news_title, n.image as news_image, n.category as news_category
+    SELECT r.id, r.user_id, r.news_id as target_id, r.reason, r.details, r.status, r.created_at, 
+           'article' as type, u.fullname as reporter_name, n.title as target_title, n.image as news_image, n.category as news_category
     FROM article_reports r
     JOIN users u ON r.user_id = u.id
     JOIN crawl_news n ON r.news_id = n.id
-    ORDER BY r.status ASC, r.created_at DESC
+    
+    UNION ALL
+    
+    SELECT r.id, r.user_id, r.comment_id as target_id, r.reason, r.details, r.status, r.created_at, 
+           'comment' as type, u.fullname as reporter_name, c.content as target_title, NULL as news_image, NULL as news_category
+    FROM comment_reports r
+    JOIN users u ON r.user_id = u.id
+    JOIN comments c ON r.comment_id = c.id
+    
+    ORDER BY status ASC, created_at DESC
 ");
 
 echo json_encode(['status' => 'success', 'data' => $reports]);
