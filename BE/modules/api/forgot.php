@@ -47,7 +47,7 @@ if (isPost()) {
                 $subject = 'Reset mật khẩu tài khoản hệ thống Tai!!';
                 $content = 'Bạn đang yêu cầu reset mật khẩu tại Tai. <br>';
                 $content .= 'Để thay đổi mật khẩu, hãy click vào đường link bên dưới: <br>';
-                $content .= _HOST_URL . '/?module=auth&action=reset&token=' . $forgot_token . '<br>';
+                $content .= _FRONTEND_URL . '/reset-password?token=' . $forgot_token . '<br>';
                 $content .= 'Cảm ơn bạn đã ủng hộ Tai!!!';
 
                 try {
