@@ -153,12 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
     loading = false;
   }
 
-  function markAsViewedAndLoadAI(item) {
+  async function markAsViewedAndLoadAI(item) {
     let viewed = JSON.parse(sessionStorage.getItem("viewedNews") || "[]");
     if (!viewed.includes(item.id)) {
       viewed.push(item.id);
       sessionStorage.setItem("viewedNews", JSON.stringify(viewed));
     }
+    
     loadAIRelated(item.id);
   }
   async function loadAIRelated(articleId) {
@@ -365,6 +366,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   );
 
-  observer.observe(document.getElementById("loading"));
-  loadNews();
+  const loadingElMain = document.getElementById("loading");
+  if (loadingElMain) {
+    observer.observe(loadingElMain);
+  }
+  
+  // Chỉ gọi loadNews nếu đang ở trang có danh sách tin
+  if (document.getElementById("newsList")) {
+    loadNews();
+  }
 });

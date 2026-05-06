@@ -30,6 +30,18 @@ if (!empty($token)) {
             $user_is_vip = $userInfo['is_vip'];
         }
 
+        // Ghi lại lịch sử xem
+        $checkHistory = getOne("SELECT id FROM history WHERE user_id = $user_id AND news_id = $id");
+        if ($checkHistory) {
+            update('history', ['viewed_at' => date('Y-m-d H:i:s')], "id = " . $checkHistory['id']);
+        } else {
+            insert('history', [
+                'user_id' => $user_id,
+                'news_id' => $id,
+                'viewed_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+
         $fav = getOne("
             SELECT f.id 
             FROM favourite_news f 

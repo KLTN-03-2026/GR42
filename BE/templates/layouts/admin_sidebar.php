@@ -64,15 +64,6 @@
                 </div>
                 
                 <div class="topbar-right">
-                    <div class="dropdown me-3">
-                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fa-solid fa-globe me-1"></i> <?= ($lang == 'vi') ? __('lang_vi') : __('lang_en') ?>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                            <li><a class="dropdown-item" href="?<?= http_build_query(array_merge($_GET, ['lang' => 'vi'])) ?>"><?= __('lang_vi') ?></a></li>
-                            <li><a class="dropdown-item" href="?<?= http_build_query(array_merge($_GET, ['lang' => 'en'])) ?>"><?= __('lang_en') ?></a></li>
-                        </ul>
-                    </div>
                     <div class="dropdown">
                         <a href="#" class="user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="user-avatar">

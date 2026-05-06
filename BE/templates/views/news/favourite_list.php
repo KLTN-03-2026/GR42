@@ -2,15 +2,15 @@
 <link rel="stylesheet" href="<?= _HOST_URL ?>/templates/assets/css/favourite.css">
 <div class="container py-4">
     <div class="favorite-wrapper">
-        <h2 class="mb-4"><i class="fa fa-heart text-danger"></i> <?= __('favorite_news') ?></h2>
+        <h2 class="mb-4"><i class="fa fa-heart text-danger"></i> Tin yêu thích</h2>
         <div class="mb-3">
             <a href="?module=news&action=list" class="btn btn-secondary">
-                <?= __('home') ?>
+                Trang chủ
             </a>
         </div>
 
         <?php if (empty($listFav)): ?>
-        <div class="alert alert-info"><?= __('no_favorites_msg') ?></div>
+        <div class="alert alert-info">Chưa có tin tức nào được thêm vào danh sách yêu thích.</div>
         <?php else: ?>
         <?php foreach ($listFav as $item): ?>
         <div class="fav-item" id="fav-<?= $item['news_id'] ?>">
@@ -23,7 +23,7 @@
                         <?= htmlspecialchars($item['title']) ?>
                     </a>
                 </h5>
-                <div class="meta"><?= __('saved_at') ?>: <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
+                <div class="meta">Lưu lúc: <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
             </div>
             <button class="remove-btn" onclick="removeFav(<?= $item['news_id'] ?>)">
                 <i class="fa fa-trash"></i>
@@ -57,7 +57,7 @@ async function removeFav(news_id) {
                     if (document.querySelectorAll(".fav-item").length === 0) {
                         document.querySelector(".container").insertAdjacentHTML(
                             "beforeend",
-                            '<div class="alert alert-info"><?= __('no_favorites_msg') ?></div>'
+                            '<div class="alert alert-info">Chưa có tin tức nào được thêm vào danh sách yêu thích.</div>'
                         );
                     }
                 }, 300);

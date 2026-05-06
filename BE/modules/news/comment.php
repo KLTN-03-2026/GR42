@@ -24,6 +24,30 @@ $stmt->execute();
 $news = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
+// Ghi lịch sử khi xem trang bình luận (được tính là đã đọc bài báo)
+$user_id = $_SESSION['user_id'] ?? 0;
+if ($user_id <= 0) {
+    $token = getSession('token_login');
+    if (!empty($token)) {
+        $checkToken = getOne("SELECT user_id FROM token_login WHERE token = '" . addslashes($token) . "'");
+        if ($checkToken) {
+            $user_id = $checkToken['user_id'];
+        }
+    }
+}
+if ($user_id > 0 && $news) {
+    $checkHistory = getOne("SELECT id FROM history WHERE user_id = $user_id AND news_id = $news_id");
+    if ($checkHistory) {
+        update('history', ['viewed_at' => date('Y-m-d H:i:s')], "id = " . $checkHistory['id']);
+    } else {
+        insert('history', [
+            'user_id' => $user_id,
+            'news_id' => $news_id,
+            'viewed_at' => date('Y-m-d H:i:s')
+        ]);
+    }
+}
+
 $sql = "
     SELECT c.*, u.fullname, u.avatar
     FROM comments c

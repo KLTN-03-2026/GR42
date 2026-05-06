@@ -10,17 +10,17 @@
             <ul class="nav nav-pills flex-nowrap overflow-auto mb-0">
                 <?php
                 $categories = [
-                    '' => __('cat_all'),
-                    'doi-song' => __('cat_life'),
-                    'kinh-doanh' => __('cat_business'),
-                    'giao-duc' => __('cat_education'),
-                    'the-gioi' => __('cat_world'),
-                    'phap-luat' => __('cat_law'),
-                    'thoi-su' => __('cat_news'),
-                    'giai-tri' => __('cat_entertainment'),
-                    'suc-khoe' => __('cat_health'),
-                    'cong-nghe' => __('cat_tech'),
-                    'the-thao' => __('cat_sports')
+                    '' => 'Tất cả',
+                    'doi-song' => 'Đời sống',
+                    'kinh-doanh' => 'Kinh doanh',
+                    'giao-duc' => 'Giáo dục',
+                    'the-gioi' => 'Thế giới',
+                    'phap-luat' => 'Pháp luật',
+                    'thoi-su' => 'Thời sự',
+                    'giai-tri' => 'Giải trí',
+                    'suc-khoe' => 'Sức khỏe',
+                    'cong-nghe' => 'Công nghệ',
+                    'the-thao' => 'Thể thao'
                 ];
                 foreach ($categories as $key => $name):
                     $active = $category == $key ? 'active' : '';
@@ -45,17 +45,17 @@
             </section>
         </div>
         <aside class="home-top__side">
-            <h3 class="side-title"><?= __('hot_news_today') ?></h3>
+            <h3 class="side-title">Tin nóng hôm nay</h3>
             <div class="side-news" id="hotNewsSide">
             </div>
         </aside>
     </section>
     <section class="home-news">
         <div class="home-news__header">
-            <h2><?= __('latest_news') ?></h2>
+            <h2>Tin mới nhất</h2>
         </div>
         <div id="newsList" class="home-news__list grid-view" aria-label="Danh sách tin chính"></div>
-        <div id="loading" class="text-center py-3 text-muted"><?= __('loading') ?></div>
+        <div id="loading" class="text-center py-3 text-muted">Đang tải...</div>
     </section>
 </main>
 
@@ -67,7 +67,7 @@
         <div class="chat-header">
             <div class="title d-flex align-items-center">
                 <div class="bot-avatar"><i class="fa-solid fa-robot"></i></div>
-                <span><?= __('ai_chat') ?></span>
+                <span>Trợ lý AI</span>
             </div>
             <div class="actions">
                 <button id="clear-chat" class="clear-btn" title="Xóa lịch sử" aria-label="Xóa lịch sử">
@@ -80,7 +80,7 @@
         </div>
         <div id="chat-box" class="chat-box" aria-live="polite" aria-relevant="additions"></div>
         <div class="chat-input">
-            <input type="text" id="chat-input" placeholder="<?= __('type_message') ?>" aria-label="<?= __('type_message') ?>">
+            <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." aria-label="Nhập tin nhắn...">
             <button id="send-btn" aria-label="Gửi tin nhắn"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>

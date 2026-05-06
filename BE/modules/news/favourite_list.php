@@ -4,7 +4,7 @@ if (!defined('_TAI')) {
 }
 
 $data = [
-    'title' => __('favorite_news')
+    'title' => 'Tin yêu thích'
 ];
 layout('header', $data);
 

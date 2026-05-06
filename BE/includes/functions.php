@@ -194,11 +194,4 @@ function renderView($viewName, $data = []) {
         echo "View {$viewName} không tồn tại.";
     }
 }
-
-function __($key) {
-    global $translations;
-    if (isset($translations[$key])) {
-        return $translations[$key];
-    }
-    return $key;
-}
+

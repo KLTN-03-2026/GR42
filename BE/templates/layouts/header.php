@@ -115,9 +115,9 @@ global $lang;
             <div class="search-wrapper position-relative">
                 <input type="text" id="searchBox" name="keyword"
                     value="<?php echo htmlspecialchars($keyword ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                    class="form-control search-input" placeholder="<?= __('search_placeholder') ?>" autocomplete="off"
-                    onkeyup="suggestSearch()" aria-label="<?= __('search_placeholder') ?>">
-                <button class="search-btn" type="submit" aria-label="<?= __('search') ?>">
+                    class="form-control search-input" placeholder="Tìm kiếm tin tức..." autocomplete="off"
+                    onkeyup="suggestSearch()" aria-label="Tìm kiếm tin tức...">
+                <button class="search-btn" type="submit" aria-label="Tìm kiếm">
                     <i class="fa fa-search"></i>
                 </button>
                 <div id="suggestionBox" role="listbox"></div>
@@ -125,23 +125,15 @@ global $lang;
         </form>
 
         <div class="user-info">
-            <div class="dropdown me-3">
-                <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="fa fa-globe me-1"></i> <?= ($lang == 'vi') ? __('lang_vi') : __('lang_en') ?>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li><a class="dropdown-item" href="?<?= http_build_query(array_merge($_GET, ['lang' => 'vi'])) ?>"><?= __('lang_vi') ?></a></li>
-                    <li><a class="dropdown-item" href="?<?= http_build_query(array_merge($_GET, ['lang' => 'en'])) ?>"><?= __('lang_en') ?></a></li>
-                </ul>
-            </div>
             <img src="<?= !empty($user['avatar']) ? htmlspecialchars($user['avatar']) : './templates/uploads/avatar.jpg' ?>"
                 alt="User Image">
             <span><?= htmlspecialchars($user['fullname']) ?></span>
         </div>
         <div class="actions">
-            <a href="<?= _HOST_URL  ?>/?module=news&action=favourite_list" class="btn"><?= __('favorite_news') ?></a>
-            <a href="<?= _HOST_URL  ?>/?module=users&action=profile" class="btn"><?= __('profile') ?></a>
-            <a href="<?= _HOST_URL  ?>/?module=auth&action=logout" class="btn"><?= __('logout') ?></a>
+            <a href="<?= _HOST_URL  ?>/?module=news&action=history_list" class="btn">Lịch sử đọc</a>
+            <a href="<?= _HOST_URL  ?>/?module=news&action=favourite_list" class="btn">Tin yêu thích</a>
+            <a href="<?= _HOST_URL  ?>/?module=users&action=profile" class="btn">Hồ sơ</a>
+            <a href="<?= _HOST_URL  ?>/?module=auth&action=logout" class="btn">Đăng xuất</a>
         </div>
 
     </div>
