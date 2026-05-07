@@ -56,7 +56,7 @@ if (!empty($token)) {
 
 $user_id = !empty($user_id) ? (int)$user_id : 0;
 $comments = getAll("
-    SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, 
+    SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, u.is_vip, 
            CASE 
              WHEN u.avatar LIKE 'http%' THEN u.avatar 
              WHEN u.avatar LIKE 'data:%' THEN u.avatar

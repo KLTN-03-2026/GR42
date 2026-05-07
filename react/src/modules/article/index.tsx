@@ -69,6 +69,8 @@ const ArticleDetail = () => {
     ];
 
     const token = localStorage.getItem('auth_token');
+    const currentUserId = Number(localStorage.getItem('user_id') || 0);
+    const currentUserRole = localStorage.getItem('user_role') || 'user';
 
     const fetchData = useCallback(async () => {
         try {
@@ -719,8 +721,13 @@ const ArticleDetail = () => {
                     <div className="space-y-12">
                         {comments.length > 0 ? comments.filter(c => !c.parent_id).map((comment) => (
                             <div key={comment.id} className="space-y-8">
-                                <div className="flex gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <VAvatar src={comment.avatar} name={comment.fullname} size="md" className="rounded-2xl" />
+                                <div className={`flex gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 p-6 rounded-[2rem] transition-all ${Number(comment.is_vip) === 1 ? 'bg-gradient-to-br from-amber-50/50 to-transparent border-2 border-amber-200 shadow-xl shadow-amber-50 relative overflow-hidden' : ''}`}>
+                                    {Number(comment.is_vip) === 1 && (
+                                        <div className="absolute top-0 right-0 p-2">
+                                            <Crown size={14} className="text-amber-500 animate-pulse" />
+                                        </div>
+                                    )}
+                                    <VAvatar src={comment.avatar} name={comment.fullname} size="md" className="rounded-2xl" isVip={Number(comment.is_vip) === 1} />
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
                                             <span className="font-black text-sm text-slate-900">{comment.fullname}</span>
@@ -751,14 +758,16 @@ const ArticleDetail = () => {
                                                     {Number(comment.like_count) > 0 && comment.like_count} Thích
                                                 </button>
                                                 
-                                                {token && Number(comment.user_id) === Number(localStorage.getItem('user_id')) && (
+                                                {token && (String(comment.user_id) === String(localStorage.getItem('user_id')) || localStorage.getItem('user_role') === 'admin') && (
                                                     <>
-                                                        <button 
-                                                            className="hover:text-blue-600 transition-colors"
-                                                            onClick={() => handleStartEdit(comment)}
-                                                        >
-                                                            Sửa
-                                                        </button>
+                                                        {String(comment.user_id) === String(localStorage.getItem('user_id')) && (
+                                                            <button 
+                                                                className="hover:text-blue-600 transition-colors"
+                                                                onClick={() => handleStartEdit(comment)}
+                                                            >
+                                                                Sửa
+                                                            </button>
+                                                        )}
                                                         <button 
                                                             className="hover:text-red-500 transition-colors"
                                                             onClick={() => handleDeleteComment(comment.id)}
@@ -819,8 +828,8 @@ const ArticleDetail = () => {
                                 
                                 <div className="ml-16 space-y-8 border-l-2 border-slate-50 pl-8">
                                     {comments.filter(reply => reply.parent_id === comment.id).map(reply => (
-                                        <div key={reply.id} className="flex gap-4">
-                                            <VAvatar src={reply.avatar} name={reply.fullname} size="sm" className="rounded-xl" />
+                                        <div key={reply.id} className={`flex gap-4 p-4 rounded-2xl transition-all ${Number(reply.is_vip) === 1 ? 'bg-amber-50/30 border border-amber-100 shadow-sm' : ''}`}>
+                                            <VAvatar src={reply.avatar} name={reply.fullname} size="sm" className="rounded-xl" isVip={Number(reply.is_vip) === 1} />
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-1">
                                                     <span className="font-black text-[12px] text-slate-900">{reply.fullname}</span>
@@ -840,25 +849,27 @@ const ArticleDetail = () => {
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <p className="text-slate-500 text-xs leading-relaxed mb-3 font-medium">{reply.content}</p>
-                                                )}
-                                                <div className="flex items-center gap-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                                    <button 
-                                                        className={`flex items-center gap-1 transition-colors ${Number(reply.is_liked) === 1 ? 'text-blue-600' : 'hover:text-blue-600'}`}
-                                                        onClick={() => handleLikeComment(reply.id)}
-                                                    >
-                                                        <ThumbsUp size={12} className={Number(reply.is_liked) === 1 ? 'fill-current' : ''} /> 
-                                                        {Number(reply.like_count) > 0 && reply.like_count} Thích
-                                                    </button>
-                                                    
-                                                    {token && Number(reply.user_id) === Number(localStorage.getItem('user_id')) && (
-                                                        <>
+                                                    <>
+                                                        <p className="text-slate-500 text-xs leading-relaxed mb-3 font-medium">{reply.content}</p>
+                                                        <div className="flex items-center gap-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">
                                                             <button 
-                                                                className="hover:text-blue-600 transition-colors"
-                                                                onClick={() => handleStartEdit(reply)}
+                                                                className={`flex items-center gap-1 transition-colors ${Number(reply.is_liked) === 1 ? 'text-blue-600' : 'hover:text-blue-600'}`}
+                                                                onClick={() => handleLikeComment(reply.id)}
                                                             >
-                                                                Sửa
+                                                                <ThumbsUp size={12} className={Number(reply.is_liked) === 1 ? 'fill-current' : ''} /> 
+                                                                {Number(reply.like_count) > 0 && reply.like_count} Thích
                                                             </button>
+                                                    
+                                                    {token && (String(reply.user_id) === String(localStorage.getItem('user_id')) || localStorage.getItem('user_role') === 'admin') && (
+                                                        <>
+                                                            {String(reply.user_id) === String(localStorage.getItem('user_id')) && (
+                                                                <button 
+                                                                    className="hover:text-blue-600 transition-colors"
+                                                                    onClick={() => handleStartEdit(reply)}
+                                                                >
+                                                                    Sửa
+                                                                </button>
+                                                            )}
                                                             <button 
                                                                 className="hover:text-red-500 transition-colors"
                                                                 onClick={() => handleDeleteComment(reply.id)}
@@ -875,7 +886,9 @@ const ArticleDetail = () => {
                                                         <AlertCircle size={12} /> Báo cáo
                                                     </button>
                                                 </div>
-                                            </div>
+                                            </>
+                                        )}
+                                    </div>
                                         </div>
                                     ))}
                                 </div>

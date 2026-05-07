@@ -28,11 +28,13 @@ const Header = () => {
       axios.get(`${API_BASE_URL}/index.php?module=api&action=user&token=${authToken}`)
         .then(res => {
           if (res.data.status === 'success') {
-            const currentRole = res.data.data.profile.role;
+            const profile = res.data.data.profile;
+            const currentRole = profile.role;
             if (currentRole !== userRole) {
               setUserRole(currentRole);
               localStorage.setItem('user_role', currentRole);
             }
+            localStorage.setItem('user_vip', profile.is_vip === '1' ? '1' : '0');
           }
         })
         .catch(console.error);
@@ -117,7 +119,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="bg-white border-b border-slate-100 flex items-center sticky top-0 z-50 shadow-sm shadow-slate-100/50">
+      <header className={`bg-white border-b flex items-center sticky top-0 z-50 shadow-sm transition-all duration-500 ${localStorage.getItem('user_vip') === '1' ? 'border-b-amber-200 shadow-amber-50/50' : 'border-b-slate-100 shadow-slate-100/50'}`}>
         <div className="max-w-7xl mx-auto w-full px-6 h-20 flex items-center justify-between gap-12">
           <Link to="/" className="flex items-center gap-2 group shrink-0">
             <img src="/logo_vertex.png" alt="Vertex" className="h-16 w-auto object-contain" />
@@ -218,6 +220,7 @@ const Header = () => {
                     src={userAvatar ? (userAvatar.startsWith('http') || userAvatar.startsWith('data:') ? userAvatar : `${API_BASE_URL.replace('/BE', '')}/${userAvatar}`) : null} 
                     name={userName || 'U'} 
                     size="md" 
+                    isVip={localStorage.getItem('user_vip') === '1'}
                     className="hover:ring-2 hover:ring-blue-100 transition-all active:scale-95" 
                   />
                   <div className="hidden lg:block text-left">

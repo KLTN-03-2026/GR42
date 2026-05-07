@@ -17,6 +17,8 @@ import {
   ShieldCheck,
   Clock
 } from 'lucide-react';
+import axios from 'axios';
+import { API_BASE_URL } from '../../constants/config';
 
 import Chatbot from '../core/Chatbot';
 import VAvatar from '../core/VAvatar';
@@ -62,11 +64,26 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm, navigate]);
 
+  React.useEffect(() => {
+    const authToken = localStorage.getItem('auth_token');
+    if (authToken) {
+      axios.get(`${API_BASE_URL}/index.php`, { params: { module: 'api', action: 'user', token: authToken } })
+        .then(res => {
+          if (res.data.status === 'success') {
+            localStorage.setItem('user_vip', res.data.data.profile.is_vip === '1' ? '1' : '0');
+          }
+        })
+        .catch(err => console.error('Error fetching VIP status:', err));
+    }
+  }, []);
+
   const menuItems = [
     { to: '/', icon: <Home size={20} />, label: 'Trang chủ' },
-    { to: '/admin/favorites', icon: <Heart size={20} />, label: 'Tin yêu thích' },
-    { to: '/admin/profile', icon: <User size={20} />, label: 'Tài khoản' },
+    { to: '/admin/profile', icon: <User size={20} />, label: 'Thông tin cá nhân' },
+    { to: '/admin/favorites', icon: <Heart size={20} />, label: 'Bài viết yêu thích' },
+    { to: '/admin/interests', icon: <Heart size={20} />, label: 'Sở thích' },
     { to: '/admin/history', icon: <Clock size={20} />, label: 'Lịch sử đã đọc' },
+    { to: '/admin/upgrade', icon: <ShieldCheck size={20} />, label: 'Nâng cấp VIP' },
   ];
 
   const adminItems = [
@@ -158,7 +175,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <div className="flex items-center gap-6">
                 <div className="h-10 w-px bg-slate-100 mx-1"></div>
                 <Link to="/admin/profile" className="flex items-center gap-3 group pl-2 transition-colors">
-                  <VAvatar src={userAvatar} name={userName} size="md" className="ring-2 ring-transparent group-hover:ring-blue-100 transition-all active:scale-95" />
+                  <VAvatar 
+                    src={userAvatar} 
+                    name={userName} 
+                    size="md" 
+                    isVip={localStorage.getItem('user_vip') === '1'}
+                    className="ring-2 ring-transparent group-hover:ring-blue-100 transition-all active:scale-95" 
+                  />
                   <div className="hidden sm:block text-left">
                     <p className="text-xs font-bold text-slate-900 leading-none mb-1">{userName}</p>
                   </div>

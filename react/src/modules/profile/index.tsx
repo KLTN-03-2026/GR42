@@ -16,10 +16,16 @@ const Profile = () => {
   const [subTab, setSubTab] = useState(location.state?.subTab || 'personal');
 
   useEffect(() => {
-    if (location.state?.subTab) {
+    if (isAdminPath) {
+      if (location.pathname === '/admin/profile') setSubTab('personal');
+      else if (location.pathname === '/admin/favorites') setSubTab('favorites');
+      else if (location.pathname === '/admin/interests') setSubTab('interests');
+      else if (location.pathname === '/admin/history') setSubTab('history');
+      else if (location.pathname === '/admin/upgrade') setSubTab('upgrade');
+    } else if (location.state?.subTab) {
       setSubTab(location.state.subTab);
     }
-  }, [location.state]);
+  }, [location.pathname, location.state, isAdminPath]);
   const authToken = localStorage.getItem('auth_token');
   const userName = localStorage.getItem('user_name');
 
@@ -142,26 +148,28 @@ const Profile = () => {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
               className="flex flex-col lg:flex-row gap-8"
             >
-              <div className="w-full lg:w-72 flex-shrink-0">
-                <div className="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm space-y-2">
-                  <div className="px-4 py-2 mb-4">
-                    <p className="text-sm font-black text-slate-900 border-b border-slate-50 pb-4 mb-2">CÀI ĐẶT</p>
+              {!isAdminPath && (
+                <div className="w-full lg:w-72 flex-shrink-0">
+                  <div className="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm space-y-2">
+                    <div className="px-4 py-2 mb-4">
+                      <p className="text-sm font-black text-slate-900 border-b border-slate-50 pb-4 mb-2">CÀI ĐẶT</p>
+                    </div>
+                    {sidebarItems.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => setSubTab(item.id)}
+                        className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-xs font-bold transition-all border-2 ${
+                          subTab === item.id 
+                            ? 'bg-blue-50/50 border-blue-600 text-blue-600 shadow-sm' 
+                            : 'border-transparent text-slate-500 hover:bg-slate-50'
+                        }`}
+                      >
+                        <item.icon size={18} /> {item.name}
+                      </button>
+                    ))}
                   </div>
-                  {sidebarItems.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => setSubTab(item.id)}
-                      className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-xs font-bold transition-all border-2 ${
-                        subTab === item.id 
-                          ? 'bg-blue-50/50 border-blue-600 text-blue-600 shadow-sm' 
-                          : 'border-transparent text-slate-500 hover:bg-slate-50'
-                      }`}
-                    >
-                      <item.icon size={18} /> {item.name}
-                    </button>
-                  ))}
                 </div>
-              </div>
+              )}
 
               <div className="flex-1">
                 {subTab === 'personal' ? (

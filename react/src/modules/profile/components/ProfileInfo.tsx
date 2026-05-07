@@ -175,7 +175,13 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
       
       <div className="flex flex-col md:flex-row items-center md:items-start gap-12">
         <div className="relative group">
-          <VAvatar src={userAvatar} name={profile.fullname} size="xl" className="group-hover:scale-[1.02] transition-transform" />
+          <VAvatar 
+            src={userAvatar} 
+            name={profile.fullname} 
+            size="xl" 
+            isVip={profile.is_vip === 1}
+            className="group-hover:scale-[1.02] transition-transform" 
+          />
           <label className="absolute bottom-1 right-1 w-11 h-11 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-xl cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all active:scale-95 border-2 border-white">
               <Camera size={18} />
               <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />

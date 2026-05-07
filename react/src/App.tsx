@@ -59,9 +59,11 @@ function App() {
           <Route path="/*" element={
             <AdminLayout>
               <Routes>
-                <Route path="/favorites" element={<Navigate to="/profile" state={{ subTab: 'favorites' }} replace />} />
-                <Route path="/history" element={<Navigate to="/profile" state={{ subTab: 'history' }} replace />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/admin/profile" element={<Profile />} />
+                <Route path="/admin/favorites" element={<Profile />} />
+                <Route path="/admin/interests" element={<Profile />} />
+                <Route path="/admin/history" element={<Profile />} />
+                <Route path="/admin/upgrade" element={<Profile />} />
                 
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/news" element={<AdminNewsList />} />
@@ -69,8 +71,6 @@ function App() {
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route path="/admin/comments" element={<AdminComments />} />
                 <Route path="/admin/reports" element={<AdminReports />} />
-                <Route path="/admin/favorites" element={<Navigate to="/profile" state={{ subTab: 'favorites' }} replace />} />
-                <Route path="/admin/profile" element={<AdminProfilePage />} />
                 
                 <Route path="*" element={<Navigate to="/admin" replace />} />
               </Routes>

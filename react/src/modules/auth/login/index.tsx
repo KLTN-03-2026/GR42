@@ -105,6 +105,7 @@ const Login = () => {
           localStorage.setItem('user_avatar', result.data.avatar);
         }
         localStorage.setItem('user_role', result.data.role);
+        localStorage.setItem('user_vip', result.data.is_vip ? '1' : '0');
         if (result.data.email) {
             localStorage.setItem('user_email', result.data.email);
         }

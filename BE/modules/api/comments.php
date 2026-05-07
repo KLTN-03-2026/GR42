@@ -49,7 +49,7 @@ if ($method === 'GET' || $action_type === 'list') {
     if ($news_id <= 0) die(json_encode(['status' => 'error', 'message' => 'ID không hợp lệ']));
     
     $comments = getAll("
-        SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, 
+        SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, u.is_vip, 
                CASE 
                  WHEN u.avatar LIKE 'http%' THEN u.avatar 
                  WHEN u.avatar LIKE 'data:%' THEN u.avatar
@@ -85,7 +85,7 @@ else if ($method === 'POST') {
         if ($res) {
             $newId = lastID();
             $comment = getOne("
-                SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, 
+                SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, u.is_vip, 
                        CASE WHEN u.avatar LIKE 'http%' THEN u.avatar ELSE CONCAT('" . _HOST_URL . "/', u.avatar) END as avatar,
                        0 as like_count, 0 as is_liked
                 FROM comments c
