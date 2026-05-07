@@ -9,7 +9,7 @@ if (!defined('_TAI')) {
 $method = $_SERVER['REQUEST_METHOD'];
 $inputData = json_decode(file_get_contents('php://input'), true);
 $token = $_GET['token'] ?? ($inputData['token'] ?? '');
-$action = $_GET['action'] ?? ($inputData['action'] ?? 'get_all');
+$action = ($method === 'POST') ? ($inputData['action'] ?? $_GET['action'] ?? 'get_all') : ($_GET['action'] ?? 'get_all');
 
 if (empty($token)) {
     die(json_encode(['status' => 'error', 'message' => 'Thiếu token xác thực']));
@@ -22,7 +22,7 @@ if (!$checkToken) {
 $user_id = (int)$checkToken['user_id'];
 
 if ($method === 'GET' || $action === 'get_all') {
-    $profile = getOne("SELECT id, fullname, email, phone, address, avatar, role, is_vip, created_at FROM users WHERE id = $user_id");
+    $profile = getOne("SELECT id, fullname, email, phone, address, avatar, role, status, is_vip, created_at FROM users WHERE id = $user_id");
     
     $avatar = $profile['avatar'] ?? '';
     if (!empty($avatar) && !preg_match('/^http/', $avatar) && !preg_match('/^data:/', $avatar)) {

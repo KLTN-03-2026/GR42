@@ -113,6 +113,14 @@ else if ($method === 'POST') {
         $comment_id = (int)($inputData['id'] ?? 0);
         $res = delete('comments', "id = $comment_id AND user_id = $user_id");
         echo json_encode(['status' => $res ? 'success' : 'error', 'message' => $res ? 'Đã xóa' : 'Lỗi xóa hoặc không có quyền']);
+    } else if ($action_type === 'update') {
+        $comment_id = (int)($inputData['id'] ?? 0);
+        $content = trim($inputData['content'] ?? '');
+        if ($comment_id <= 0 || empty($content)) {
+            die(json_encode(['status' => 'error', 'message' => 'Dữ liệu không hợp lệ']));
+        }
+        $res = update('comments', ['content' => $content], "id = $comment_id AND user_id = $user_id");
+        echo json_encode(['status' => $res ? 'success' : 'error', 'message' => $res ? 'Đã cập nhật' : 'Lỗi cập nhật hoặc không có quyền']);
     }
 }
 ?>

@@ -40,7 +40,7 @@ $todayComments = getOne("SELECT COUNT(*) as count FROM comments WHERE DATE(creat
 
 $categories = getAll("SELECT category, COUNT(*) as count FROM crawl_news GROUP BY category ORDER BY count DESC LIMIT 5");
 
-$recentNews = getAll("SELECT id, title, category, pubDate, source, image FROM crawl_news ORDER BY id DESC LIMIT 5");
+$recentNews = getAll("SELECT id, title, category, pubdate as pubDate, source, image FROM crawl_news ORDER BY id DESC LIMIT 5");
 
 $recentActivity = getAll("
     (SELECT 'user' as type, fullname as title, created_at as date, email as subtitle FROM users ORDER BY created_at DESC LIMIT 3)
@@ -49,10 +49,13 @@ $recentActivity = getAll("
     ORDER BY date DESC LIMIT 5
 ");
 
-$weeklyNews = getAll("
+$period = $_GET['period'] ?? 'week';
+$days = ($period === 'month') ? 30 : 6;
+
+$newsStats = getAll("
     SELECT DATE(savedtime) as date, COUNT(*) as count 
     FROM crawl_news 
-    WHERE savedtime >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    WHERE savedtime >= DATE_SUB(CURDATE(), INTERVAL $days DAY)
     GROUP BY DATE(savedtime)
     ORDER BY date ASC
 ");
@@ -65,12 +68,11 @@ echo json_encode([
             'total_news' => (int)$totalNews,
             'total_comments' => (int)$totalComments,
             'today_news' => (int)$todayNews,
-            'today_comments' => (int)$todayComments,
-            'today_visits' => 4521 
+            'today_comments' => (int)$todayComments
         ],
         'categories' => $categories,
         'recent_news' => $recentNews,
         'recent_activity' => $recentActivity,
-        'weekly_news' => $weeklyNews
+        'news_stats' => $newsStats
     ]
 ]);

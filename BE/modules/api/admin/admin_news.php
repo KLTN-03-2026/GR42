@@ -64,7 +64,7 @@ if (!empty($search))   $where .= " AND (title LIKE '%$search%' OR source LIKE '%
 if (!empty($category)) $where .= " AND category = '$category'";
 
 $total = getOne("SELECT COUNT(*) as count FROM crawl_news WHERE $where")['count'];
-$data  = getAll("SELECT id, title, category, source, link, image, pubdate FROM crawl_news WHERE $where ORDER BY id DESC LIMIT $offset, $limit");
+$data  = getAll("SELECT id, title, category, source, link, image, pubdate as pubDate FROM crawl_news WHERE $where ORDER BY id DESC LIMIT $offset, $limit");
 
 echo json_encode([
     'status' => 'success',

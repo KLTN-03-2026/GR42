@@ -48,6 +48,7 @@ if (isPost()) {
                     $response['status'] = 'success';
                     $response['msg'] = 'Đăng nhập thành công';
                     $response['data'] = [
+                        'id' => $user['id'],
                         'token' => $token,
                         'name' => $user['fullname'],
                         'email' => $user['email'],
