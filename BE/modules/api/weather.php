@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../config.php';
 $lat = isset($_GET['lat']) ? $_GET['lat'] : null;
 $lon = isset($_GET['lon']) ? $_GET['lon'] : null;
 $q = isset($_GET['q']) ? $_GET['q'] : 'Hanoi';
+
 $apiKey = _OPENWEATHERMAP_API_KEY;
 $cacheDir = __DIR__ . '/../../cache';
 
@@ -12,7 +13,6 @@ if (!is_dir($cacheDir)) {
     mkdir($cacheDir, 0777, true);
 }
 
-// Generate unique cache key based on params
 $cacheKey = md5($lat . '_' . $lon . '_' . $q);
 $cacheFile = $cacheDir . '/weather_' . $cacheKey . '.json';
 $cacheTime = 900;
@@ -41,14 +41,19 @@ if ($httpcode == 200) {
 
     // Clean up city names for better UI
     if (isset($data['name'])) {
-        if ($data['name'] === 'Tỉnh Ðà Nẵng' || $data['name'] === 'Da Nang')
-            $data['name'] = 'Đà Nẵng';
-        if ($data['name'] === 'Tỉnh Thừa Thiên-Huế')
-            $data['name'] = 'Huế';
-        if ($data['name'] === 'Thành phố Cần Thơ')
-            $data['name'] = 'Cần Thơ';
-        if ($data['name'] === 'Thành phố Hồ Chí Minh')
-            $data['name'] = 'TP. Hồ Chí Minh';
+        $cityMap = [
+            'Tỉnh Ðà Nẵng' => 'Đà Nẵng',
+            'Da Nang' => 'Đà Nẵng',
+            'Tỉnh Thừa Thiên-Huế' => 'Huế',
+            'Thành phố Cần Thơ' => 'Cần Thơ',
+            'Thành phố Hồ Chí Minh' => 'TP. Hồ Chí Minh',
+            'Ha Noi' => 'Hà Nội',
+            'Hanoi' => 'Hà Nội'
+        ];
+
+        if (isset($cityMap[$data['name']])) {
+            $data['name'] = $cityMap[$data['name']];
+        }
     }
 
     $finalResponse = json_encode([
