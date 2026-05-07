@@ -21,6 +21,14 @@ if(!empty($token)){
     if(!empty($checkTokenLogin)){
         $user_id = $checkTokenLogin['user_id'];
         $detailUser = getOne("SELECT * FROM users WHERE id = $user_id");
+        
+        // Lấy danh sách sở thích của user
+        $interestsRes = getAll("SELECT category_name FROM user_interests WHERE user_id = $user_id");
+        $user_interests = !empty($interestsRes) ? array_column($interestsRes, 'category_name') : [];
+        
+        // Lấy danh sách tất cả category
+        $categoriesRes = getAll("SELECT DISTINCT category FROM crawl_news WHERE category != '' AND category IS NOT NULL");
+        $categories = !empty($categoriesRes) ? array_column($categoriesRes, 'category') : [];
     }
 }
 
@@ -78,6 +86,19 @@ if(isPost()){
         $condition = "id = " . $user_id;
 
         if(update('users', $dataUpdate, $condition)){
+            // Cập nhật sở thích
+            if (isset($_POST['interests']) && is_array($_POST['interests'])) {
+                delete('user_interests', "user_id = $user_id");
+                foreach ($_POST['interests'] as $cat) {
+                    insert('user_interests', [
+                        'user_id' => $user_id,
+                        'category_name' => $cat
+                    ]);
+                }
+            } else {
+                delete('user_interests', "user_id = $user_id");
+            }
+
             setSessionFlash('msg', 'Cập nhật thành công');
             setSessionFlash('msg_type', 'success');
             redirect('?module=users&action=profile');
@@ -109,5 +130,7 @@ renderView('users/profile', [
     'msg' => $msg,
     'msg_type' => $msg_type,
     'oldData' => $oldData,
-    'errorsArr' => $errorsArr
+    'errorsArr' => $errorsArr,
+    'categories' => $categories,
+    'user_interests' => $user_interests
 ]);

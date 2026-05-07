@@ -4,9 +4,39 @@ require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../includes/database.php';
 
+$token = $_GET['token'] ?? '';
+if (empty($token)) {
+    echo json_encode(['status' => 'error', 'message' => 'Vui lòng đăng nhập để sử dụng tính năng tóm tắt AI'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$checkToken = getOne("SELECT user_id FROM token_login WHERE token = '$token'");
+if (!$checkToken) {
+    echo json_encode(['status' => 'error', 'message' => 'Phiên đăng nhập không hợp lệ'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$user_id = (int)$checkToken['user_id'];
+$userProfile = getOne("SELECT is_vip, ai_summary_count FROM users WHERE id = $user_id");
+if (!$userProfile) {
+    echo json_encode(['status' => 'error', 'message' => 'Không tìm thấy người dùng'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$is_vip = (int)$userProfile['is_vip'];
+$ai_summary_count = (int)$userProfile['ai_summary_count'];
+
+if ($is_vip !== 1 && $ai_summary_count >= 2) {
+    echo json_encode([
+        'status' => 'upgrade_required',
+        'message' => 'Bạn đã dùng hết 2 lần miễn phí. Hãy nâng cấp VIP để trải nghiệm tính năng AI không giới hạn!'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 $news_id = isset($_GET['news_id']) ? (int) $_GET['news_id'] : 0;
 if ($news_id <= 0) {
-    echo json_encode(['status' => 'error', 'message' => 'ID không hợp lệ']);
+    echo json_encode(['status' => 'error', 'message' => 'ID không hợp lệ'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 $news = getOne("SELECT title, content FROM crawl_news WHERE id = $news_id");
@@ -96,6 +126,9 @@ if (isset($responseData['error'])) {
         'raw' => $responseData
     ], JSON_UNESCAPED_UNICODE);
 } elseif (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+    if ($is_vip !== 1) {
+        query("UPDATE users SET ai_summary_count = ai_summary_count + 1 WHERE id = $user_id");
+    }
     echo json_encode([
         'status' => 'success',
         'summary' => $responseData['candidates'][0]['content']['parts'][0]['text']

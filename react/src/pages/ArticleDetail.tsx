@@ -38,6 +38,7 @@ const ArticleDetail = () => {
     const [isLiking, setIsLiking] = useState(false);
     const [aiSummary, setAiSummary] = useState<string>('');
     const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+    const [aiStatus, setAiStatus] = useState<'loading' | 'success' | 'upgrade_required' | 'unauthorized' | 'error'>('loading');
     const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null);
     const [replyComment, setReplyComment] = useState('');
     const [submittingReply, setSubmittingReply] = useState(false);
@@ -85,24 +86,35 @@ const ArticleDetail = () => {
     const fetchAiSummary = async (newsId: string) => {
         try {
             setIsSummaryLoading(true);
+            setAiStatus('loading');
             const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
             
             const res = await axios.get(`${host}/BE/index.php`, {
                 params: {
                     module: 'api',
                     action: 'ai_summary',
-                    news_id: newsId
+                    news_id: newsId,
+                    token: token || ''
                 }
             });
             if (res.data.status === 'success') {
                 let summary = res.data.summary || '';
                 summary = summary.replace(/```html|```/g, '').trim();
                 setAiSummary(summary);
+                setAiStatus('success');
+            } else if (res.data.status === 'upgrade_required') {
+                setAiStatus('upgrade_required');
+                setAiSummary(res.data.message);
+            } else if (res.data.status === 'error' && res.data.message && res.data.message.includes('Vui lòng đăng nhập')) {
+                setAiStatus('unauthorized');
+                setAiSummary(res.data.message);
             } else {
-                setAiSummary('Không thể tạo tóm tắt vào lúc này.');
+                setAiStatus('error');
+                setAiSummary(res.data.message || 'Không thể tạo tóm tắt vào lúc này.');
             }
         } catch (error) {
             console.error('Error fetching AI summary:', error);
+            setAiStatus('error');
             setAiSummary('Lỗi kết nối API AI.');
         } finally {
             setIsSummaryLoading(false);
@@ -524,13 +536,35 @@ const ArticleDetail = () => {
                                             <div className="h-4 bg-blue-100/50 animate-pulse rounded-full w-[90%]"></div>
                                             <div className="h-4 bg-blue-100/50 animate-pulse rounded-full w-[80%]"></div>
                                         </div>
+                                    ) : aiStatus === 'upgrade_required' ? (
+                                        <div className="bg-amber-50 rounded-2xl p-6 border border-amber-200 mb-8 text-center shadow-inner">
+                                            <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                <Sparkles size={24} />
+                                            </div>
+                                            <h5 className="text-amber-800 font-black mb-2 text-sm">Hết lượt miễn phí</h5>
+                                            <p className="text-amber-600/80 text-xs font-bold mb-5 leading-relaxed">{aiSummary}</p>
+                                            <VButton variant="primary" fullWidth className="bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-200 text-white" onClick={() => navigate('/profile', { state: { subTab: 'upgrade' } })}>
+                                                Nâng cấp VIP ngay
+                                            </VButton>
+                                        </div>
+                                    ) : aiStatus === 'unauthorized' ? (
+                                        <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-8 text-center">
+                                            <div className="w-12 h-12 bg-slate-200 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                <MessageCircle size={24} />
+                                            </div>
+                                            <p className="text-slate-500 text-xs font-bold mb-4">{aiSummary}</p>
+                                            <VButton variant="primary" fullWidth onClick={() => navigate('/login')} className="shadow-sm">
+                                                Đăng nhập ngay
+                                            </VButton>
+                                        </div>
                                     ) : (
                                         <div 
                                             className="text-xs font-bold text-slate-600 leading-relaxed italic mb-8 whitespace-pre-wrap ai-summary-content max-h-[400px] overflow-y-auto no-scrollbar"
-                                            dangerouslySetInnerHTML={{ __html: aiSummary || article.description || 'Đang cập nhật tóm tắt thông minh cho bài viết này...' }}
+                                            dangerouslySetInnerHTML={{ __html: aiSummary || article?.description || 'Đang cập nhật tóm tắt thông minh cho bài viết này...' }}
                                         />
                                     )}
                                     
+                                    {aiStatus === 'success' && (
                                     <VButton 
                                         variant="primary" fullWidth 
                                         icon={MessageCircle} 
@@ -547,6 +581,7 @@ const ArticleDetail = () => {
                                     >
                                         Hỏi AI chi tiết hơn
                                     </VButton>
+                                    )}
                                 </div>
                             </div>
 

@@ -38,6 +38,24 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label style="margin-bottom: 10px; display: block; font-weight: bold;">Sở thích (Chuyên mục yêu thích)</label>
+            <div class="interests-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                <?php if(!empty($categories)): ?>
+                    <?php foreach($categories as $cat): ?>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer; padding: 8px 15px; border: 1px solid #ddd; border-radius: 20px; background: #f9f9f9;">
+                            <input type="checkbox" name="interests[]" value="<?= htmlspecialchars($cat) ?>" 
+                                <?= (isset($user_interests) && in_array($cat, $user_interests)) ? 'checked' : '' ?>
+                                style="margin: 0; width: auto; height: auto;">
+                            <?= htmlspecialchars($cat) ?>
+                        </label>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="color: #888; font-size: 14px; font-style: italic;">Chưa có chuyên mục nào khả dụng.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn-submit">Lưu thay đổi</button>
             <a href="?module=news&action=list" class="btn-back-home">Quay về trang chủ</a>

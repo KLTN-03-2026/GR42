@@ -6,6 +6,20 @@ require_once __DIR__ . '/../../includes/functions.php';
 
 $user_id = 0;
 $token = isset($_GET['token']) ? trim($_GET['token']) : '';
+
+if (empty($token)) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (function_exists('getSession')) {
+        $token = getSession('token_login');
+    }
+    // Lấy thử trực tiếp từ session nếu getSession không có
+    if (empty($token) && isset($_SESSION['token_login'])) {
+        $token = $_SESSION['token_login'];
+    }
+}
+
 if (!empty($token)) {
     $checkToken = getOne("SELECT * FROM token_login WHERE token = '$token'");
     if (!empty($checkToken)) {
@@ -22,6 +36,8 @@ $category = isset($_GET['category']) ? trim($_GET['category']) : '';
 $where = " WHERE 1=1 ";
 $types = "";
 $params = [];
+$orderBy = "n.pubdate DESC";
+$selectFields = "";
 
 if (!empty($keyword)) {
     $where .= " AND title LIKE ? ";
@@ -33,16 +49,21 @@ if (!empty($category)) {
     $where .= " AND category = ? ";
     $types .= "s";
     $params[] = $category;
-} else if ($user_id > 0 && !isset($_GET['category'])) {
+} else if ($user_id > 0) {
     $interestsRes = getAll("SELECT category_name FROM user_interests WHERE user_id = $user_id");
     if (!empty($interestsRes)) {
         $interests = array_column($interestsRes, 'category_name');
-        $placeholders = implode(',', array_fill(0, count($interests), '?'));
-        $where .= " AND category IN ($placeholders) ";
-        $types .= str_repeat("s", count($interests));
-        foreach ($interests as $interest) {
-            $params[] = $interest;
-        }
+        $safeInterests = array_map(function($val) use ($conn) {
+            return "'" . $conn->real_escape_string($val) . "'";
+        }, $interests);
+        $interestsString = implode(',', $safeInterests);
+        
+        $selectFields = ", 
+            CASE WHEN n.category IN ($interestsString) THEN 1 ELSE 0 END as is_interest,
+            ROW_NUMBER() OVER(PARTITION BY CASE WHEN n.category IN ($interestsString) THEN 1 ELSE 0 END ORDER BY n.pubdate DESC) as r_num
+        ";
+        
+        $orderBy = "r_num ASC, is_interest DESC";
     }
 }
 
@@ -63,6 +84,7 @@ $sql = "SELECT n.*, n.image, n.pubdate as pubDate,
            JOIN crawl_news n2 ON f.news_id = n2.id
            WHERE n2.title = n.title AND f.user_id = ?
        ) AS is_favourite
+       $selectFields
 FROM (
     SELECT MAX(id) as id
     FROM crawl_news
@@ -70,7 +92,7 @@ FROM (
     GROUP BY title
 ) as unique_news
 JOIN crawl_news n ON n.id = unique_news.id
-ORDER BY n.pubdate DESC
+ORDER BY $orderBy
 LIMIT ? OFFSET ?";
 
 $stmt = $conn->prepare($sql);

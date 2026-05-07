@@ -14,7 +14,13 @@ const Profile = () => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
   const [mainTab, setMainTab] = useState<'profile' | 'favorites'>('profile');
-  const [subTab, setSubTab] = useState('personal');
+  const [subTab, setSubTab] = useState(location.state?.subTab || 'personal');
+
+  useEffect(() => {
+    if (location.state?.subTab) {
+      setSubTab(location.state.subTab);
+    }
+  }, [location.state]);
   const authToken = localStorage.getItem('auth_token');
   const userName = localStorage.getItem('user_name');
 
