@@ -9,7 +9,9 @@ module.exports = {
         'surface': '#FFFFFF',
       },
       fontFamily: {
+        'sans': ['Roboto', 'sans-serif'],
         'inter': ['Inter', 'sans-serif'],
+        'roboto': ['Roboto', 'sans-serif'],
       },
     },
   },

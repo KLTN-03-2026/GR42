@@ -1,31 +1,33 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import PublicLayout from './components/PublicLayout';
-import AdminLayout from './components/AdminLayout';
-import Home from './pages/Home';
-import ArticleDetail from './pages/ArticleDetail';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Profile from './pages/Profile';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminNewsList from './pages/AdminNewsList';
-import AdminNewsAdd from './pages/AdminNewsAdd';
+import PublicLayout from './components/layout/PublicLayout';
+import AdminLayout from './components/layout/AdminLayout';
+import Home from './modules/home';
+import ArticleDetail from './modules/article';
+import Login from './modules/auth/login';
+import Register from './modules/auth/register';
+import ForgotPassword from './modules/auth/forgot-password';
+import ResetPassword from './modules/auth/reset-password';
+import Profile from './modules/profile';
+import AdminDashboard from './modules/admin/dashboard';
+import AdminNewsList from './modules/admin/news';
+import AdminNewsAdd from './modules/admin/news/add';
 
-import AdminUsers from './pages/AdminUsers';
-import AdminReports from './pages/AdminReports';
-import AdminComments from './pages/AdminComments';
-import AdminProfilePage from './pages/AdminProfilePage';
-import Favorites from './pages/Favorites';
-import AdminRoute from './components/AdminRoute';
+import AdminUsers from './modules/admin/users';
+import AdminReports from './modules/admin/reports';
+import AdminComments from './modules/admin/comments';
+import AdminProfilePage from './modules/admin/profile';
+
+import AdminRoute from './routes/AdminRoute';
+import { ToastProvider } from './context/ToastContext';
 
 interface AppProps {}
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <ToastProvider>
+      <Router>
+        <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -53,7 +55,7 @@ function App() {
           <Route path="/*" element={
             <AdminLayout>
               <Routes>
-                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/favorites" element={<Navigate to="/profile" state={{ subTab: 'favorites' }} replace />} />
                 <Route path="/profile" element={<Profile />} />
                 
                 <Route path="/admin" element={<AdminDashboard />} />
@@ -62,7 +64,7 @@ function App() {
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route path="/admin/comments" element={<AdminComments />} />
                 <Route path="/admin/reports" element={<AdminReports />} />
-                <Route path="/admin/favorites" element={<Favorites />} />
+                <Route path="/admin/favorites" element={<Navigate to="/profile" state={{ subTab: 'favorites' }} replace />} />
                 <Route path="/admin/profile" element={<AdminProfilePage />} />
                 
                 <Route path="*" element={<Navigate to="/admin" replace />} />
@@ -72,7 +74,8 @@ function App() {
         </Route>
       </Routes>
     </Router>
-  );
+  </ToastProvider>
+);
 }
 
 export default App;

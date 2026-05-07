@@ -7,7 +7,7 @@
 
 @layer base {
   body {
-    @apply bg-background text-slate-900 font-inter antialiased;
+    @apply bg-background text-slate-900 font-roboto antialiased;
     margin: 0;
   }
 }
@@ -41,6 +41,9 @@
   .card {
     @apply bg-surface rounded-2xl shadow-sm border border-slate-100 p-4 transition-all duration-300;
   }
+  .category-link {
+    @apply whitespace-nowrap text-lg md:text-xl font-black transition-all duration-300 relative py-2;
+  }
   .btn-primary {
     @apply bg-blue-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-blue-700 active:scale-95 transition-all;
   }
@@ -69,4 +72,12 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   visibility: hidden;
   display: none !important;
   pointer-events: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
