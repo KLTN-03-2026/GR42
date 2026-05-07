@@ -49,7 +49,7 @@ if ($method === 'GET' || $action_type === 'list') {
     if ($news_id <= 0) die(json_encode(['status' => 'error', 'message' => 'ID không hợp lệ']));
     
     $comments = getAll("
-        SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, u.is_vip, 
+        SELECT c.id, CAST(c.user_id AS UNSIGNED) as user_id, c.content, c.created_at, c.parent_id, u.fullname, u.is_vip, 
                CASE 
                  WHEN u.avatar LIKE 'http%' THEN u.avatar 
                  WHEN u.avatar LIKE 'data:%' THEN u.avatar
@@ -85,7 +85,7 @@ else if ($method === 'POST') {
         if ($res) {
             $newId = lastID();
             $comment = getOne("
-                SELECT c.id, c.user_id, c.content, c.created_at, c.parent_id, u.fullname, u.is_vip, 
+                SELECT c.id, CAST(c.user_id AS UNSIGNED) as user_id, c.content, c.created_at, c.parent_id, u.fullname, u.is_vip, 
                        CASE WHEN u.avatar LIKE 'http%' THEN u.avatar ELSE CONCAT('" . _HOST_URL . "/', u.avatar) END as avatar,
                        0 as like_count, 0 as is_liked
                 FROM comments c
@@ -109,9 +109,13 @@ else if ($method === 'POST') {
         }
         $count = getOne("SELECT COUNT(*) as count FROM comment_likes WHERE comment_id = $comment_id")['count'];
         echo json_encode(['status' => 'success', 'action' => $action, 'like_count' => $count]);
-    }    else if ($action_type === 'delete') {
+    } else if ($action_type === 'delete') {
         $comment_id = (int)($inputData['id'] ?? 0);
-        $res = delete('comments', "id = $comment_id AND user_id = $user_id");
+        $checkAdmin = getOne("SELECT role FROM users WHERE id = $user_id");
+        $isAdmin = ($checkAdmin && $checkAdmin['role'] === 'admin');
+        
+        $condition = $isAdmin ? "id = $comment_id" : "id = $comment_id AND user_id = $user_id";
+        $res = delete('comments', $condition);
         echo json_encode(['status' => $res ? 'success' : 'error', 'message' => $res ? 'Đã xóa' : 'Lỗi xóa hoặc không có quyền']);
     } else if ($action_type === 'update') {
         $comment_id = (int)($inputData['id'] ?? 0);
@@ -119,7 +123,11 @@ else if ($method === 'POST') {
         if ($comment_id <= 0 || empty($content)) {
             die(json_encode(['status' => 'error', 'message' => 'Dữ liệu không hợp lệ']));
         }
-        $res = update('comments', ['content' => $content], "id = $comment_id AND user_id = $user_id");
+        $checkAdmin = getOne("SELECT role FROM users WHERE id = $user_id");
+        $isAdmin = ($checkAdmin && $checkAdmin['role'] === 'admin');
+        
+        $condition = $isAdmin ? "id = $comment_id" : "id = $comment_id AND user_id = $user_id";
+        $res = update('comments', ['content' => $content], $condition);
         echo json_encode(['status' => $res ? 'success' : 'error', 'message' => $res ? 'Đã cập nhật' : 'Lỗi cập nhật hoặc không có quyền']);
     }
 }

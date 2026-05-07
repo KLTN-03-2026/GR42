@@ -214,7 +214,7 @@ const Header = () => {
               <div className="flex items-center gap-3 pl-4 border-l border-slate-100">
                 <Link 
                   to={userRole === 'admin' ? "/admin" : "/profile"} 
-                  className="flex items-center gap-3 group"
+                  className="flex items-center gap-3 group hover:bg-slate-50 p-2 -ml-2 rounded-2xl transition-all active:scale-95"
                 >
                   <VAvatar 
                     src={userAvatar ? (userAvatar.startsWith('http') || userAvatar.startsWith('data:') ? userAvatar : `${API_BASE_URL.replace('/BE', '')}/${userAvatar}`) : null} 

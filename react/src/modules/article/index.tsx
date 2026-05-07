@@ -51,9 +51,10 @@ const ArticleDetail = () => {
     const [readingIndex, setReadingIndex] = useState<number | null>(null);
     const [isReadingAll, setIsReadingAll] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
-    const [reportReason, setReportReason] = useState('');
-    const [reportDetails, setReportDetails] = useState('');
+    const [reportReason, setReportReason] = useState("");
+    const [reportDetails, setReportDetails] = useState("");
     const [submittingReport, setSubmittingReport] = useState(false);
+    const [reportingCommentId, setReportingCommentId] = useState<number | null>(null);
     const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
     const [editingContent, setEditingContent] = useState('');
     const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
@@ -380,7 +381,8 @@ const ArticleDetail = () => {
         try {
             setSubmittingReport(true);
             const res = await axios.post(`${API_BASE_URL}/index.php?module=api&action=reports`, {
-                news_id: id,
+                news_id: reportingCommentId ? null : id,
+                comment_id: reportingCommentId,
                 reason: reportReason,
                 details: reportDetails,
                 token: token
@@ -390,6 +392,8 @@ const ArticleDetail = () => {
                 showToast(res.data.message, 'success');
                 setShowReportModal(false);
                 setReportDetails('');
+                setReportReason('');
+                setReportingCommentId(null);
             } else {
                 showToast(res.data.message, 'error');
             }
@@ -786,7 +790,10 @@ const ArticleDetail = () => {
 
                                                 <button 
                                                     className="hover:text-red-500 transition-colors flex items-center gap-1"
-                                                    onClick={() => showToast('Đã gửi báo cáo bình luận này.', 'success')}
+                                                    onClick={() => {
+                                                        setReportingCommentId(comment.id);
+                                                        setShowReportModal(true);
+                                                    }}
                                                 >
                                                     <AlertCircle size={14} /> Báo cáo
                                                 </button>
@@ -881,7 +888,10 @@ const ArticleDetail = () => {
                                                     
                                                     <button 
                                                         className="hover:text-red-500 transition-colors flex items-center gap-1"
-                                                        onClick={() => alert('Đã gửi báo cáo phản hồi này.')}
+                                                        onClick={() => {
+                                                            setReportingCommentId(reply.id);
+                                                            setShowReportModal(true);
+                                                        }}
                                                     >
                                                         <AlertCircle size={12} /> Báo cáo
                                                     </button>
@@ -921,7 +931,9 @@ const ArticleDetail = () => {
                             
                             <div className="flex justify-between items-center mb-8">
                                 <div className="space-y-1">
-                                    <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase">Báo cáo bài viết</h3>
+                                    <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase">
+                                        {reportingCommentId ? 'Báo cáo bình luận' : 'Báo cáo bài viết'}
+                                    </h3>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Giúp chúng tôi cải thiện môi trường tin tức</p>
                                 </div>
                                 <button onClick={() => setShowReportModal(false)} className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 hover:text-slate-600 transition-all">
