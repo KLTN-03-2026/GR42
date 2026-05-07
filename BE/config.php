@@ -35,6 +35,8 @@ define('_PATH_URL_TEMPLATES', _PATH_URL . '/templates');
 define('_GEMINI_API_KEY', $envConfig['GEMINI_API_KEY'] ?? '');
 define('_GOOGLE_CLIENT_ID', $envConfig['GOOGLE_CLIENT_ID'] ?? '');
 define('_GOOGLE_CLIENT_SECRET', $envConfig['GOOGLE_CLIENT_SECRET'] ?? '');
+define('_OPENWEATHERMAP_API_KEY', $envConfig['OPENWEATHERMAP_API_KEY'] ?? '');
+
 /*Json URL GGSHEET*/
 define('_JSON_URL_SHEET', $envConfig['JSON_URL_SHEET'] ?? '');
 

@@ -5,8 +5,7 @@ require_once __DIR__ . '/../../config.php';
 $lat = isset($_GET['lat']) ? $_GET['lat'] : null;
 $lon = isset($_GET['lon']) ? $_GET['lon'] : null;
 $q = isset($_GET['q']) ? $_GET['q'] : 'Hanoi';
-
-$apiKey = 'a970c4064122ec6945e1064585bf8762';
+$apiKey = _OPENWEATHERMAP_API_KEY;
 $cacheDir = __DIR__ . '/../../cache';
 
 if (!is_dir($cacheDir)) {
