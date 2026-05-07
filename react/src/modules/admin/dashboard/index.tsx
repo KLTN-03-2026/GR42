@@ -35,7 +35,7 @@ const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
         <Icon size={28} className={color.replace('bg-', 'text-')} />
       </div>
       <div>
-        <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">{title}</h3>
+        <h3 className="text-slate-400 text-[10px] font-black tracking-widest mb-1">{title}</h3>
         <p className="text-3xl font-black text-slate-900 tracking-tight">
           {typeof value === 'number' ? value.toLocaleString() : (value || '...')}
         </p>
@@ -134,7 +134,7 @@ const AdminDashboard = () => {
                 
                 <div className="relative z-10 max-w-2xl">
                     <div className="flex items-center gap-3 mb-6">
-                        <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-[0.2em]">
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black tracking-[0.2em]">
                             Quản lý Hệ thống
                         </span>
                         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
@@ -162,19 +162,19 @@ const AdminDashboard = () => {
                     >
                         <div className="flex items-center justify-between mb-10">
                             <div>
-                                <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider mb-1">Tần suất đăng bài</h3>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dữ liệu cập nhật theo tuần</p>
+                                <h3 className="font-black text-slate-900 text-sm tracking-wider mb-1">Tần suất đăng bài</h3>
+                                <p className="text-[10px] font-bold text-slate-400 tracking-widest">Dữ liệu cập nhật theo tuần</p>
                             </div>
                             <div className="flex gap-2 bg-slate-50 p-1.5 rounded-2xl">
                                 <button 
                                     onClick={() => setPeriod('week')}
-                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${period === 'week' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all ${period === 'week' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
                                 >
                                     7 Ngày
                                 </button>
                                 <button 
                                     onClick={() => setPeriod('month')}
-                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${period === 'month' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all ${period === 'month' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
                                 >
                                     Tháng
                                 </button>
@@ -195,7 +195,7 @@ const AdminDashboard = () => {
                                     <Tooltip 
                                         cursor={{ fill: '#f8fafc' }}
                                         contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '15px' }}
-                                        labelStyle={{ fontWeight: 900, marginBottom: '5px', textTransform: 'uppercase', fontSize: '10px' }}
+                                        labelStyle={{ fontWeight: 900, marginBottom: '5px', fontSize: '10px' }}
                                     />
                                     <Bar dataKey="value" fill="url(#barGradient)" radius={[8, 8, 0, 0]} barSize={45} />
                                 </BarChart>
@@ -210,8 +210,8 @@ const AdminDashboard = () => {
                                     <Zap size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider">Cập nhật tin tức</h3>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Các bài báo mới nhất trong hệ thống</p>
+                                    <h3 className="font-black text-slate-900 text-sm tracking-wider">Cập nhật tin tức</h3>
+                                    <p className="text-[10px] font-bold text-slate-400 tracking-widest">Các bài báo mới nhất trong hệ thống</p>
                                 </div>
                             </div>
                             <VButton variant="ghost" size="sm" onClick={() => navigate('/admin/news')}>Xem tất cả</VButton>
@@ -236,11 +236,11 @@ const AdminDashboard = () => {
                                             }}
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                                            <span className="text-[8px] font-black text-white uppercase tracking-widest">Chỉnh sửa</span>
+                                            <span className="text-[8px] font-black text-white tracking-widest">Chỉnh sửa</span>
                                         </div>
                                     </div>
-                                    <h4 className="text-[11px] font-black text-slate-800 line-clamp-2 leading-tight uppercase mb-2 group-hover:text-blue-600 transition-colors">{item.title}</h4>
-                                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold uppercase tracking-tighter">
+                                    <h4 className="text-[11px] font-black text-slate-800 line-clamp-2 leading-tight mb-2 group-hover:text-blue-600 transition-colors">{item.title}</h4>
+                                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold tracking-tighter">
                                         <span>{item.source}</span>
                                         <span className="flex items-center gap-1"><Clock size={10} /> {item.pubDate.split(' ')[0]}</span>
                                     </div>
@@ -252,7 +252,7 @@ const AdminDashboard = () => {
 
                 <div className="lg:col-span-4 space-y-8">
                     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                        <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider mb-8 flex items-center gap-3">
+                        <h3 className="font-black text-slate-900 text-sm tracking-wider mb-8 flex items-center gap-3">
                             <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
                             Thao tác nhanh
                         </h3>
@@ -278,7 +278,7 @@ const AdminDashboard = () => {
                                     <div className={`w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-100 group-hover:scale-110 transition-transform ${crawling ? 'animate-spin' : ''}`}>
                                         <Activity size={24} />
                                     </div>
-                                    <span className="font-black text-xs text-slate-700 uppercase tracking-widest group-hover:text-emerald-700 transition-colors">
+                                    <span className="font-black text-xs text-slate-700 tracking-widest group-hover:text-emerald-700 transition-colors">
                                         {crawling ? 'Đang thu thập...' : 'Chạy Thu Thập Dữ Liệu'}
                                     </span>
                                 </div>
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
                     </div>
 
                     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden group">
-                        <h3 className="font-black uppercase tracking-widest text-[10px] mb-8 text-slate-400 text-center">Phân bố danh mục</h3>
+                        <h3 className="font-black tracking-widest text-[10px] mb-8 text-slate-400 text-center">Phân bố danh mục</h3>
                         <div className="h-[250px] relative flex items-center justify-center">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -298,20 +298,20 @@ const AdminDashboard = () => {
                                         ))}
                                     </Pie>
                                     <Tooltip 
-                                        contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}
+                                        contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', fontSize: '10px', fontWeight: 800 }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="absolute flex flex-col items-center pointer-events-none group-hover:scale-110 transition-transform duration-500">
                                 <span className="text-3xl font-black text-slate-900 tracking-tighter">{data?.stats.total_news}</span>
-                                <span className="text-[8px] font-black uppercase text-slate-400 tracking-[0.3em]">Tin bài</span>
+                                <span className="text-[8px] font-black text-slate-400 tracking-[0.3em]">Tin bài</span>
                             </div>
                         </div>
                         <div className="mt-8 grid grid-cols-2 gap-3">
                             {data?.categories.map((item: any, index: number) => (
                                 <div key={item.category} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-transparent hover:border-blue-100 transition-colors">
                                     <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                                    <span className="text-[9px] text-slate-600 uppercase font-black tracking-tight flex-1 line-clamp-1">{item.category}</span>
+                                    <span className="text-[9px] text-slate-600 font-black tracking-tight flex-1 line-clamp-1">{item.category}</span>
                                     <span className="text-[9px] font-black text-slate-900">{item.count}</span>
                                 </div>
                             ))}
@@ -333,7 +333,7 @@ const QuickActionBtn = ({ icon: Icon, label, color, onClick, badge }: any) => (
                 <Icon size={24} />
             </div>
             <div className="flex flex-col items-start">
-                <span className="font-black text-xs text-slate-700 uppercase tracking-widest group-hover:text-blue-700 transition-colors">{label}</span>
+                <span className="font-black text-xs text-slate-700 tracking-widest group-hover:text-blue-700 transition-colors">{label}</span>
                 {badge && <span className="text-[8px] font-black bg-red-500 text-white px-2 py-0.5 rounded-full mt-1">+{badge} Mới</span>}
             </div>
         </div>

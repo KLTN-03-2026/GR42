@@ -39,7 +39,9 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
     if (!authToken) return;
     setChecking(true);
     try {
-      const res = await axios.get(`${API_BASE_URL}/modules/api/user.php?token=${authToken}`);
+      const res = await axios.get(`${API_BASE_URL}/index.php`, {
+        params: { module: 'api', action: 'user', token: authToken }
+      });
       if (res.data.status === 'success') {
         const updatedIsVip = res.data.data.profile.is_vip === 1;
         setIsVip(updatedIsVip);

@@ -14,7 +14,8 @@ import {
   Bell,
   Menu,
   X,
-  ShieldCheck
+  ShieldCheck,
+  Clock
 } from 'lucide-react';
 
 import Chatbot from '../core/Chatbot';
@@ -65,6 +66,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { to: '/', icon: <Home size={20} />, label: 'Trang chủ' },
     { to: '/admin/favorites', icon: <Heart size={20} />, label: 'Tin yêu thích' },
     { to: '/admin/profile', icon: <User size={20} />, label: 'Tài khoản' },
+    { to: '/admin/history', icon: <Clock size={20} />, label: 'Lịch sử đã đọc' },
   ];
 
   const adminItems = [
@@ -113,7 +115,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             />
           ))}
 
-          <div className="pt-6 pb-2 px-4 uppercase text-[10px] font-bold text-slate-400 tracking-wider">
+          <div className="pt-6 pb-2 px-4 text-[10px] font-bold text-slate-400 tracking-wider">
             Quản trị
           </div>
           {adminItems.map((item) => (
@@ -154,10 +156,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </div>
 
               <div className="flex items-center gap-6">
-                <button className="p-3 text-slate-500 hover:bg-slate-50 rounded-2xl transition-colors relative">
-                  <Bell size={20} />
-                  <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
                 <div className="h-10 w-px bg-slate-100 mx-1"></div>
                 <Link to="/admin/profile" className="flex items-center gap-3 group pl-2 transition-colors">
                   <VAvatar src={userAvatar} name={userName} size="md" className="ring-2 ring-transparent group-hover:ring-blue-100 transition-all active:scale-95" />
@@ -166,7 +164,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   </div>
                 </Link>
 
-                <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 text-amber-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-amber-100 shrink-0">
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 text-amber-600 rounded-2xl text-[10px] font-black tracking-widest border border-amber-100 shrink-0">
                     <ShieldCheck size={14} />
                     Quản lý
                 </div>

@@ -196,7 +196,7 @@ const Register = () => {
               <div className="flex items-start gap-3 px-1 pb-4">
                   <input type="checkbox" required id="terms" className="mt-1 w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-100 cursor-pointer" />
                   <label htmlFor="terms" className="text-[11px] text-slate-500 font-bold leading-relaxed cursor-pointer">
-                      Tôi đồng ý với <Link to="/terms" className="text-blue-600 hover:underline">Điều khoản</Link> & <Link to="/privacy" className="text-blue-600 hover:underline">Chính sách bảo mật</Link> của KLTN NEWS.
+                      Tôi đồng ý với <Link to="/terms" className="text-blue-600 hover:underline">Điều khoản</Link> & <Link to="/privacy" className="text-blue-600 hover:underline">Chính sách bảo mật</Link> của Vertex.
                   </label>
               </div>
 

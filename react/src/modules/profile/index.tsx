@@ -43,13 +43,13 @@ const Profile = () => {
 
   useEffect(() => {
     
-    axios.get(`${API_BASE_URL}/modules/api/categories_get.php`)
+    axios.get(`${API_BASE_URL}/index.php`, { params: { module: 'api', action: 'categories_get' } })
       .then(res => { if (res.data.status === 'success') setApiCategories(res.data.data); })
       .catch(err => console.error('Lỗi fetch categories:', err));
 
     if (authToken) {
       
-      axios.get(`${API_BASE_URL}/modules/api/user.php?token=${authToken}`)
+      axios.get(`${API_BASE_URL}/index.php`, { params: { module: 'api', action: 'user', token: authToken } })
         .then(res => { 
           if (res.data.status === 'success') {
             setSelectedInterests(res.data.data.interests);
@@ -90,8 +90,8 @@ const Profile = () => {
     if (!authToken) return;
     try {
       setLoadingHistory(true);
-      const res = await axios.get(`${API_BASE_URL}/modules/api/history_get.php`, {
-        params: { token: authToken }
+      const res = await axios.get(`${API_BASE_URL}/index.php`, {
+        params: { module: 'api', action: 'history_get', token: authToken }
       });
       if (res.data.status === 'success') {
         setHistory(res.data.data);
@@ -119,7 +119,7 @@ const Profile = () => {
     if (!authToken) { alert('Vui lòng đăng nhập để lưu sở thích'); return; }
     setLoadingInterests(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/modules/api/user.php`, {
+      const response = await axios.post(`${API_BASE_URL}/index.php?module=api&action=user`, {
         token: authToken,
         action: 'update_interests',
         interests: selectedInterests

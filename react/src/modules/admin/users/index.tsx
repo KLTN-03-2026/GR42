@@ -57,9 +57,13 @@ const AdminUsers = () => {
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        `${API_BASE_URL}/modules/api/admin/admin_users.php?token=${token}`
-      );
+      const res = await axios.get(`${API_BASE_URL}/index.php`, {
+        params: {
+          module: 'api',
+          action: 'admin/admin_users',
+          token: token
+        }
+      });
       if (res.data.status === "success") {
         setUsers(res.data.data);
       }

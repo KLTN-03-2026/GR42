@@ -73,10 +73,13 @@ const ArticleDetail = () => {
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
-            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-            
-            const res = await axios.get(`${host}/BE/modules/api/news_get_detail.php`, {
-                params: { id, token }
+            const res = await axios.get(`${API_BASE_URL}/index.php`, {
+                params: { 
+                    module: 'api',
+                    action: 'news_get_detail',
+                    id, 
+                    token 
+                }
             });
 
             if (res.data.status === 'success') {

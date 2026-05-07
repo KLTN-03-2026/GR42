@@ -17,6 +17,8 @@ import AdminUsers from './modules/admin/users';
 import AdminReports from './modules/admin/reports';
 import AdminComments from './modules/admin/comments';
 import AdminProfilePage from './modules/admin/profile';
+import Terms from './modules/legal/Terms';
+import Privacy from './modules/legal/Privacy';
 
 import AdminRoute from './routes/AdminRoute';
 import { ToastProvider } from './context/ToastContext';
@@ -32,6 +34,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terms" element={<PublicLayout><Terms /></PublicLayout>} />
+        <Route path="/privacy" element={<PublicLayout><Privacy /></PublicLayout>} />
 
         <Route path="/article/:id" element={
           <PublicLayout>
@@ -56,6 +60,7 @@ function App() {
             <AdminLayout>
               <Routes>
                 <Route path="/favorites" element={<Navigate to="/profile" state={{ subTab: 'favorites' }} replace />} />
+                <Route path="/history" element={<Navigate to="/profile" state={{ subTab: 'history' }} replace />} />
                 <Route path="/profile" element={<Profile />} />
                 
                 <Route path="/admin" element={<AdminDashboard />} />

@@ -22,8 +22,13 @@ const AdminReports = () => {
     const fetchReports = useCallback(async () => {
         try {
             setLoading(true);
-            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-            const res = await axios.get(`${host}/BE/modules/api/admin/reports_get.php?token=${token}`);
+            const res = await axios.get(`${API_BASE_URL}/index.php`, {
+                params: {
+                    module: 'api',
+                    action: 'admin/reports_get',
+                    token: token
+                }
+            });
             if (res.data.status === 'success') {
                 setReports(res.data.data);
             }
@@ -42,8 +47,7 @@ const AdminReports = () => {
         if (!window.confirm(`Xác nhận ${action === 'process' ? 'đã xử lý' : 'xóa'} báo cáo này?`)) return;
         
         try {
-            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-            const res = await axios.post(`${host}/BE/modules/api/admin/reports_action.php`, {
+            const res = await axios.post(`${API_BASE_URL}/index.php?module=api&action=admin/reports_action&token=${token}`, {
                 id,
                 action,
                 token
@@ -88,7 +92,7 @@ const AdminReports = () => {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
                     <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-6 opacity-20" />
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Đang tải danh sách báo cáo...</p>
+                    <p className="text-[10px] font-black text-slate-400 tracking-widest">Đang tải danh sách báo cáo...</p>
                 </div>
             ) : reports.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
@@ -114,12 +118,12 @@ const AdminReports = () => {
                                     <div className="flex-1 space-y-6">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${
                                                     report.status === 1 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
                                                 }`}>
                                                     {report.status === 1 ? 'Đã xử lý' : 'Chờ xử lý'}
                                                 </span>
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                <span className="text-[10px] font-bold text-slate-400 tracking-widest flex items-center gap-1.5">
                                                     <Clock size={12} /> {report.created_at}
                                                 </span>
                                             </div>
@@ -147,7 +151,7 @@ const AdminReports = () => {
                                             <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100">
                                                 <div className="flex items-center gap-3 mb-3">
                                                     <ShieldAlert size={18} className="text-red-500" />
-                                                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">Lý do: {report.reason}</h4>
+                                                    <h4 className="text-sm font-black text-slate-900 tracking-tight">Lý do: {report.reason}</h4>
                                                 </div>
                                                 {report.details && (
                                                     <p className="text-xs font-bold text-slate-600 leading-relaxed italic">
@@ -163,7 +167,7 @@ const AdminReports = () => {
                                                     </div>
                                                 )}
                                                 <div className="flex-1 min-w-0">
-                                                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-1">
+                                                    <span className="text-[10px] font-black text-blue-600 tracking-widest block mb-1">
                                                         {report.type === 'article' ? report.news_category : 'BÌNH LUẬN'}
                                                     </span>
                                                     <h5 className="text-sm font-black text-slate-800 line-clamp-1 group-hover:text-blue-600 transition-colors">
@@ -177,7 +181,7 @@ const AdminReports = () => {
                                                         {report.type === 'article' && report.target_id && (
                                                             <a 
                                                                 href={`/article/${encodeId(report.target_id)}`} target="_blank" rel="noreferrer"
-                                                                className="flex items-center gap-1 text-[9px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+                                                                className="flex items-center gap-1 text-[9px] font-black text-blue-600 tracking-widest hover:underline"
                                                             >
                                                                 Xem bài báo <ExternalLink size={10} />
                                                             </a>

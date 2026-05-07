@@ -73,7 +73,7 @@ const AdminComments = () => {
         return (
             <div className="flex flex-col items-center justify-center py-32">
                 <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-6 opacity-20" />
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Đang tải danh sách bình luận...</p>
+                <p className="text-[10px] font-black text-slate-400 tracking-widest">Đang tải danh sách bình luận...</p>
             </div>
         );
     }
@@ -123,10 +123,10 @@ const AdminComments = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Người dùng</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nội dung</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Bài viết</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Thao tác</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 tracking-widest">Người dùng</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 tracking-widest">Nội dung</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 tracking-widest">Bài viết</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 tracking-widest text-center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -147,13 +147,13 @@ const AdminComments = () => {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-black text-slate-900 leading-none">{comment.fullname}</p>
-                                                    <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-tight">{comment.email}</p>
+                                                    <p className="text-[10px] text-slate-400 font-bold mt-1 tracking-tight">{comment.email}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6 max-w-md">
                                             <p className="text-sm font-medium text-slate-700 leading-relaxed mb-2">{comment.content}</p>
-                                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold tracking-widest">
                                                 <Clock size={12} />
                                                 {new Date(comment.created_at).toLocaleString('vi-VN')}
                                             </div>
@@ -195,7 +195,7 @@ const AdminComments = () => {
                             <AlertCircle size={40} />
                         </div>
                         <h3 className="text-xl font-black text-slate-900 mb-2">Không tìm thấy bình luận nào</h3>
-                        <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">Thử tìm kiếm với từ khóa khác</p>
+                        <p className="text-slate-400 font-bold text-sm tracking-widest">Thử tìm kiếm với từ khóa khác</p>
                     </div>
                 )}
             </div>

@@ -19,7 +19,7 @@ function callGeminiApi(array $data, string $apiKey, string $model, string $caCer
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode($data, JSON_UNESCAPED_UNICODE),
         CURLOPT_HTTPHEADER => ["Content-Type: application/json; charset=utf-8"],
-        CURLOPT_TIMEOUT => 30,
+        CURLOPT_TIMEOUT => 60,
         CURLOPT_SSL_VERIFYPEER => !empty($caCertPath),
     ]);
     if (!empty($caCertPath)) {

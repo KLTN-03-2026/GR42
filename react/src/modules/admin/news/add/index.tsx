@@ -110,12 +110,12 @@ const AdminNewsAdd = () => {
                     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
                         <div className="flex items-center gap-2 mb-2">
                             <FileText size={18} className="text-blue-500" />
-                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">Nội dung bài viết</h2>
+                            <h2 className="text-sm font-black tracking-widest text-slate-400">Nội dung bài viết</h2>
                         </div>
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Tiêu đề bài báo <span className="text-red-500">*</span></label>
+                                <label className="block text-[10px] font-black tracking-widest text-slate-400 mb-2 ml-1">Tiêu đề bài báo <span className="text-red-500">*</span></label>
                                 <input 
                                     type="text"
                                     name="title"
@@ -128,7 +128,7 @@ const AdminNewsAdd = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Nguồn tin</label>
+                                    <label className="block text-[10px] font-black tracking-widest text-slate-400 mb-2 ml-1">Nguồn tin</label>
                                     <input 
                                         type="text"
                                         name="source"
@@ -139,7 +139,7 @@ const AdminNewsAdd = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Đường dẫn gốc</label>
+                                    <label className="block text-[10px] font-black tracking-widest text-slate-400 mb-2 ml-1">Đường dẫn gốc</label>
                                     <div className="relative">
                                         <LinkIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                         <input 
@@ -155,7 +155,7 @@ const AdminNewsAdd = () => {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Nội dung chi tiết</label>
+                                <label className="block text-[10px] font-black tracking-widest text-slate-400 mb-2 ml-1">Nội dung chi tiết</label>
                                 <textarea 
                                     name="content"
                                     value={formData.content}
@@ -174,12 +174,12 @@ const AdminNewsAdd = () => {
                     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-8">
                         <div className="flex items-center gap-2">
                             <Settings size={18} className="text-slate-400" />
-                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">Thuộc tính</h2>
+                            <h2 className="text-sm font-black tracking-widest text-slate-400">Thuộc tính</h2>
                         </div>
 
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Chuyên mục <span className="text-red-500">*</span></label>
+                                <label className="block text-[10px] font-black tracking-widest text-slate-400 mb-2 ml-1">Chuyên mục <span className="text-red-500">*</span></label>
                                 <select 
                                     name="category"
                                     value={formData.category}
@@ -198,7 +198,7 @@ const AdminNewsAdd = () => {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Ảnh bìa (URL)</label>
+                                <label className="block text-[10px] font-black tracking-widest text-slate-400 mb-3 ml-1">Ảnh bìa (URL)</label>
                                 <div className="space-y-4">
                                     <div className="aspect-video bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden group transition-all hover:border-blue-200">
                                         {formData.thumbnail ? (

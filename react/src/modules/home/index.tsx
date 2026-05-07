@@ -56,8 +56,8 @@ const Home = () => {
       }
 
       // Fetch history
-      const histRes = await axios.get(`${host}/BE/modules/api/history_get.php`, {
-        params: { token }
+      const histRes = await axios.get(`${API_BASE_URL}/index.php`, {
+        params: { module: 'api', action: 'history_get', token }
       });
       if (histRes.data.status === 'success') {
         setHistory(histRes.data.data.slice(0, 5));
@@ -71,8 +71,7 @@ const Home = () => {
     try {
       const token = localStorage.getItem('auth_token');
       if (reset) setLoading(true);
-      const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-      const response = await axios.get(`${host}/BE/index.php`, {
+      const response = await axios.get(`${API_BASE_URL}/index.php`, {
         params: {
           module: 'api',
           action: 'news_load',
@@ -291,7 +290,7 @@ const Home = () => {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.2 }}
-                          className="inline-block px-3 py-1 bg-blue-600 rounded-lg text-white text-[10px] font-black uppercase tracking-widest mb-6"
+                          className="inline-block px-3 py-1 bg-blue-600 rounded-lg text-white text-[10px] font-black tracking-widest mb-6"
                         >
                             TIÊU ĐIỂM
                         </motion.span>
