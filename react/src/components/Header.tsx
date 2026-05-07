@@ -7,6 +7,7 @@ import { API_BASE_URL } from '../config';
 import VAvatar from './VAvatar';
 import VModal from './VModal';
 import { encodeId } from '../utils/idEncoder';
+import WeatherWidget from './WeatherWidget';
 
 const Header = () => {
   const location = useLocation();
@@ -90,19 +91,19 @@ const Header = () => {
           </Link>
 
           <div className="flex-1 max-w-3xl relative group hidden md:block" ref={searchRef}>
-            <button 
+            <button
               onClick={() => {
                 if (searchTerm.trim()) {
-                    setShowSuggestions(false);
-                    navigate(`/?keyword=${encodeURIComponent(searchTerm.trim())}`);
+                  setShowSuggestions(false);
+                  navigate(`/?keyword=${encodeURIComponent(searchTerm.trim())}`);
                 }
               }}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors"
             >
               <Search size={18} />
             </button>
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Hôm nay bạn muốn xem tin tức gì?"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -111,19 +112,19 @@ const Header = () => {
               className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-12 py-3 text-sm font-medium focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none"
             />
             {searchTerm && (
-                <button 
-                  onClick={() => {
-                      setSearchTerm('');
-                      setSuggestions([]);
-                      setShowSuggestions(false);
-                      if (location.search.includes('keyword')) {
-                          navigate('/');
-                      }
-                  }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-red-500 transition-colors"
-                >
-                  <X size={18} />
-                </button>
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setSuggestions([]);
+                  setShowSuggestions(false);
+                  if (location.search.includes('keyword')) {
+                    navigate('/');
+                  }
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-red-500 transition-colors"
+              >
+                <X size={18} />
+              </button>
             )}
 
             <AnimatePresence>
@@ -139,7 +140,7 @@ const Header = () => {
                   </div>
                   <div className="max-h-[400px] overflow-y-auto">
                     {suggestions.map((item) => (
-                      <div 
+                      <div
                         key={item.id}
                         onClick={() => handleSelectSuggestion(item.id)}
                         className="p-4 hover:bg-blue-50 cursor-pointer flex gap-4 transition-colors border-b border-slate-50 last:border-0 group"
@@ -158,10 +159,10 @@ const Header = () => {
                       </div>
                     ))}
                   </div>
-                  <div 
+                  <div
                     onClick={() => {
-                        setShowSuggestions(false);
-                        navigate(`/?keyword=${encodeURIComponent(searchTerm.trim())}`);
+                      setShowSuggestions(false);
+                      navigate(`/?keyword=${encodeURIComponent(searchTerm.trim())}`);
                     }}
                     className="p-4 text-center bg-blue-600 text-white text-xs font-black uppercase tracking-widest cursor-pointer hover:bg-blue-700 transition-all"
                   >
@@ -173,31 +174,32 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-4 shrink-0">
+            <WeatherWidget />
             {authToken ? (
               <div className="flex items-center gap-3 pl-4 border-l border-slate-100">
-                <Link 
-                  to={userRole === 'admin' ? "/admin" : "/profile"} 
+                <Link
+                  to={userRole === 'admin' ? "/admin" : "/profile"}
                   className="flex items-center gap-3 group"
                 >
                   <VAvatar src={userAvatar} name={userName || 'U'} size="md" className="hover:ring-2 hover:ring-blue-100 transition-all active:scale-95" />
                   <div className="hidden lg:block text-left">
                     <div className="flex items-center gap-1.5">
-                        <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{userName || 'Người dùng'}</p>
+                      <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{userName || 'Người dùng'}</p>
                     </div>
                   </div>
                 </Link>
 
                 {userRole === 'admin' && (
-                  <Link 
-                    to="/admin" 
+                  <Link
+                    to="/admin"
                     className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-100 transition-all active:scale-95 border border-amber-100"
                   >
                     <ShieldCheck size={14} />
                     Quản lý
                   </Link>
                 )}
-                
-                <button 
+
+                <button
                   onClick={() => setShowLogoutConfirm(true)}
                   className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all active:scale-90"
                   title="Đăng xuất"
@@ -208,10 +210,10 @@ const Header = () => {
             ) : (
               <>
                 <Link to="/login" className="text-xs font-black text-slate-900 bg-slate-100 hover:bg-blue-600 hover:text-white px-5 py-2.5 rounded-xl transition-all uppercase tracking-widest active:scale-95">
-                    Đăng nhập
+                  Đăng nhập
                 </Link>
                 <Link to="/register" className="hidden sm:block text-xs font-black text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl shadow-lg shadow-blue-200 transition-all uppercase tracking-widest active:scale-95">
-                    Đăng ký
+                  Đăng ký
                 </Link>
               </>
             )}

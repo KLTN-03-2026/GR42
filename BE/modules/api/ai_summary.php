@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/cors.php';
-
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../includes/database.php';
 
@@ -16,20 +15,20 @@ if (!$checkToken) {
     exit;
 }
 
-$user_id = (int)$checkToken['user_id'];
+$user_id = (int) $checkToken['user_id'];
 $userProfile = getOne("SELECT is_vip, ai_summary_count FROM users WHERE id = $user_id");
 if (!$userProfile) {
     echo json_encode(['status' => 'error', 'message' => 'Không tìm thấy người dùng'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$is_vip = (int)$userProfile['is_vip'];
-$ai_summary_count = (int)$userProfile['ai_summary_count'];
+$is_vip = (int) $userProfile['is_vip'];
+$ai_summary_count = (int) $userProfile['ai_summary_count'];
 
-if ($is_vip !== 1 && $ai_summary_count >= 2) {
+if ($is_vip !== 1 && $ai_summary_count >= 3) {
     echo json_encode([
         'status' => 'upgrade_required',
-        'message' => 'Bạn đã dùng hết 2 lần miễn phí. Hãy nâng cấp VIP để trải nghiệm tính năng AI không giới hạn!'
+        'message' => 'Bạn đã dùng hết 3 lần miễn phí. Hãy nâng cấp VIP để trải nghiệm tính năng AI không giới hạn!'
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
