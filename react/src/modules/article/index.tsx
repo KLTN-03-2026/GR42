@@ -758,9 +758,9 @@ const ArticleDetail = () => {
                                                     {Number(comment.like_count) > 0 && comment.like_count} Thích
                                                 </button>
                                                 
-                                                {token && (String(comment.user_id) === String(localStorage.getItem('user_id')) || localStorage.getItem('user_role') === 'admin') && (
+                                                {token && (Number(comment.user_id) === currentUserId || currentUserRole === 'admin') && (
                                                     <>
-                                                        {String(comment.user_id) === String(localStorage.getItem('user_id')) && (
+                                                        {Number(comment.user_id) === currentUserId && (
                                                             <button 
                                                                 className="hover:text-blue-600 transition-colors"
                                                                 onClick={() => handleStartEdit(comment)}
@@ -860,9 +860,9 @@ const ArticleDetail = () => {
                                                                 {Number(reply.like_count) > 0 && reply.like_count} Thích
                                                             </button>
                                                     
-                                                    {token && (String(reply.user_id) === String(localStorage.getItem('user_id')) || localStorage.getItem('user_role') === 'admin') && (
+                                                    {token && (Number(reply.user_id) === currentUserId || currentUserRole === 'admin') && (
                                                         <>
-                                                            {String(reply.user_id) === String(localStorage.getItem('user_id')) && (
+                                                            {Number(reply.user_id) === currentUserId && (
                                                                 <button 
                                                                     className="hover:text-blue-600 transition-colors"
                                                                     onClick={() => handleStartEdit(reply)}
