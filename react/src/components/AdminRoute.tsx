@@ -15,17 +15,14 @@ const AdminRoute = () => {
         return;
       }
 
-      const localRole = localStorage.getItem('user_role');
-      if (localRole !== 'admin') {
-        setIsAdmin(false);
-        return;
-      }
+      // Always verify with the backend to ensure role changes in DB are reflected
 
       try {
-        const response = await axios.get(`${API_BASE_URL}/modules/api/user.php?token=${token}`);
+        const response = await axios.get(`${API_BASE_URL}/index.php?module=api&action=user&token=${token}`);
         
         if (response.data.status === 'success' && response.data.data.profile.role === 'admin') {
           setIsAdmin(true);
+          localStorage.setItem('user_role', 'admin');
         } else {
           setIsAdmin(false);
           localStorage.removeItem('user_role');

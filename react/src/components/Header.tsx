@@ -20,8 +20,24 @@ const Header = () => {
 
   const userName = localStorage.getItem('user_name');
   const userAvatar = localStorage.getItem('user_avatar');
-  const userRole = localStorage.getItem('user_role');
+  const [userRole, setUserRole] = useState(localStorage.getItem('user_role'));
   const authToken = localStorage.getItem('auth_token');
+
+  useEffect(() => {
+    if (authToken) {
+      axios.get(`${API_BASE_URL}/index.php?module=api&action=user&token=${authToken}`)
+        .then(res => {
+          if (res.data.status === 'success') {
+            const currentRole = res.data.data.profile.role;
+            if (currentRole !== userRole) {
+              setUserRole(currentRole);
+              localStorage.setItem('user_role', currentRole);
+            }
+          }
+        })
+        .catch(console.error);
+    }
+  }, [authToken, userRole]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
