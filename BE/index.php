@@ -37,6 +37,16 @@ if (!empty($path)) {
                 }
             }
         }
+
+        if (!file_exists($path)) {
+            $it = new RecursiveDirectoryIterator('modules');
+            foreach (new RecursiveIteratorIterator($it) as $file) {
+                if ($file->getFilename() === $action . '.php') {
+                    $path = $file->getPathname();
+                    break;
+                }
+            }
+        }
     }
 
     if (file_exists($path)) {

@@ -1,14 +1,11 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once 'includes/database.php';
-require_once 'includes/session.php';
+require_once _PATH_URL . '/includes/database.php';
+require_once _PATH_URL . '/includes/session.php';
 
 $client_id = _GOOGLE_CLIENT_ID;
 $client_secret = _GOOGLE_CLIENT_SECRET;
 $redirect_uri = _HOST_URL . '/?module=auth&action=google_callback';
+
 if (isset($_GET['code'])) {
     $token_url = "https://oauth2.googleapis.com/token";
     $post_data = [
@@ -30,6 +27,7 @@ if (isset($_GET['code'])) {
 
     $response = curl_exec($ch);
     $data = json_decode($response, true);
+
     if (!empty($data['access_token'])) {
         $ch = curl_init();
         curl_setopt_array($ch, [
@@ -46,6 +44,7 @@ if (isset($_GET['code'])) {
             global $conn;
             $emailEsc = $conn->real_escape_string($email);
             $checkUser = getOne("SELECT * FROM users WHERE email = '$emailEsc'");
+
             if (empty($checkUser)) {
                 $newUser = [
                     'email' => $email,
@@ -58,41 +57,35 @@ if (isset($_GET['code'])) {
                 if (insert('users', $newUser)) {
                     $userId = lastID();
                     if (!$userId) {
-                        $newUserCheck = getOne("SELECT id FROM users WHERE email = '$email'");
+                        $newUserCheck = getOne("SELECT id FROM users WHERE email = '$emailEsc'");
                         $userId = $newUserCheck['id'];
                     }
                 } else {
-                    die("Lỗi tạo người dùng mới trong database.");
+                    header('Location: ' . _FRONTEND_URL . '/login?error=' . urlencode('Lỗi tạo tài khoản mới'));
+                    exit;
                 }
             } else {
                 $userId = $checkUser['id'];
-                
                 if (empty($checkUser['avatar']) && !empty($userinfo['picture'])) {
                     update('users', ['avatar' => $userinfo['picture']], "id = '$userId'");
                 }
             }
-            $_SESSION['user_id'] = $userId;
+
+            // Tạo token đăng nhập
             $token = sha1(uniqid() . time());
-            setSession('token_login', $token);
             $tokenData = [
                 'token' => $token,
                 'user_id' => $userId,
                 'created_at' => date('Y-m-d H:i:s')
             ];
+
             $res = $conn->query("INSERT INTO token_login (token, user_id, created_at) VALUES ('$token', $userId, NOW())");
             if (!$res) {
-                header('Location: ' . _FRONTEND_URL . '/login?error=' . urlencode('Lỗi tạo token: ' . $conn->error));
+                header('Location: ' . _FRONTEND_URL . '/login?error=' . urlencode('Lỗi hệ thống: Không thể tạo phiên đăng nhập'));
                 exit;
             }
-            $userFinal = getOne("SELECT avatar, role FROM users WHERE id = '$userId'");
-            $avatar = $userFinal['avatar'] ?? '';
-            $role = $userFinal['role'] ?? 'user';
-            
-            if (!empty($avatar) && !preg_match('/^http/', $avatar) && !preg_match('/^data:/', $avatar)) {
-                $avatar = _HOST_URL . '/' . $avatar;
-            }
-            $state = $_GET['state'] ?? '';
 
+            $state = $_GET['state'] ?? '';
             if ($state === 'react') {
                 $redirectUrl = _FRONTEND_URL . "/login?token=" . $token;
             } else {
@@ -101,14 +94,15 @@ if (isset($_GET['code'])) {
             header("Location: " . $redirectUrl);
             exit;
         } else {
-            echo "Không thể lấy thông tin người dùng từ Google.";
+            header('Location: ' . _FRONTEND_URL . '/login?error=' . urlencode('Không thể lấy thông tin từ Google'));
             exit;
         }
     } else {
-        echo "Không thể lấy token từ Google. Chi tiết lỗi: " . htmlspecialchars(json_encode($data));
+        $errorDetail = $data['error_description'] ?? ($data['error'] ?? 'Unknown error');
+        header('Location: ' . _FRONTEND_URL . '/login?error=' . urlencode('Lỗi Google: ' . $errorDetail));
         exit;
     }
 } else {
-    echo "Mã xác thực không hợp lệ.";
+    header('Location: ' . _FRONTEND_URL . '/login?error=' . urlencode('Thiếu mã xác thực từ Google'));
     exit;
 }
