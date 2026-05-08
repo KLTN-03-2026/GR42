@@ -3,7 +3,7 @@ if (!defined('_TAI')) {
     die('Truy cập không hợp lệ');
 }
 
-require_once __DIR__ . '/cors.php';
+require_once _PATH_URL . '/modules/api/cors.php';
 
 $lang = $_GET['lang'] ?? 'vi';
 

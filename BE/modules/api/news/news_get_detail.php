@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/cors.php';
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once _PATH_URL . '/modules/api/cors.php';
+require_once _PATH_URL . '/config.php';
+require_once _PATH_URL . '/includes/database.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $token = isset($_GET['token']) ? trim($_GET['token']) : '';

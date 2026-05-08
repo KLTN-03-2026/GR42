@@ -26,6 +26,19 @@ if (!empty($_GET['action'])) {
 $path = 'modules/' . $module . '/' . $action . '.php';
 
 if (!empty($path)) {
+    if (!file_exists($path)) {
+        $modulePath = 'modules/' . $module;
+        if (is_dir($modulePath)) {
+            $it = new RecursiveDirectoryIterator($modulePath);
+            foreach (new RecursiveIteratorIterator($it) as $file) {
+                if ($file->getFilename() === $action . '.php') {
+                    $path = $file->getPathname();
+                    break;
+                }
+            }
+        }
+    }
+
     if (file_exists($path)) {
         require_once $path;
     } else {
@@ -34,3 +47,4 @@ if (!empty($path)) {
 } else {
     require_once './modules/errors/500.php';
 }
+?>

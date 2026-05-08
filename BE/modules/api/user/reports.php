@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/cors.php';
+require_once _PATH_URL . '/modules/api/cors.php';
 if (!defined('_TAI')) {
     define('_TAI', true);
 }
 if (!defined('_HOST')) {
-    require_once __DIR__ . '/../../config.php';
-    require_once __DIR__ . '/../../includes/database.php';
+require_once _PATH_URL . '/config.php';
+require_once _PATH_URL . '/includes/database.php';
 }
 
 query("CREATE TABLE IF NOT EXISTS `article_reports` (

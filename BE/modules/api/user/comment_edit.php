@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/cors.php';
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once _PATH_URL . '/modules/api/cors.php';
+require_once _PATH_URL . '/config.php';
+require_once _PATH_URL . '/includes/database.php';
 
 $response = ['status' => 'error', 'message' => 'Lỗi không xác định.'];
 if (empty($_SESSION['user_id'])) {

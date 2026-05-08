@@ -4,8 +4,8 @@ header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../cors.php';
-require_once __DIR__ . '/../../../includes/database.php';
+require_once _PATH_URL . '/modules/api/cors.php';
+require_once _PATH_URL . '/includes/database.php';
 
 $token = $_GET['token'] ?? '';
 

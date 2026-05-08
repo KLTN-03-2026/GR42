@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__, 2) . '/config.php';
-require_once 'cors.php';
+require_once _PATH_URL . '/config.php';
+require_once _PATH_URL . '/modules/api/cors.php';
 
 // Kiểm tra xem token đã được cấu hình chưa
 if (!defined('_SEPAY_TOKEN') || empty(_SEPAY_TOKEN)) {

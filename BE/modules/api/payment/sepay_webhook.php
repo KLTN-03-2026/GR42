@@ -1,7 +1,7 @@
 <?php
-require_once dirname(__DIR__, 2) . '/config.php';
-require_once dirname(__DIR__, 2) . '/includes/database.php';
-require_once 'cors.php';
+require_once _PATH_URL . '/config.php';
+require_once _PATH_URL . '/includes/database.php';
+require_once _PATH_URL . '/modules/api/cors.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

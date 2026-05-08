@@ -2,9 +2,9 @@
 if (!defined('_TAI')) {
     define('_TAI', true);
 }
-require_once '../../config.php';
-require_once '../../includes/connect.php';
-require_once '../../includes/database.php';
+require_once _PATH_URL . '/config.php';
+require_once _PATH_URL . '/includes/connect.php';
+require_once _PATH_URL . '/includes/database.php';
 require_once '../../includes/session.php';
 
 header('Content-Type: application/json');
