@@ -26,13 +26,15 @@ const WeatherWidget = () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API_BASE_URL}/index.php`, {
-          params: { module: 'api', action: 'weather', q: cityId }
+        params: { module: 'api', action: 'weather', q: cityId }
       });
-      if (res.data.status === 'success') {
-          setWeather(res.data.data);
+      if (res.data && res.data.status === 'success') {
+        setWeather(res.data.data);
+      } else {
+        console.warn('Weather API returned non-success status:', res.data);
       }
     } catch (error) {
-      console.error('Error fetching weather:', error);
+      console.error('Error fetching weather by city:', error);
     } finally {
       setLoading(false);
     }
@@ -42,13 +44,15 @@ const WeatherWidget = () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API_BASE_URL}/index.php`, {
-          params: { module: 'api', action: 'weather', lat: lat, lon: lon }
+        params: { module: 'api', action: 'weather', lat: lat, lon: lon }
       });
-      if (res.data.status === 'success') {
-          setWeather(res.data.data);
+      if (res.data && res.data.status === 'success') {
+        setWeather(res.data.data);
+      } else {
+        console.warn('Weather API returned non-success status:', res.data);
       }
     } catch (error) {
-      console.error('Error fetching weather:', error);
+      console.error('Error fetching weather by coords:', error);
     } finally {
       setLoading(false);
     }
@@ -117,21 +121,21 @@ const WeatherWidget = () => {
     switch (iconCode) {
       case '01d': return <Sun size={20} className="text-amber-500" />;
       case '01n': return <Moon size={20} className="text-blue-300" />;
-      case '02d': 
-      case '02n': 
-      case '03d': 
-      case '03n': 
-      case '04d': 
+      case '02d':
+      case '02n':
+      case '03d':
+      case '03n':
+      case '04d':
       case '04n': return <Cloud size={20} className="text-slate-400" />;
-      case '09d': 
+      case '09d':
       case '09n': return <CloudDrizzle size={20} className="text-blue-400" />;
-      case '10d': 
+      case '10d':
       case '10n': return <CloudRain size={20} className="text-blue-500" />;
-      case '11d': 
+      case '11d':
       case '11n': return <CloudLightning size={20} className="text-purple-500" />;
-      case '13d': 
+      case '13d':
       case '13n': return <CloudSnow size={20} className="text-blue-200" />;
-      case '50d': 
+      case '50d':
       case '50n': return <CloudFog size={20} className="text-slate-400" />;
       default: return <Sun size={20} className="text-amber-500" />;
     }
@@ -139,30 +143,30 @@ const WeatherWidget = () => {
 
   if (loading && !weather) {
     return (
-      <div className="hidden lg:flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-100">
+      <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-100">
         <Loader2 size={16} className="animate-spin text-slate-400" />
         <span className="text-[10px] font-bold text-slate-400">Thời tiết</span>
       </div>
     );
   }
 
-  if (!weather) return null;
-
   return (
-    <div className="relative hidden lg:block" ref={dropdownRef}>
-      <button 
+    <div className="relative flex" ref={dropdownRef}>
+      <button
         onClick={() => setShowDropdown(!showDropdown)}
         className={`flex items-center gap-3 bg-slate-50 hover:bg-slate-100 transition-colors px-4 py-2 rounded-2xl border ${showDropdown ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100'} group`}
       >
-        {loading ? <Loader2 size={20} className="animate-spin text-blue-500" /> : getWeatherIcon(weather.weather[0].icon)}
+        {loading ? <Loader2 size={20} className="animate-spin text-blue-500" /> : getWeatherIcon(weather?.weather?.[0]?.icon || '01d')}
         <div className="flex flex-col text-left">
           <div className="flex items-center gap-1">
-            <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">{weather.name === 'Tỉnh Ðà Nẵng' || weather.name === 'Da Nang' ? 'Đà Nẵng' : weather.name}</span>
+            <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">
+              {!weather ? 'Thời tiết' : (weather.name === 'Tỉnh Ðà Nẵng' || weather.name === 'Da Nang' ? 'Đà Nẵng' : weather.name)}
+            </span>
             <ChevronDown size={10} className={`text-slate-400 transition-transform ${showDropdown ? 'rotate-180 text-blue-500' : ''}`} />
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-xs font-bold text-blue-600">{Math.round(weather.main.temp)}°C</span>
-              <span className="text-[9px] text-slate-400 font-bold capitalize truncate max-w-[80px]">• {weather.weather[0].description}</span>
+            <span className="text-xs font-bold text-blue-600">{weather?.main ? Math.round(weather.main.temp) : '--'}°C</span>
+            <span className="text-[9px] text-slate-400 font-bold capitalize truncate max-w-[80px]">• {weather?.weather?.[0]?.description || 'Đang tải...'}</span>
           </div>
         </div>
       </button>
@@ -187,9 +191,9 @@ const WeatherWidget = () => {
                 <MapPin size={14} className="text-blue-500" />
                 <span className="text-xs font-bold text-blue-600 group-hover:text-blue-700">Vị trí hiện tại của bạn</span>
               </button>
-              
+
               <div className="h-px bg-slate-100 my-1 mx-2"></div>
-              
+
               {VIETNAM_CITIES.map((city) => (
                 <button
                   key={city.id}

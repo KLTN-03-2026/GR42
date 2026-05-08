@@ -43,9 +43,16 @@ function cleanContent($html, $source = '')
     $html = trim(str_replace('""', '"', $html));
 
     if ($source === 'vietnamnet') {
+        // Cắt bỏ phần nội dung từ share-social trở đi
+        $html = preg_replace('/<div[^>]*class="vnn-share-social share-social lg-hidden"[^>]*>[\s\S]*/i', '', $html);
+
+        // Loại bỏ các thẻ div chứa nội dung không liên quan (quảng cáo, bài liên quan, wiki)
         $html = preg_replace('/^(id="maincontent"|class="content-detail"|class="maincontent main-content")[^>]*>/i', '', $html);
-        $html = preg_replace('/<div[^>]*class="[^"]*(ArticleRelate|article-relate|news-feature|related-news|insert-wiki-content)[^"]*"[^>]*>[\s\S]*?<\/div>/i', '', $html);
+        $html = preg_replace('/<div[^>]*class="[^"]*(ArticleRelate|article-relate|news-feature|related-news|insert-wiki-content|vnn-res-article-relate|vnn-title|vnn-source|vnn-author|vnn-social-share|vnn-box-app|vnn-google-news|vnn-tags|vnn-detail-author)[^"]*"[^>]*>[\s\S]*?<\/div>/i', '', $html);
         $html = preg_replace('/<table[^>]*class="[^"]*(vnn-quote)[^"]*"[^>]*>[\s\S]*?<\/table>/i', '', $html);
+
+        // Loại bỏ các hình ảnh icon hoặc logo nhỏ
+        $html = preg_replace('/<img[^>]*class="[^"]*(vnn-source-icon|vnn-logo|social-icon|author-img|icon-app|icon-google-news)[^"]*"[^>]*>/i', '', $html);
     }
 
     libxml_use_internal_errors(true);
@@ -53,8 +60,10 @@ function cleanContent($html, $source = '')
     $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
     $xpath = new DOMXPath($dom);
 
-    foreach ($xpath->query('//script|//style|//table|//iframe|//form|//nav|//header|//footer') as $node) {
-        $node->parentNode->removeChild($node);
+    foreach ($xpath->query('//script|//style|//table|//iframe|//form|//nav|//header|//footer|//*[contains(@class, "social-share")]|//*[contains(@class, "author-info")]|//*[contains(@class, "vnn-title")]|//a[contains(@href, "zalo.me")]|//a[contains(@href, "facebook.com/sharer")]|//a[contains(@href, "messenger.com")]') as $node) {
+        if ($node->parentNode) {
+            $node->parentNode->removeChild($node);
+        }
     }
     foreach ($xpath->query('//*[contains(text(), "Xem thêm về:")]') as $node) {
         if ($node->parentNode) {

@@ -32,23 +32,31 @@ $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_TIMEOUT, 5); // 5 seconds timeout
 $response = curl_exec($ch);
 $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curl_error = curl_error($ch);
 curl_close($ch);
 
 if ($httpcode == 200) {
     $data = json_decode($response, true);
 
-    // Clean up city names for better UI
     if (isset($data['name'])) {
         $cityMap = [
             'Tỉnh Ðà Nẵng' => 'Đà Nẵng',
             'Da Nang' => 'Đà Nẵng',
+            'Thanh Pho GJa Nang' => 'Đà Nẵng',
             'Tỉnh Thừa Thiên-Huế' => 'Huế',
+            'Thanh Pho Hue' => 'Huế',
             'Thành phố Cần Thơ' => 'Cần Thơ',
+            'Can Tho' => 'Cần Thơ',
             'Thành phố Hồ Chí Minh' => 'TP. Hồ Chí Minh',
+            'Ho Chi Minh City' => 'TP. Hồ Chí Minh',
             'Ha Noi' => 'Hà Nội',
-            'Hanoi' => 'Hà Nội'
+            'Hanoi' => 'Hà Nội',
+            'Thanh Pho Hai Phong' => 'Hải Phòng',
+            'Hai Phong' => 'Hải Phòng',
+            'Thành phố Hải Phòng' => 'Hải Phòng'
         ];
 
         if (isset($cityMap[$data['name']])) {
@@ -60,16 +68,13 @@ if ($httpcode == 200) {
         'status' => 'success',
         'data' => $data
     ]);
-
-    // Save to cache
     file_put_contents($cacheFile, $finalResponse);
 
     echo $finalResponse;
 } else {
-    $curl_error = curl_error($ch);
     echo json_encode([
         'status' => 'error',
-        'message' => 'Failed to fetch weather data. HTTP Code: ' . $httpcode . '. Response: ' . $response . ($curl_error ? ' cURL Error: ' . $curl_error : '')
+        'message' => 'Failed to fetch weather data. HTTP Code: ' . $httpcode . ($curl_error ? ' cURL Error: ' . $curl_error : '')
     ]);
 }
 ?>
