@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
     exit;
 }
 
-require_once __DIR__ . '/../../includes/session.php';
+require_once _PATH_URL . '/includes/session.php';
 global $conn;
 if (!isset($conn)) $conn = new mysqli("localhost", "root", "", "crawl_news");
 

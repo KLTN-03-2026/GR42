@@ -8,8 +8,8 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
     exit;
 }
 
-require_once __DIR__ . '/../../includes/session.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once _PATH_URL . '/includes/session.php';
+require_once _PATH_URL . '/includes/database.php';
 
 $sql = "SELECT t.*, u.fullname, u.email 
         FROM transactions t 

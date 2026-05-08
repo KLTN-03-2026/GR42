@@ -26,10 +26,10 @@ if (strpos($currentPath, '/modules') !== false) {
 }
 define('_HOST_URL', $protocol . $host . $projectRoot);
 define('_FRONTEND_URL', 'http://localhost:3000');
-define('_HOST_URL_TEMPLATES', _HOST_URL . '/templates');
+define('_HOST_URL_TEMPLATES', _HOST_URL . '/modules/ssr/templates');
 
 define('_PATH_URL', __DIR__);
-define('_PATH_URL_TEMPLATES', _PATH_URL . '/templates');
+define('_PATH_URL_TEMPLATES', _PATH_URL . '/modules/ssr/templates');
 
 /*API KEYS AND GG CLIENT*/
 define('_GEMINI_API_KEY', $envConfig['GEMINI_API_KEY'] ?? '');

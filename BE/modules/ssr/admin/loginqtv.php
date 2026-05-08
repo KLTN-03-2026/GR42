@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../includes/session.php';
+require_once _PATH_URL . '/includes/session.php';
 
 $error_msg = "";
 
