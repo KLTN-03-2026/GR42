@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 1. KIỂM TRA QUYỀN ADMIN
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: ?module=admin&action=loginqtv");
+    header("Location: ?module=ssr/admin&action=loginqtv");
     exit;
 }
 
@@ -43,7 +43,7 @@ if (isset($_GET['report_action']) && isset($_GET['id']) && isset($_GET['type']))
         }
     }
     
-    header("Location: ?module=admin&action=reports");
+    header("Location: ?module=ssr/admin&action=reports");
     exit;
 }
 

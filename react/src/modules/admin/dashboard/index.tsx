@@ -82,8 +82,12 @@ const AdminDashboard = () => {
         
         try {
             setCrawling(true);
-            const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-            const res = await axios.get(`${host}/BE/modules/api/crawl_database.php`);
+            const res = await axios.get(`${API_BASE_URL}/index.php`, {
+                params: {
+                    module: 'api',
+                    action: 'crawl_database'
+                }
+            });
             
             if (res.data.status === 'success') {
                 alert(`Thành công! Đã thêm: ${res.data.new} - Cập nhật: ${res.data.updated} bài báo.`);

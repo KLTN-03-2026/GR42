@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: ?module=admin&action=loginqtv");
+    header("Location: ?module=ssr/admin&action=loginqtv");
     exit;
 }
 
@@ -43,7 +43,7 @@ if ($result) {
 if(isset($_GET['delete_id'])) {
     $del_id = (int)$_GET['delete_id'];
     $conn->query("DELETE FROM crawl_news WHERE id = $del_id");
-    header("Location: ?module=admin&action=news");
+    header("Location: ?module=ssr/admin&action=news");
     exit;
 }
 

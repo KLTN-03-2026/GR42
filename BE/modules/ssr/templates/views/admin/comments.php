@@ -86,7 +86,7 @@ layout('admin_sidebar');
                                     <td class="text-end pe-4">
                                         <a href="#" class="btn btn-sm btn-light text-primary rounded-circle me-1" style="width: 32px; height: 32px; padding: 0; line-height: 32px;" title="Trả lời/Chi tiết"><i class="fa-solid fa-reply"></i></a>
                                         
-                                        <a href="?module=admin&action=comments&delete_id=<?= $cmt['id'] ?? '' ?>" class="btn btn-sm btn-light text-danger rounded-circle" style="width: 32px; height: 32px; padding: 0; line-height: 32px;" title="Xoá" onclick="return confirm('Bạn có chắc muốn xoá bình luận này?');"><i class="fa-solid fa-trash-can"></i></a>
+                                        <a href="?module=ssr/admin&action=comments&delete_id=<?= $cmt['id'] ?? '' ?>" class="btn btn-sm btn-light text-danger rounded-circle" style="width: 32px; height: 32px; padding: 0; line-height: 32px;" title="Xoá" onclick="return confirm('Bạn có chắc muốn xoá bình luận này?');"><i class="fa-solid fa-trash-can"></i></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

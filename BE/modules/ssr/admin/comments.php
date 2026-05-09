@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 1. KIỂM TRA QUYỀN ADMIN
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: ?module=admin&action=loginqtv");
+    header("Location: ?module=ssr/admin&action=loginqtv");
     exit;
 }
 
@@ -54,7 +54,7 @@ try {
 if(isset($_GET['delete_id'])) {
     $del_id = (int)$_GET['delete_id'];
     $conn->query("DELETE FROM comments WHERE id = $del_id");
-    header("Location: ?module=admin&action=comments");
+    header("Location: ?module=ssr/admin&action=comments");
     exit;
 }
 

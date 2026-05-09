@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 1. KIỂM TRA QUYỀN ADMIN
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: ?module=admin&action=loginqtv");
+    header("Location: ?module=ssr/admin&action=loginqtv");
     exit;
 }
 
@@ -15,7 +15,7 @@ global $conn;
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if($id <= 0) {
-    header("Location: ?module=admin&action=news");
+    header("Location: ?module=ssr/admin&action=news");
     exit;
 }
 
@@ -24,7 +24,7 @@ $sql = "SELECT * FROM crawl_news WHERE id = $id";
 $article = getOne($sql);
 if(!$article) {
     // Nếu không tìm thấy trong crawl_news, quay lại (hoặc bảng tên khác)
-    header("Location: ?module=admin&action=news");
+    header("Location: ?module=ssr/admin&action=news");
     exit;
 }
 

@@ -9,7 +9,7 @@ layout('admin_sidebar');
             <h4 class="fw-bold mb-0">Quản lý Người Dùng</h4>
             <p class="text-muted small mb-0">Xem, chỉnh sửa hoặc xóa thông tin người dùng khỏi hệ thống.</p>
         </div>
-        <a href="?module=admin&action=users_add" class="btn btn-primary shadow-sm rounded-pill px-4">
+        <a href="?module=ssr/admin&action=users_add" class="btn btn-primary shadow-sm rounded-pill px-4">
             <i class="fa-solid fa-plus me-2"></i>Thêm Người Dùng Mới
         </a>
     </div>
@@ -69,8 +69,8 @@ layout('admin_sidebar');
                                         <?= isset($user['created_at']) ? date('d/m/Y', strtotime($user['created_at'])) : '---' ?>
                                     </td>
                                     <td class="text-end pe-4">
-                                        <a href="?module=admin&action=users_history&id=<?= $user['id'] ?? '' ?>" class="btn btn-sm btn-light text-info rounded-circle me-1" style="width: 32px; height: 32px; padding: 0; line-height: 32px;" title="Lịch sử đọc"><i class="fa-solid fa-clock-rotate-left"></i></a>
-                                        <a href="?module=admin&action=users_edit&id=<?= $user['id'] ?? '' ?>" class="btn btn-sm btn-light text-primary rounded-circle me-1" style="width: 32px; height: 32px; padding: 0; line-height: 32px;"><i class="fa-solid fa-pen"></i></a>
+                                        <a href="?module=ssr/admin&action=users_history&id=<?= $user['id'] ?? '' ?>" class="btn btn-sm btn-light text-info rounded-circle me-1" style="width: 32px; height: 32px; padding: 0; line-height: 32px;" title="Lịch sử đọc"><i class="fa-solid fa-clock-rotate-left"></i></a>
+                                        <a href="?module=ssr/admin&action=users_edit&id=<?= $user['id'] ?? '' ?>" class="btn btn-sm btn-light text-primary rounded-circle me-1" style="width: 32px; height: 32px; padding: 0; line-height: 32px;"><i class="fa-solid fa-pen"></i></a>
                                         
                                         <!-- Deletion disabled -->
                                     </td>

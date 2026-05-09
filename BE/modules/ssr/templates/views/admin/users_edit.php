@@ -9,7 +9,7 @@ layout('admin_sidebar');
             <h4 class="fw-bold mb-0">Chỉnh sửa Người Dùng</h4>
             <p class="text-muted small mb-0">Thay đổi thông tin hồ sơ, vai trò, mật khẩu của thành viên.</p>
         </div>
-        <a href="?module=admin&action=users" class="btn btn-light shadow-sm rounded-pill px-4">
+        <a href="?module=ssr/admin&action=users" class="btn btn-light shadow-sm rounded-pill px-4">
             <i class="fa-solid fa-arrow-left me-2"></i>Trở về danh sách
         </a>
     </div>

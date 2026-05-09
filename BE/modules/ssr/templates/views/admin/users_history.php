@@ -4,7 +4,7 @@
             <h4 class="fw-bold mb-0">Lịch sử đọc: <?= htmlspecialchars($user['fullname']) ?></h4>
             <p class="text-muted small mb-0">Danh sách các bài báo mà người dùng này đã xem.</p>
         </div>
-        <a href="?module=admin&action=users" class="btn btn-secondary shadow-sm rounded-pill px-4">
+        <a href="?module=ssr/admin&action=users" class="btn btn-secondary shadow-sm rounded-pill px-4">
             <i class="fa-solid fa-arrow-left me-2"></i>Quay lại
         </a>
     </div>

@@ -9,7 +9,7 @@ layout('admin_sidebar');
             <h4 class="fw-bold mb-0">Thêm Bài Báo Mới</h4>
             <p class="text-muted small mb-0">Viết bài mới, thêm hình ảnh hoặc chọn chuyên mục.</p>
         </div>
-        <a href="?module=admin&action=news" class="btn btn-light shadow-sm rounded-pill px-4">
+        <a href="?module=ssr/admin&action=news" class="btn btn-light shadow-sm rounded-pill px-4">
             <i class="fa-solid fa-arrow-left me-2"></i>Trở về danh sách
         </a>
     </div>
@@ -24,7 +24,7 @@ layout('admin_sidebar');
         <?= htmlspecialchars($msg) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         <?php if($msgType == 'success'): ?>
-        <a href="?module=admin&action=news" class="btn btn-sm btn-success ms-3 rounded-pill">Quay lại danh sách</a>
+        <a href="?module=ssr/admin&action=news" class="btn btn-sm btn-success ms-3 rounded-pill">Quay lại danh sách</a>
         <?php endif; ?>
     </div>
     <?php endif; ?>

@@ -4,7 +4,7 @@ require_once _PATH_URL . '/includes/session.php';
 $error_msg = "";
 
 if (isset($_SESSION['user_id']) && isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
-    header("Location: ?module=admin&action=dashboard");
+    header("Location: ?module=ssr/admin&action=dashboard");
     exit;
 }
 
@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 setSession('user_name', $user['fullname']);
                 setSession('user_role', 'admin');
 
-                header("Location: ?module=admin&action=dashboard");
+                header("Location: ?module=ssr/admin&action=dashboard");
                 exit;
             } else {
                 $error_msg = "Tài khoản không có quyền Admin!";

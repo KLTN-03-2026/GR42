@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: ?module=admin&action=loginqtv");
+    header("Location: ?module=ssr/admin&action=loginqtv");
     exit;
 }
 

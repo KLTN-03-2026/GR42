@@ -97,15 +97,15 @@ layout('admin_sidebar');
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-3">
-                        <a href="?module=admin&action=news_add" class="btn btn-primary text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
+                        <a href="?module=ssr/admin&action=news_add" class="btn btn-primary text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
                             <span class="fw-bold"><i class="fa-solid fa-plus me-2"></i>Thêm Bài Báo Mới</span>
                             <i class="fa-solid fa-chevron-right opacity-50"></i>
                         </a>
-                        <a href="?module=admin&action=users_add" class="btn btn-outline-primary text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
+                        <a href="?module=ssr/admin&action=users_add" class="btn btn-outline-primary text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
                             <span class="fw-bold"><i class="fa-solid fa-user-plus me-2"></i>Thêm Người Dùng</span>
                             <i class="fa-solid fa-chevron-right opacity-50"></i>
                         </a>
-                        <a href="?module=admin&action=comments" class="btn btn-outline-warning text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
+                        <a href="?module=ssr/admin&action=comments" class="btn btn-outline-warning text-start px-4 py-3 d-flex justify-content-between align-items-center rounded-3">
                             <span class="fw-bold"><i class="fa-solid fa-comments me-2"></i>Duyệt Bình Luận <span class="badge bg-danger ms-2 rounded-pill">12</span></span>
                             <i class="fa-solid fa-chevron-right opacity-50"></i>
                         </a>
@@ -129,7 +129,7 @@ function runCrawl(e) {
         btn.innerHTML = '<span class="fw-bold"><i class="fa-solid fa-spinner fa-spin me-2"></i>Đang chạy...</span><i class="fa-solid fa-chevron-right opacity-50"></i>';
         btn.classList.add('disabled');
 
-        fetch('modules/api/crawl_database.php')
+        fetch('?module=api/tools&action=crawl_database')
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {

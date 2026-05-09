@@ -83,7 +83,7 @@ layout('admin_sidebar');
                                         <div class="d-flex justify-content-end gap-1">
                                             <?php if($rpt['status'] == 0): ?>
                                                 <!-- Đánh dấu đã xử lý -->
-                                                <a href="?module=admin&action=reports&report_action=process&id=<?= $rpt['id'] ?>&type=<?= $rpt['type'] ?>" 
+                                                <a href="?module=ssr/admin&action=reports&report_action=process&id=<?= $rpt['id'] ?>&type=<?= $rpt['type'] ?>" 
                                                    class="btn btn-sm btn-light text-success rounded-circle" 
                                                    style="width: 32px; height: 32px; padding: 0; line-height: 32px;" 
                                                    title="Đã xử lý (Giữ lại nội dung)">
@@ -91,7 +91,7 @@ layout('admin_sidebar');
                                                 </a>
 
                                                 <!-- Duyệt vi phạm (Xóa nội dung + Báo cáo) -->
-                                                <a href="?module=admin&action=reports&report_action=delete_content&id=<?= $rpt['id'] ?>&type=<?= $rpt['type'] ?>&target_id=<?= $rpt['target_id'] ?>" 
+                                                <a href="?module=ssr/admin&action=reports&report_action=delete_content&id=<?= $rpt['id'] ?>&type=<?= $rpt['type'] ?>&target_id=<?= $rpt['target_id'] ?>" 
                                                    class="btn btn-sm btn-light text-danger rounded-circle" 
                                                    style="width: 32px; height: 32px; padding: 0; line-height: 32px;" 
                                                    title="Duyệt vi phạm (Xóa nội dung gốc)" 
@@ -101,7 +101,7 @@ layout('admin_sidebar');
                                             <?php endif; ?>
                                             
                                             <!-- Xóa bản ghi báo cáo -->
-                                            <a href="?module=admin&action=reports&report_action=delete_report&id=<?= $rpt['id'] ?>&type=<?= $rpt['type'] ?>" 
+                                            <a href="?module=ssr/admin&action=reports&report_action=delete_report&id=<?= $rpt['id'] ?>&type=<?= $rpt['type'] ?>" 
                                                class="btn btn-sm btn-light text-secondary rounded-circle" 
                                                style="width: 32px; height: 32px; padding: 0; line-height: 32px;" 
                                                title="Xóa báo cáo này (Báo cáo sai)" 
