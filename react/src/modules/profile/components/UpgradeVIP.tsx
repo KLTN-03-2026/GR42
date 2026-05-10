@@ -23,10 +23,10 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
 
   // Constants for payment
   const BANK_NAME = 'MB BANK';
-  const ACCOUNT_NAME = 'PHAN THE TAI';
+  const ACCOUNT_NAME = 'VerTex';
   const ACCOUNT_NUMBER = '0935058232';
   const AMOUNT = 30000;
-  const TRANSFER_CONTENT = `VIP ${userData?.id || ''}`;
+  const TRANSFER_CONTENT = `VIP ${userData?.id}`;
 
   // VietQR generation
   const qrUrl = `https://img.vietqr.io/image/mbbank-${ACCOUNT_NUMBER}-compact2.png?amount=${AMOUNT}&addInfo=${encodeURIComponent(TRANSFER_CONTENT)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
@@ -35,28 +35,46 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
     setIsVip(userData?.is_vip === 1);
   }, [userData]);
 
-  const handleCheckStatus = async () => {
+  const handleCheckStatus = async (silent = false) => {
     if (!authToken) return;
-    setChecking(true);
+    if (!silent) setChecking(true);
     try {
       const res = await axios.get(`${API_BASE_URL}/index.php`, {
-        params: { module: 'api', action: 'user', token: authToken }
+        params: { module: 'api', action: 'sepay_check', token: authToken }
       });
       if (res.data.status === 'success') {
-        const updatedIsVip = res.data.data.profile.is_vip === 1;
+        const updatedIsVip = res.data.is_vip === 1;
         setIsVip(updatedIsVip);
         if (updatedIsVip) {
-          alert('Chúc mừng! Tài khoản của bạn đã được nâng cấp lên VIP thành công.');
+          if (!silent) alert(res.data.message || 'Chúc mừng! Tài khoản của bạn đã được nâng cấp lên VIP thành công.');
         } else {
-          alert('Chưa nhận được thanh toán hoặc giao dịch đang được xử lý. Vui lòng thử lại sau ít phút.');
+          if (!silent) alert('Chưa nhận được thanh toán hoặc giao dịch đang được xử lý. Vui lòng thử lại sau ít phút.');
         }
+      } else if (res.data.status === 'pending') {
+        if (!silent) alert(res.data.message || 'Chưa tìm thấy giao dịch thanh toán hoặc giao dịch đang được xử lý.');
+      } else {
+        if (!silent) alert(res.data.message || 'Có lỗi xảy ra khi kiểm tra.');
       }
     } catch (error) {
       console.error('Lỗi khi kiểm tra trạng thái:', error);
+      if (!silent) alert('Có lỗi xảy ra khi gọi API kiểm tra trạng thái.');
     } finally {
-      setChecking(false);
+      if (!silent) setChecking(false);
     }
   };
+
+  // Tự động kiểm tra sau mỗi 5 giây nếu chưa là VIP
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (!isVip && authToken) {
+      interval = setInterval(() => {
+        handleCheckStatus(true);
+      }, 5000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isVip, authToken]);
 
   if (isVip) {
     return (
@@ -129,9 +147,8 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
                   <span className="text-xl font-black text-slate-900">{ACCOUNT_NUMBER}</span>
                   <button
                     onClick={() => handleCopy(ACCOUNT_NUMBER, 'number')}
-                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${
-                      copiedField === 'number' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${copiedField === 'number' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                      }`}
                   >
                     {copiedField === 'number' ? 'Đã chép' : 'Sao chép'}
                   </button>
@@ -148,9 +165,8 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
                   <span className="text-xl font-black text-amber-600 font-mono tracking-wider">{TRANSFER_CONTENT}</span>
                   <button
                     onClick={() => handleCopy(TRANSFER_CONTENT, 'content')}
-                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${
-                      copiedField === 'content' ? 'bg-green-600 text-white' : 'bg-amber-600 text-white hover:bg-amber-700 active:scale-95'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${copiedField === 'content' ? 'bg-green-600 text-white' : 'bg-amber-600 text-white hover:bg-amber-700 active:scale-95'
+                      }`}
                   >
                     {copiedField === 'content' ? 'Đã chép' : 'Sao chép'}
                   </button>
@@ -166,7 +182,7 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
             <VButton
               variant="primary"
               icon={checking ? Activity : undefined}
-              onClick={handleCheckStatus}
+              onClick={() => handleCheckStatus(false)}
               loading={checking}
               className="whitespace-nowrap shrink-0"
             >
