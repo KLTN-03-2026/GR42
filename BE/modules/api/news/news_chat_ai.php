@@ -1,32 +1,51 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 require_once _PATH_URL . '/modules/api/cors.php';
 if (!defined('_HOST')) {
-require_once _PATH_URL . '/config.php';
-require_once _PATH_URL . '/includes/database.php';
+    require_once _PATH_URL . '/config.php';
+    require_once _PATH_URL . '/includes/database.php';
 }
 
-function callGeminiApi(array $data, string $apiKey, string $model, string $caCertPath): ?array
+function streamGeminiApi(array $data, string $apiKey, string $model): array
 {
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:streamGenerateContent?alt=sse&key={$apiKey}";
     $ch = curl_init();
+
+    $headersSent = false;
+    $errorBody = '';
+    $httpCode = 0;
+
     curl_setopt_array($ch, [
         CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_RETURNTRANSFER => false,
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode($data, JSON_UNESCAPED_UNICODE),
         CURLOPT_HTTPHEADER => ["Content-Type: application/json; charset=utf-8"],
         CURLOPT_TIMEOUT => 60,
-        CURLOPT_SSL_VERIFYPEER => !empty($caCertPath),
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_WRITEFUNCTION => function ($curl, $chunk) use (&$headersSent, &$errorBody, &$httpCode) {
+            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            if ($httpCode === 0)
+                $httpCode = $code;
+            if ($code === 200) {
+                if (!$headersSent) {
+                    header('Content-Type: text/event-stream; charset=utf-8');
+                    header('Cache-Control: no-cache');
+                    header('Connection: keep-alive');
+                    $headersSent = true;
+                }
+                echo $chunk;
+                if (ob_get_level() > 0)
+                    ob_flush();
+                flush();
+            } else {
+                $errorBody .= $chunk;
+            }
+            return strlen($chunk);
+        }
     ]);
-    if (!empty($caCertPath)) {
-        curl_setopt($ch, CURLOPT_CAINFO, $caCertPath);
-    }
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    curl_exec($ch);
+    $finalHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
     if (curl_errno($ch)) {
         $err = curl_error($ch);
@@ -34,30 +53,30 @@ function callGeminiApi(array $data, string $apiKey, string $model, string $caCer
         return ["error" => "cURL error: " . $err];
     }
     curl_close($ch);
-    $responseData = json_decode($response, true);
-    if (!$responseData) {
-        return ["error" => "HTTP $httpCode: Không thể phân tích phản hồi", "http_code" => $httpCode];
-    }
-    if ($httpCode !== 200 || isset($responseData['error'])) {
+
+    if ($finalHttpCode !== 200) {
+        $responseData = json_decode($errorBody, true);
+        if (!$responseData) {
+            return ["error" => "HTTP $finalHttpCode: Không thể phân tích phản hồi", "http_code" => $finalHttpCode];
+        }
         $errorMsg = $responseData['error']['message'] ?? 'Unknown error';
-        return ["error" => "API error ($httpCode): $errorMsg", "http_code" => $httpCode];
+        return ["error" => "API error ($finalHttpCode): $errorMsg", "http_code" => $finalHttpCode];
     }
-    return $responseData;
+    return ["success" => true];
 }
 
-function callGeminiApiWithMultipleKeys(array $data, array $apiKeys, string $model, string $caCertPath, int $retriesPerKey = 2, int $delaySeconds = 3): array
+function streamGeminiApiWithMultipleKeys(array $data, array $apiKeys, string $model, int $retriesPerKey = 2, int $delaySeconds = 3): array
 {
-    $resp = [];
     foreach ($apiKeys as $apiKey) {
         if (empty($apiKey))
             continue;
         for ($i = 0; $i <= $retriesPerKey; $i++) {
-            $resp = callGeminiApi($data, $apiKey, $model, $caCertPath);
-            $errorStr = $resp['error'] ?? '';
-            $httpCode = $resp['http_code'] ?? 200;
-            if (empty($errorStr)) {
+            $resp = streamGeminiApi($data, $apiKey, $model);
+            if (isset($resp['success'])) {
                 return $resp;
             }
+            $errorStr = $resp['error'] ?? '';
+            $httpCode = $resp['http_code'] ?? 200;
             if (preg_match('/quota|expired|invalid/i', $errorStr)) {
                 break;
             }
@@ -69,48 +88,64 @@ function callGeminiApiWithMultipleKeys(array $data, array $apiKeys, string $mode
             }
         }
     }
-    return $resp;
+    return ["error" => "Tất cả API Key đều lỗi hoặc đã hết hạn ngạch."];
 }
 
-function extractKeyword($text)
+function extractKeywords(string $text): array
 {
-    $stopwords = ['tôi', 'muốn', 'biết', 'về', 'tin', 'tức', 'thông', 'hãy', 'cho', 'các', 'bài', 'liên', 'quan', 'đến', 'ai', 'là', 'gì', 'hôm', 'nay', 'có', 'hot', 'không', 'ko', 'mới', 'nhất', 'nào', 'kể', 'nghe', 'xem', 'thế'];
-    $words = preg_split('/[\s,\.]+/u', $text);
-    $filtered = array_filter($words, fn($word) => !in_array(mb_strtolower($word, 'UTF-8'), $stopwords));
-    return trim(implode(' ', $filtered));
+    $stopwords = ['tôi', 'muốn', 'biết', 'về', 'tin', 'tức', 'thông', 'hãy', 'cho', 'các', 'bài', 'liên', 'quan', 'đến', 'ai', 'là', 'gì', 'hôm', 'nay', 'có', 'hot', 'không', 'ko', 'mới', 'nhất', 'nào', 'kể', 'nghe', 'xem', 'thế', 'làm', 'sao', 'như', 'đâu'];
+    $words = preg_split('/[\s,\.]+/', mb_strtolower($text, 'UTF-8'));
+    $filtered = array_filter($words, fn($word) => mb_strlen($word, 'UTF-8') > 2 && !in_array($word, $stopwords));
+    return array_values(array_unique($filtered));
 }
 
 $apiKeys = array_filter(array_map('trim', explode(',', _GEMINI_API_KEY)));
-$caCertPath = "";
 $model = "gemini-2.5-flash";
+
 $inputData = json_decode(file_get_contents('php://input'), true) ?? [];
-$mode = $_POST['mode'] ?? ($inputData['mode'] ?? '');
 $prompt = trim($_POST['prompt'] ?? ($inputData['prompt'] ?? ''));
 $articleContext = trim($_POST['articleContext'] ?? ($inputData['articleContext'] ?? ''));
-if ($mode === 'clear') {
-    unset($_SESSION['chat_history']);
-    echo json_encode(["status" => "success", "message" => "Lịch sử chat đã được xóa."], JSON_UNESCAPED_UNICODE);
-    exit;
-}
+$clientHistory = $inputData['history'] ?? [];
+
 if (empty($prompt)) {
     echo json_encode(["status" => "error", "error" => "Không có nội dung gửi lên."]);
     exit;
 }
 
-$history = $_SESSION['chat_history'] ?? [];
+$geminiHistory = [];
+if (is_array($clientHistory)) {
+    foreach ($clientHistory as $msg) {
+        $role = ($msg['role'] === 'user') ? 'user' : 'model';
+        $geminiHistory[] = ["role" => $role, "parts" => [["text" => $msg['content']]]];
+    }
+}
+
 $articles = [];
 if (isset($conn) && $conn) {
     $conn->set_charset("utf8mb4");
-    $keyword = extractKeyword($prompt);
-    if (empty($keyword)) {
-        $stmt = $conn->prepare("SELECT title, source, link, pubdate as pubDate FROM crawl_news ORDER BY pubdate DESC LIMIT 5");
-    } else {
-        $stmt = $conn->prepare("SELECT title, source, link, pubdate as pubDate FROM crawl_news WHERE title LIKE ? ORDER BY pubdate DESC LIMIT 5");
+    $keywords = extractKeywords($prompt);
+
+    $sql = "SELECT id, title, source, link, pubdate as pubDate FROM crawl_news ";
+    $params = [];
+    $types = "";
+
+    if (!empty($keywords)) {
+        $conditions = [];
+        $topKeywords = array_slice($keywords, 0, 3);
+        foreach ($topKeywords as $kw) {
+            $conditions[] = "title LIKE ?";
+            $params[] = "%" . $kw . "%";
+            $types .= "s";
+        }
+        $sql .= "WHERE " . implode(" OR ", $conditions) . " ";
     }
+
+    $sql .= "ORDER BY pubdate DESC LIMIT 5";
+    $stmt = $conn->prepare($sql);
+
     if ($stmt) {
-        if (!empty($keyword)) {
-            $like = "%" . $keyword . "%";
-            $stmt->bind_param("s", $like);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
         }
         $stmt->execute();
         $result = $stmt->get_result();
@@ -127,11 +162,11 @@ $context = "";
 
 if (!empty($articleContext)) {
     $context = "Ngữ cảnh bài báo người dùng đang quan tâm:\n$articleContext\n\n";
-    $context .= "Dựa vào ngữ cảnh bài báo này, hãy trả lời câu hỏi của tôi một cách chi tiết. Nếu câu hỏi nằm ngoài bài báo, bạn có thể trả lời bình thường dựa trên kiến thức của bạn.\n";
+    $context .= "Dựa vào ngữ cảnh bài báo này, hãy trả lời câu hỏi chi tiết. Nếu hỏi ngoài lề, hãy trả lời bình thường.\n";
 } elseif (!empty($articles)) {
     $context = "Ngữ cảnh tin tức mới nhất:\n";
     foreach ($articles as $a) {
-        $context .= "- {$a['title']} (Nguồn: {$a['source']}, Ngày: {$a['pubDate']})\n";
+        $context .= "- Tiêu đề: {$a['title']} (Nguồn: {$a['source']}, Ngày: {$a['pubDate']}, Đường dẫn: /article/{$a['id']})\n";
     }
     $combinedTitles = mb_strtolower(json_encode($articles, JSON_UNESCAPED_UNICODE), 'UTF-8');
     if (strpos($combinedTitles, 'lương cường') !== false && mb_strpos(mb_strtolower($prompt, 'UTF-8'), 'chủ tịch') !== false) {
@@ -144,18 +179,20 @@ if (!empty($context)) {
     $finalPrompt .= "\n{$context}\nDựa vào ngữ cảnh trên (nếu có liên quan), hãy trả lời câu hỏi sau:\n";
 }
 $finalPrompt .= $prompt;
-$history[] = ["role" => "user", "parts" => [["text" => $prompt]]];
+
 $requestData = [
     "system_instruction" => [
         "parts" => [
             [
-                "text" => "Bạn là một AI chuyên về tin tức Việt Nam (năm hiện tại là 2026). Luôn trả lời bằng tiếng Việt, ngắn gọn, dễ hiểu, thân thiện.
-                Nhiệm vụ: Tóm tắt và trả lời các câu hỏi về tin tức dựa trên 'Ngữ cảnh' được cung cấp. Nếu người dùng hỏi tin tức mà không có ngữ cảnh nào, hãy lịch sự báo rằng bạn chưa cập nhật được dữ liệu tin tức mới trên hệ thống. TUYỆT ĐỐI KHÔNG nói những câu như 'tôi là AI không thể dự đoán tương lai' hay 'tôi chỉ được huấn luyện đến năm...'."
+                "text" => "Bạn là một trợ lý AI thông minh chuyên về tin tức (hiện tại là năm 2026). Luôn trả lời bằng tiếng Việt, thân thiện và có sử dụng định dạng Markdown (như in đậm, in nghiêng, danh sách) để văn bản dễ đọc hơn.
+Nhiệm vụ: Dựa vào 'Ngữ cảnh' để trả lời. Nếu không có ngữ cảnh, hãy dùng kiến thức sẵn có nhưng nhớ báo cho người dùng biết là bạn chưa tìm thấy tin tức mới nhất về chủ đề này trên hệ thống. 
+QUAN TRỌNG: Bất cứ khi nào bạn nhắc đến một bài báo có trong 'Ngữ cảnh', BẠN BẮT BUỘC PHẢI TẠO ĐƯỜNG DẪN đến bài báo đó bằng định dạng Markdown: [Tiêu đề bài báo](Đường dẫn). Bạn PHẢI lấy chính xác chuỗi 'Đường dẫn' được cung cấp trong ngữ cảnh (ví dụ: /article/123), TUYỆT ĐỐI KHÔNG tự ý ghép thêm bất kỳ tên miền nào (như localhost hay vnexpress) vào trước đường dẫn.
+KHÔNG trả lời theo kiểu 'tôi là AI không thể dự đoán' hay 'chỉ được huấn luyện đến năm...'"
             ]
         ]
     ],
     "contents" => array_merge(
-        array_slice($history, 0, -1),
+        $geminiHistory,
         [["role" => "user", "parts" => [["text" => $finalPrompt]]]]
     ),
     "generationConfig" => [
@@ -166,33 +203,18 @@ $requestData = [
     ]
 ];
 
-$apiResponse = callGeminiApiWithMultipleKeys($requestData, $apiKeys, $model, $caCertPath, 2, 3);
-if (isset($apiResponse['error'])) {
-    if (preg_match('/quota/i', $apiResponse['error'])) {
-        $aiMessage = "Xin lỗi, API Key của bạn đã sử dụng hết lượt miễn phí trong ngày hôm nay. Vui lòng thử lại vào ngày mai hoặc thêm thẻ thanh toán nhé!";
-    } elseif (preg_match('/overloaded|high demand/i', $apiResponse['error'])) {
-        $aiMessage = "Xin lỗi, hệ thống AI đang quá tải lúc này. Bạn vui lòng thử lại sau ít phút nhé!";
-    } else {
-        $aiMessage = "Lỗi từ API: " . $apiResponse['error'];
-    }
-} elseif (isset($apiResponse['candidates'][0]['content']['parts'])) {
-    $parts = $apiResponse['candidates'][0]['content']['parts'];
-    $aiMessage = implode("\n", array_column($parts, 'text'));
-} else {
-    $aiMessage = "Không có phản hồi văn bản từ AI !!!";
-}
+$apiResponse = streamGeminiApiWithMultipleKeys($requestData, $apiKeys, $model);
 
-$history[] = ["role" => "model", "parts" => [["text" => $aiMessage]]];
-if (count($history) > 10) {
-    $history = array_slice($history, -10);
-    if (!empty($history) && $history[0]['role'] !== 'user') {
-        array_shift($history);
+if (isset($apiResponse['error'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    $errMsg = $apiResponse['error'];
+    if (preg_match('/quota/i', $errMsg)) {
+        $errMsg = "Xin lỗi, API Key đã hết lượt sử dụng. Vui lòng thử lại sau.";
+    } elseif (preg_match('/overloaded/i', $errMsg)) {
+        $errMsg = "Hệ thống AI đang quá tải. Vui lòng thử lại sau.";
     }
+    echo json_encode([
+        "status" => "error",
+        "message" => $errMsg
+    ], JSON_UNESCAPED_UNICODE);
 }
-$_SESSION['chat_history'] = $history;
-echo json_encode([
-    "status" => "success",
-    "message" => $aiMessage,
-    "history" => $history,
-    "articles" => $articles
-], JSON_UNESCAPED_UNICODE);
