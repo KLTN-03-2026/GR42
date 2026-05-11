@@ -304,7 +304,7 @@ const Chatbot = () => {
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
-                              a: ({ node, href, children, ...props }) => {
+                              a: ({ node, href, children, ...props }:any) => {
                                 if (href && href.startsWith('/')) {
                                   return <Link to={href} className="text-blue-600 hover:underline font-medium" {...props}>{children}</Link>;
                                 }
