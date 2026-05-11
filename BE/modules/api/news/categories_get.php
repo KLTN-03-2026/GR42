@@ -1,9 +1,9 @@
 <?php
+if (!defined('_PATH_URL')) {
+    define('_PATH_URL', dirname(dirname(dirname(__DIR__))));
+}
+
 require_once _PATH_URL . '/modules/api/cors.php';
-define('_TAI', true);
-require_once _PATH_URL . '/config.php';
-require_once _PATH_URL . '/includes/database.php';
-require_once _PATH_URL . '/includes/functions.php';
 
 $categories = [
     'THOI-SU',
@@ -27,4 +27,5 @@ echo json_encode([
     'status' => 'success',
     'data' => $categories
 ]);
+exit();
 ?>

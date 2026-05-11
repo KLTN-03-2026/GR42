@@ -218,7 +218,7 @@ const Home = () => {
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            className={`whitespace-nowrap text-base md:text-lg font-black transition-all duration-300 relative py-2 ${
+            className={`whitespace-nowrap text-sm md:text-base font-black transition-all duration-300 relative py-2 ${
               selectedCategory === cat.id 
                 ? 'text-blue-600' 
                 : 'text-slate-400 hover:text-slate-900'
@@ -298,7 +298,7 @@ const Home = () => {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.3 }}
-                          className="text-2xl md:text-4xl font-black text-white leading-tight mb-4 group-hover:text-blue-400 transition-colors"
+                          className="text-xl md:text-3xl font-black text-white leading-tight mb-4 group-hover:text-blue-400 transition-colors"
                         >
                             {featuredItem.title}
                         </motion.h3>
@@ -411,8 +411,8 @@ const Home = () => {
           )}
 
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-              <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
               {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : 'Tin mới nhất'}
             </h2>
           </div>

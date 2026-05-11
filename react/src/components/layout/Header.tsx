@@ -120,9 +120,9 @@ const Header = () => {
   return (
     <>
       <header className={`bg-white border-b flex items-center sticky top-0 z-50 shadow-sm transition-all duration-500 ${localStorage.getItem('user_vip') === '1' ? 'border-b-amber-200 shadow-amber-50/50' : 'border-b-slate-100 shadow-slate-100/50'}`}>
-        <div className="max-w-7xl mx-auto w-full px-6 h-20 flex items-center justify-between gap-12">
+        <div className="max-w-7xl mx-auto w-full px-6 h-16 flex items-center justify-between gap-12">
           <Link to="/" className="flex items-center gap-2 group shrink-0">
-            <img src="/logo_vertex.png" alt="Vertex" className="h-16 w-auto object-contain" />
+            <img src="/logo_vertex.png" alt="Vertex" className="h-12 w-auto object-contain" />
           </Link>
 
           <div className="flex-1 max-w-3xl relative group hidden md:block" ref={searchRef}>

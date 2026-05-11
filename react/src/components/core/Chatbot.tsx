@@ -221,11 +221,11 @@ const Chatbot = () => {
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className={`bg-white/95 backdrop-blur-3xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-white/40 flex flex-col overflow-hidden mb-6 ${isExpanded ? 'w-[450px] h-[650px]' : 'w-[380px] h-[550px]'
+            className={`bg-white/95 backdrop-blur-3xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-white/40 flex flex-col overflow-hidden mb-6 ${isExpanded ? 'w-[400px] h-[580px]' : 'w-[320px] h-[480px]'
               }`}
           >
             {/* Header */}
-            <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 border-b border-indigo-500/30 flex items-center justify-between shadow-md relative z-10">
+            <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 border-b border-indigo-500/30 flex items-center justify-between shadow-md relative z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
                   <Sparkles size={20} className="text-white" />
@@ -255,7 +255,7 @@ const Chatbot = () => {
             </div>
 
             {/* Chat Body */}
-            <div className="flex-1 overflow-y-auto p-5 bg-slate-50/30 space-y-6 scrollbar-hide no-scrollbar relative">
+            <div className="flex-1 overflow-y-auto p-4 bg-slate-50/30 space-y-4 scrollbar-hide no-scrollbar relative">
               {messages.length === 0 && (
                 <div className="h-full flex flex-col items-center justify-center text-center px-2">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl flex items-center justify-center text-blue-600 mb-4 border border-blue-100/50 shadow-sm animate-bounce">
@@ -348,7 +348,7 @@ const Chatbot = () => {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-white/60 backdrop-blur-xl border-t border-slate-100/50 relative z-10">
+            <div className="p-3 bg-white/60 backdrop-blur-xl border-t border-slate-100/50 relative z-10">
               <div className="relative flex items-end gap-2 bg-white rounded-3xl border border-slate-200 p-1.5 shadow-sm focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-300 transition-all">
                 <button
                   onClick={startListening}
@@ -392,7 +392,7 @@ const Chatbot = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative w-16 h-16 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center text-white transition-all duration-300 transform ${isOpen
+        className={`relative w-14 h-14 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center text-white transition-all duration-300 transform ${isOpen
           ? 'bg-slate-800 rotate-90 scale-90'
           : 'bg-gradient-to-tr from-blue-600 to-indigo-500 hover:shadow-[0_8px_30px_rgba(79,70,229,0.4)]'
           }`}

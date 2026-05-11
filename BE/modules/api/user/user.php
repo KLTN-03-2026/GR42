@@ -1,10 +1,8 @@
 <?php
-require_once _PATH_URL . '/modules/api/cors.php';
-if (!defined('_TAI')) {
-    define('_TAI', true);
-require_once _PATH_URL . '/config.php';
-require_once _PATH_URL . '/includes/database.php';
+if (!defined('_PATH_URL')) {
+    define('_PATH_URL', dirname(dirname(dirname(__DIR__))));
 }
+require_once _PATH_URL . '/modules/api/cors.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $inputData = json_decode(file_get_contents('php://input'), true);
