@@ -2,12 +2,9 @@
 layout('admin_header');
 layout('admin_sidebar');
 
-// Require DB connection for stats if needed, or assume data is passed via Controller.
-// For now, we use dummy data for the beautiful UI. 
 ?>
 
 <div class="container-fluid">
-    <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card bg-primary text-white" style="border-radius: 15px; background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
@@ -19,39 +16,36 @@ layout('admin_sidebar');
         </div>
     </div>
 
-    <!-- Stats Row -->
     <div class="row g-4 mb-4">
         <div class="col-12 col-sm-6 col-xl-3">
             <div class="stat-card bg-gradient-primary h-100 shadow-sm border-0">
                 <div class="stat-card-title">Tổng Người Dùng</div>
-                <div class="stat-card-value">1,245</div>
+                <div class="stat-card-value"><?= number_format($stats['total_users']) ?></div>
                 <i class="fa-solid fa-users stat-card-icon"></i>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <div class="stat-card bg-gradient-success h-100 shadow-sm border-0">
                 <div class="stat-card-title">Tổng Bài Báo</div>
-                <div class="stat-card-value">342</div>
+                <div class="stat-card-value"><?= number_format($stats['total_news']) ?></div>
                 <i class="fa-solid fa-newspaper stat-card-icon"></i>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <div class="stat-card bg-gradient-warning h-100 shadow-sm border-0">
-                <div class="stat-card-title">Bình Luận Mới</div>
-                <div class="stat-card-value">89</div>
+                <div class="stat-card-title">Tổng Bình Luận</div>
+                <div class="stat-card-value"><?= number_format($stats['total_comments']) ?></div>
                 <i class="fa-solid fa-comments stat-card-icon"></i>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <div class="stat-card bg-gradient-danger h-100 shadow-sm border-0">
                 <div class="stat-card-title">Lượt Truy Cập Hôm Nay</div>
-                <div class="stat-card-value">4,521</div>
+                <div class="stat-card-value"><?= number_format($stats['today_visits']) ?></div>
                 <i class="fa-solid fa-chart-line stat-card-icon"></i>
             </div>
         </div>
     </div>
-
-    <!-- Quick Actions & Recent Activity -->
     <div class="row g-4">
         <div class="col-12 col-lg-8">
             <div class="card h-100 shadow-sm border-0">
@@ -61,30 +55,32 @@ layout('admin_sidebar');
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                        <div class="list-group-item px-4 py-3 border-bottom-0">
-                            <div class="d-flex align-items-start">
-                                <div class="bg-primary text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fa-solid fa-user-plus"></i>
+                        <?php if (!empty($recent_activity)): ?>
+                            <?php foreach ($recent_activity as $activity): ?>
+                                <div class="list-group-item px-4 py-3 border-bottom-0">
+                                    <div class="d-flex align-items-start">
+                                        <div class="bg-<?= $activity['type'] === 'user' ? 'primary' : 'success' ?> text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-<?= $activity['type'] === 'user' ? 'user-plus' : 'comment' ?>"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-bold">
+                                                <?= $activity['type'] === 'user' ? 'Người dùng mới đăng ký' : 'Bình luận mới' ?>
+                                            </h6>
+                                            <p class="mb-1 text-muted small">
+                                                <?php if ($activity['type'] === 'user'): ?>
+                                                    Tài khoản <span class="text-dark fw-bold"><?= $activity['title'] ?></span> (<?= $activity['subtitle'] ?>) vừa gia nhập.
+                                                <?php else: ?>
+                                                    "<span class="text-dark fw-bold"><?= mb_strimwidth($activity['title'], 0, 50, '...') ?></span>" tại bài viết <i><?= $activity['subtitle'] ?></i>
+                                                <?php endif; ?>
+                                            </p>
+                                            <small class="text-muted"><i class="fa-regular fa-clock me-1"></i><?= date('d/m/Y, H:i', strtotime($activity['date'])) ?></small>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1 fw-bold">Người dùng mới đăng ký</h6>
-                                    <p class="mb-1 text-muted small">Tài khoản <span class="text-dark fw-bold">nguyenvana@gmail.com</span> vừa tạo cách đây 5 phút.</p>
-                                    <small class="text-muted"><i class="fa-regular fa-clock me-1"></i>Hôm nay, 10:25 AM</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="list-group-item px-4 py-3 border-bottom-0">
-                            <div class="d-flex align-items-start">
-                                <div class="bg-success text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fa-solid fa-newspaper"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1 fw-bold">Bài báo mới được xuất bản</h6>
-                                    <p class="mb-1 text-muted small">Bài viết "<span class="text-dark fw-bold">Công nghệ AI thay đổi thế giới</span>" vừa được duyệt.</p>
-                                    <small class="text-muted"><i class="fa-regular fa-clock me-1"></i>Hôm qua, 15:40 PM</small>
-                                </div>
-                            </div>
-                        </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="p-4 text-center text-muted">Chưa có hoạt động nào.</div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

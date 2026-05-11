@@ -38,6 +38,15 @@ $totalComments = getOne("SELECT COUNT(*) as count FROM comments")['count'];
 $todayNews = getOne("SELECT COUNT(*) as count FROM crawl_news WHERE DATE(savedtime) = CURDATE()")['count'];
 $todayComments = getOne("SELECT COUNT(*) as count FROM comments WHERE DATE(created_at) = CURDATE()")['count'];
 
+$todayVisits = getOne("SELECT COUNT(DISTINCT user_id) as count FROM token_login WHERE DATE(created_at) = CURDATE()")['count'];
+$visitStats = getAll("
+    SELECT DATE(created_at) as date, COUNT(DISTINCT user_id) as count 
+    FROM token_login 
+    WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    GROUP BY DATE(created_at)
+    ORDER BY date ASC
+");
+
 $categories = getAll("SELECT category, COUNT(*) as count FROM crawl_news GROUP BY category ORDER BY count DESC LIMIT 5");
 
 $recentNews = getAll("SELECT id, title, category, pubdate as pubDate, source, image FROM crawl_news ORDER BY id DESC LIMIT 5");
@@ -68,11 +77,13 @@ echo json_encode([
             'total_news' => (int)$totalNews,
             'total_comments' => (int)$totalComments,
             'today_news' => (int)$todayNews,
-            'today_comments' => (int)$todayComments
+            'today_comments' => (int)$todayComments,
+            'today_visits' => (int)$todayVisits
         ],
         'categories' => $categories,
         'recent_news' => $recentNews,
         'recent_activity' => $recentActivity,
-        'news_stats' => $newsStats
+        'news_stats' => $newsStats,
+        'visit_stats' => $visitStats
     ]
 ]);

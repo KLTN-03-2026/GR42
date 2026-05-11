@@ -152,8 +152,8 @@ const AdminDashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Tổng Thành viên" value={data?.stats.total_users} icon={Users} color="bg-blue-500" delay={0.1} />
                 <StatCard title="Tổng Bài báo" value={data?.stats.total_news} icon={Newspaper} color="bg-indigo-500" delay={0.2} />
-                <StatCard title="Tin bài hôm nay" value={data?.stats.today_news} icon={Zap} color="bg-violet-500" delay={0.3} />
-                <StatCard title="Bình luận mới" value={data?.stats.today_comments} icon={MessageSquare} color="bg-sky-500" delay={0.4} />
+                <StatCard title="Lượt truy cập hôm nay" value={data?.stats.today_visits} icon={Activity} color="bg-emerald-500" delay={0.3} />
+                <StatCard title="Tin bài hôm nay" value={data?.stats.today_news} icon={Zap} color="bg-violet-500" delay={0.4} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -202,6 +202,47 @@ const AdminDashboard = () => {
                                         labelStyle={{ fontWeight: 900, marginBottom: '5px', fontSize: '10px' }}
                                     />
                                     <Bar dataKey="value" fill="url(#barGradient)" radius={[8, 8, 0, 0]} barSize={45} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </motion.div>
+
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                        className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm"
+                    >
+                        <div className="flex items-center justify-between mb-10">
+                            <div>
+                                <h3 className="font-black text-slate-900 text-sm tracking-wider mb-1">Lượt truy cập hệ thống</h3>
+                                <p className="text-[10px] font-bold text-slate-400 tracking-widest">Dữ liệu người dùng truy cập theo ngày</p>
+                            </div>
+                        </div>
+                        <div className="h-[300px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={data?.visit_stats?.map((item: any) => {
+                                    const date = new Date(item.date);
+                                    return {
+                                        name: dayNames[date.getDay()],
+                                        value: parseInt(item.count)
+                                    };
+                                }) || []}>
+                                    <defs>
+                                        <linearGradient id="visitGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#10b981" />
+                                            <stop offset="100%" stopColor="#34d399" />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }} />
+                                    <Tooltip 
+                                        cursor={{ fill: '#f8fafc' }}
+                                        contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '15px' }}
+                                        labelStyle={{ fontWeight: 900, marginBottom: '5px', fontSize: '10px' }}
+                                    />
+                                    <Bar dataKey="value" fill="url(#visitGradient)" radius={[8, 8, 0, 0]} barSize={45} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
