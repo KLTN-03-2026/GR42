@@ -41,6 +41,15 @@ if ($method === 'GET') {
         }
         $u['is_vip'] = (int)($u['is_vip'] ?? 0);
         $u['status'] = (int)($u['status'] ?? 0);
+        
+        $u_id = $u['id'];
+        $u['interests'] = [];
+        $intRes = getAll("SELECT category_name FROM user_interests WHERE user_id = $u_id");
+        if ($intRes) {
+            foreach($intRes as $row) {
+                $u['interests'][] = $row['category_name'];
+            }
+        }
     }
     echo json_encode(["status" => "success", "data" => $users]);
 } else if ($method === 'POST') {

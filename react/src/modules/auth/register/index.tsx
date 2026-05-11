@@ -21,6 +21,27 @@ const Register = () => {
     setSuccessMsg('');
     setLoading(true);
 
+    // Frontend Validation
+    const errors: Record<string, string> = {};
+    if (name.trim().length < 6) {
+      errors.fullname = 'Họ tên phải tối thiểu 6 ký tự';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errors.email = 'Email không đúng định dạng';
+    }
+
+    if (password.length < 6) {
+      errors.password = 'Mật khẩu phải tối thiểu 6 ký tự';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/?module=api&action=register`, {
         method: 'POST',

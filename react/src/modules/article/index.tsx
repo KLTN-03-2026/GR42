@@ -371,7 +371,7 @@ const ArticleDetail = () => {
 
     const handleReportSubmit = async () => {
         if (!token) {
-            showToast('Vui lòng đăng nhập để báo cáo bài viết', 'error');
+            showToast('Vui lòng đăng nhập để báo cáo bài báo', 'error');
             return;
         }
         if (!reportReason) {
@@ -526,9 +526,14 @@ const ArticleDetail = () => {
                                 </VButton>
                                 <VButton 
                                     variant="ghost" 
-                                    onClick={() => setShowReportModal(true)}
+                                    onClick={() => {
+                                        setReportingCommentId(null);
+                                        setReportReason("");
+                                        setReportDetails("");
+                                        setShowReportModal(true);
+                                    }}
                                     className="w-11 h-11 rounded-full p-0 flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-100 hover:bg-white hover:text-red-500 transition-all"
-                                    title="Báo cáo bài viết"
+                                    title="Báo cáo bài báo"
                                 >
                                     <AlertCircle size={22} />
                                 </VButton>
@@ -797,6 +802,8 @@ const ArticleDetail = () => {
                                                     className="hover:text-red-500 transition-colors flex items-center gap-1"
                                                     onClick={() => {
                                                         setReportingCommentId(comment.id);
+                                                        setReportReason("");
+                                                        setReportDetails("");
                                                         setShowReportModal(true);
                                                     }}
                                                 >
@@ -895,6 +902,8 @@ const ArticleDetail = () => {
                                                         className="hover:text-red-500 transition-colors flex items-center gap-1"
                                                         onClick={() => {
                                                             setReportingCommentId(reply.id);
+                                                            setReportReason("");
+                                                            setReportDetails("");
                                                             setShowReportModal(true);
                                                         }}
                                                     >
@@ -937,7 +946,7 @@ const ArticleDetail = () => {
                             <div className="flex justify-between items-center mb-8">
                                 <div className="space-y-1">
                                     <h3 className="text-lg font-black text-slate-900 tracking-tighter uppercase">
-                                        {reportingCommentId ? 'Báo cáo bình luận' : 'Báo cáo bài viết'}
+                                        {reportingCommentId ? 'Báo cáo bình luận' : 'Báo cáo bài báo'}
                                     </h3>
                                     <p className="text-[10px] font-black text-slate-400 tracking-widest">Giúp chúng tôi cải thiện môi trường tin tức</p>
                                 </div>

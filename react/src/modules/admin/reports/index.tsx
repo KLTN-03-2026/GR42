@@ -74,7 +74,7 @@ const AdminReports = () => {
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-                        Quản lý báo cáo bài viết
+                        Quản lý báo cáo bài báo
                     </h1>
                     <p className="text-xs font-bold text-slate-400 tracking-widest">Xử lý các bài viết bị người dùng báo cáo vi phạm</p>
                 </div>

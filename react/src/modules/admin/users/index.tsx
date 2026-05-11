@@ -32,6 +32,7 @@ interface UserData {
   status: number;
   is_vip: number;
   created_at: string;
+  interests?: string[];
 }
 
 const AdminUsers = () => {
@@ -83,6 +84,23 @@ const AdminUsers = () => {
       showToast("Vui lòng điền đầy đủ thông tin", "error");
       return;
     }
+
+    if (newUser.fullname.length < 6) {
+      showToast("Họ tên phải có tối thiểu 6 ký tự", "error");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newUser.email)) {
+      showToast("Email không đúng định dạng", "error");
+      return;
+    }
+
+    if (newUser.password.length < 6) {
+      showToast("Mật khẩu phải có tối thiểu 6 ký tự", "error");
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await axios.post(
@@ -293,6 +311,7 @@ const AdminUsers = () => {
                 <th className="px-6 py-4 text-center">Trạng thái</th>
                 <th className="px-6 py-4 text-center">Đặc quyền</th>
                 <th className="px-6 py-4 text-center">VIP</th>
+                <th className="px-6 py-4 text-center">Sở thích</th>
                 <th className="px-6 py-4 text-center">Ngày gia nhập</th>
                 <th className="px-6 py-4 text-right">Hành động</th>
               </tr>
@@ -373,6 +392,19 @@ const AdminUsers = () => {
                   <td className="px-6 py-4 text-center">
                     <div className={`inline-flex items-center justify-center w-8 h-8 rounded-lg ${user.is_vip === 1 ? 'bg-amber-50 text-amber-500' : 'bg-slate-50 text-slate-300'}`}>
                       <Crown size={16} fill={user.is_vip === 1 ? "currentColor" : "none"} />
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex flex-wrap justify-center gap-1 max-w-[200px] mx-auto">
+                      {user.interests && user.interests.length > 0 ? (
+                        user.interests.map((int, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black uppercase tracking-tight">
+                            {int.replace(/-/g, ' ')}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[9px] text-slate-300 italic">Trống</span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-center text-[10px] text-slate-500 font-medium">
@@ -518,6 +550,19 @@ const AdminUsers = () => {
                 <div className={`w-4 h-4 bg-white rounded-full transition-all duration-300 transform ${editingUser?.status === 1 ? 'translate-x-6' : 'translate-x-0'}`} />
               </button>
             </div>
+
+            {editingUser?.interests && editingUser.interests.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-black tracking-widest text-slate-400 ml-1">Sở thích hiện tại</label>
+                <div className="flex flex-wrap gap-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  {editingUser.interests.map((int, i) => (
+                    <span key={i} className="px-3 py-1 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest">
+                      {int.replace(/-/g, ' ')}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         }
         confirmText="Lưu thay đổi"
