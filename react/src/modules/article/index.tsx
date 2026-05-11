@@ -723,6 +723,12 @@ const ArticleDetail = () => {
                             <textarea 
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleAddComment(null as any);
+                                    }
+                                }}
                                 placeholder={token ? "Chia sẻ quan điểm của bạn..." : "Vui lòng đăng nhập để bình luận"}
                                 disabled={!token || submittingComment}
                                 className="w-full bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-6 text-sm font-bold placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none min-h-[120px] resize-none"
@@ -760,6 +766,12 @@ const ArticleDetail = () => {
                                                     <textarea 
                                                         value={editingContent}
                                                         onChange={(e) => setEditingContent(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault();
+                                                                handleSaveEdit(comment.id);
+                                                            }
+                                                        }}
                                                         className="w-full bg-white border border-blue-100 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-blue-50 transition-all min-h-[80px] resize-none"
                                                         autoFocus
                                                     />
@@ -835,6 +847,12 @@ const ArticleDetail = () => {
                                                             <textarea 
                                                                 value={replyComment}
                                                                 onChange={(e) => setReplyComment(e.target.value)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                                                        e.preventDefault();
+                                                                        handleAddComment(null as any, comment.id);
+                                                                    }
+                                                                }}
                                                                 placeholder="Viết phản hồi của bạn..."
                                                                 className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none min-h-[100px] resize-none"
                                                             />
@@ -867,6 +885,12 @@ const ArticleDetail = () => {
                                                         <textarea 
                                                             value={editingContent}
                                                             onChange={(e) => setEditingContent(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                                    e.preventDefault();
+                                                                    handleSaveEdit(reply.id);
+                                                                }
+                                                            }}
                                                             className="w-full bg-white border border-blue-100 rounded-xl px-4 py-2 text-xs font-medium outline-none focus:ring-4 focus:ring-blue-50 transition-all min-h-[60px] resize-none"
                                                             autoFocus
                                                         />
