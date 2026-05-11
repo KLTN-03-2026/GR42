@@ -24,6 +24,22 @@ if ($action === 'process') {
     $res = update($table, ['status' => 1], "id = $id");
 } else if ($action === 'delete') {
     $res = delete($table, "id = $id");
+} else if ($action === 'delete_content') {
+    $report = getOne("SELECT * FROM $table WHERE id = $id");
+    if (!$report) {
+        die(json_encode(['status' => 'error', 'message' => 'Báo cáo không tồn tại']));
+    }
+
+    $target_id = ($type === 'comment') ? $report['comment_id'] : $report['news_id'];
+
+    if ($type === 'comment') {
+        query("DELETE FROM comment_likes WHERE comment_id = $target_id");
+        query("DELETE FROM comment_reports WHERE comment_id = $target_id");
+        $res = query("DELETE FROM comments WHERE id = $target_id");
+    } else {
+        query("DELETE FROM article_reports WHERE news_id = $target_id");
+        $res = query("DELETE FROM crawl_news WHERE id = $target_id");
+    }
 } else {
     die(json_encode(['status' => 'error', 'message' => 'Hành động không hợp lệ']));
 }

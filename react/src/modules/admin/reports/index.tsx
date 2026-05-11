@@ -7,7 +7,9 @@ import {
     ExternalLink, 
     Loader2,
     ShieldAlert,
-    Trash2
+    Trash2,
+    XCircle,
+    FileX
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../../../constants/config';
@@ -43,14 +45,20 @@ const AdminReports = () => {
         fetchReports();
     }, [fetchReports]);
 
-    const handleAction = async (id: number, action: 'process' | 'delete') => {
-        if (!window.confirm(`Xác nhận ${action === 'process' ? 'đã xử lý' : 'xóa'} báo cáo này?`)) return;
+    const handleAction = async (id: number, action: 'process' | 'delete' | 'delete_content', type: string = 'article') => {
+        let confirmMsg = '';
+        if (action === 'process') confirmMsg = 'Xác nhận đã xử lý và GIỮ LẠI nội dung này?';
+        else if (action === 'delete') confirmMsg = 'Xác nhận xóa BẢN GHI BÁO CÁO này? (Nội dung gốc vẫn được giữ lại)';
+        else if (action === 'delete_content') confirmMsg = `CẢNH BÁO: Xác nhận XÓA VĨNH VIỄN ${type === 'article' ? 'bài báo' : 'bình luận'} này?`;
+
+        if (!window.confirm(confirmMsg)) return;
         
         try {
             const res = await axios.post(`${API_BASE_URL}/index.php?module=api&action=admin/reports_action&token=${token}`, {
                 id,
                 action,
-                token
+                token,
+                type
             });
             if (res.data.status === 'success') {
                 fetchReports();
@@ -128,21 +136,33 @@ const AdminReports = () => {
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                {report.status === 0 && (
-                                                    <VButton 
-                                                        variant="ghost" size="sm" 
-                                                        className="text-green-600 hover:bg-green-50 rounded-xl"
-                                                        onClick={() => handleAction(report.id, 'process')}
-                                                    >
-                                                        <CheckCircle2 size={16} className="mr-2" /> Đánh dấu đã xử lý
-                                                    </VButton>
+                                                {Number(report.status) === 0 && (
+                                                    <>
+                                                        <VButton 
+                                                            variant="ghost" size="sm" 
+                                                            className="text-green-600 hover:bg-green-50 rounded-xl"
+                                                            onClick={() => handleAction(report.id, 'process', report.type)}
+                                                            title="Đã xử lý (Giữ lại nội dung)"
+                                                        >
+                                                            <CheckCircle2 size={16} className="mr-2" /> Duyệt (Giữ)
+                                                        </VButton>
+                                                        <VButton 
+                                                            variant="ghost" size="sm" 
+                                                            className="text-red-600 hover:bg-red-50 rounded-xl font-black"
+                                                            onClick={() => handleAction(report.id, 'delete_content', report.type)}
+                                                            title="Xóa vĩnh viễn nội dung bị báo cáo"
+                                                        >
+                                                            <Trash2 size={16} className="mr-2" /> Xóa nội dung
+                                                        </VButton>
+                                                    </>
                                                 )}
                                                 <VButton 
                                                     variant="ghost" size="sm" 
-                                                    className="text-red-500 hover:bg-red-50 rounded-xl"
-                                                    onClick={() => handleAction(report.id, 'delete')}
+                                                    className="text-slate-400 hover:bg-slate-50 rounded-xl"
+                                                    onClick={() => handleAction(report.id, 'delete', report.type)}
+                                                    title="Xóa báo cáo (Báo cáo sai/không vi phạm)"
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <XCircle size={16} />
                                                 </VButton>
                                             </div>
                                         </div>
