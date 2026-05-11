@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../../../constants/config';
 import VButton from '../../../components/core/VButton';
+import { encodeId } from '../../../utils/idEncoder';
 
 const AdminComments = () => {
     const [comments, setComments] = useState<any[]>([]);
@@ -159,17 +160,27 @@ const AdminComments = () => {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6 max-w-xs">
-                                            <div className="flex items-start gap-2">
-                                                <p className="text-xs font-bold text-slate-500 line-clamp-2 leading-snug">{comment.news_title}</p>
-                                                <a 
-                                                    href={`/news/${comment.news_id}`} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-500 hover:text-blue-700 mt-0.5"
-                                                >
-                                                    <ExternalLink size={14} />
-                                                </a>
-                                            </div>
+                                            {(() => {
+                                                const articleLink = `/article/${encodeId(comment.news_id)}#comment-${comment.id}`;
+                                                return (
+                                                    <div className="flex items-start gap-2">
+                                                        <p 
+                                                            className="text-xs font-bold text-slate-500 line-clamp-2 leading-snug cursor-pointer hover:text-blue-600 transition-colors"
+                                                            onClick={() => window.open(articleLink, '_blank')}
+                                                        >
+                                                            {comment.news_title}
+                                                        </p>
+                                                        <a 
+                                                            href={articleLink} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-500 hover:text-blue-700 mt-0.5"
+                                                        >
+                                                            <ExternalLink size={14} />
+                                                        </a>
+                                                    </div>
+                                                );
+                                            })()}
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center justify-center gap-2">

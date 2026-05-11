@@ -150,9 +150,30 @@ const ArticleDetail = () => {
         if (id) {
             fetchData();
             fetchAiSummary(id);
-            window.scrollTo(0, 0);
+            if (!window.location.hash) {
+                window.scrollTo(0, 0);
+            }
         }
     }, [id, fetchData]);
+
+    useEffect(() => {
+        if (!loading && comments.length > 0) {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#comment-')) {
+                const commentId = hash.replace('#comment-', '');
+                setTimeout(() => {
+                    const element = document.getElementById(`comment-${commentId}`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        element.classList.add('ring-4', 'ring-blue-500/30', 'scale-[1.02]', 'z-50');
+                        setTimeout(() => {
+                            element.classList.remove('ring-4', 'ring-blue-500/30', 'scale-[1.02]', 'z-50');
+                        }, 4000);
+                    }
+                }, 1000); // Wait for animations and images to load
+            }
+        }
+    }, [loading, comments, id]);
 
     const handleToggleLike = async () => {
         if (!token) {
@@ -749,7 +770,7 @@ const ArticleDetail = () => {
                     <div className="space-y-12">
                         {comments.length > 0 ? comments.filter(c => !c.parent_id).map((comment) => (
                             <div key={comment.id} className="space-y-8">
-                                <div className={`flex gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 p-6 rounded-[2rem] transition-all ${Number(comment.is_vip) === 1 ? 'bg-gradient-to-br from-amber-50/50 to-transparent border-2 border-amber-200 shadow-xl shadow-amber-50 relative overflow-hidden' : ''}`}>
+                                <div id={`comment-${comment.id}`} className={`flex gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 p-6 rounded-[2rem] transition-all ${Number(comment.is_vip) === 1 ? 'bg-gradient-to-br from-amber-50/50 to-transparent border-2 border-amber-200 shadow-xl shadow-amber-50 relative overflow-hidden' : ''}`}>
                                     {Number(comment.is_vip) === 1 && (
                                         <div className="absolute top-0 right-0 p-2">
                                             <Crown size={14} className="text-amber-500 animate-pulse" />
@@ -872,8 +893,8 @@ const ArticleDetail = () => {
                                 </div>
                                 
                                 <div className="ml-16 space-y-8 border-l-2 border-slate-50 pl-8">
-                                    {comments.filter(reply => reply.parent_id === comment.id).map(reply => (
-                                        <div key={reply.id} className={`flex gap-4 p-4 rounded-2xl transition-all ${Number(reply.is_vip) === 1 ? 'bg-amber-50/30 border border-amber-100 shadow-sm' : ''}`}>
+                                    {comments.filter(reply => Number(reply.parent_id) === Number(comment.id)).map(reply => (
+                                        <div key={reply.id} id={`comment-${reply.id}`} className={`flex gap-4 p-4 rounded-2xl transition-all duration-1000 ${Number(reply.is_vip) === 1 ? 'bg-amber-50/30 border border-amber-100 shadow-sm' : ''}`}>
                                             <VAvatar src={reply.avatar} name={reply.fullname} size="sm" className="rounded-xl" isVip={Number(reply.is_vip) === 1} />
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-1">

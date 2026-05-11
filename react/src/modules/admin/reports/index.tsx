@@ -121,96 +121,104 @@ const AdminReports = () => {
                                 transition={{ delay: index * 0.05 }}
                                 className={`bg-white rounded-[2.5rem] border ${report.status === 1 ? 'border-slate-100 opacity-60' : 'border-blue-100 shadow-xl shadow-blue-100/20'} p-8 transition-all hover:shadow-2xl overflow-hidden relative group`}
                             >
-                                <div className="flex flex-col lg:flex-row gap-8 items-start relative z-10">
-                                    <div className="flex-1 space-y-6">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${
-                                                    report.status === 1 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                                                }`}>
-                                                    {report.status === 1 ? 'Đã xử lý' : 'Chờ xử lý'}
-                                                </span>
-                                                <span className="text-[10px] font-bold text-slate-400 tracking-widest flex items-center gap-1.5">
-                                                    <Clock size={12} /> {report.created_at}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                {Number(report.status) === 0 && (
-                                                    <>
-                                                        <VButton 
-                                                            variant="ghost" size="sm" 
-                                                            className="text-green-600 hover:bg-green-50 rounded-xl"
-                                                            onClick={() => handleAction(report.id, 'process', report.type)}
-                                                            title="Đã xử lý (Giữ lại nội dung)"
-                                                        >
-                                                            <CheckCircle2 size={16} className="mr-2" /> Duyệt (Giữ)
-                                                        </VButton>
-                                                        <VButton 
-                                                            variant="ghost" size="sm" 
-                                                            className="text-red-600 hover:bg-red-50 rounded-xl font-black"
-                                                            onClick={() => handleAction(report.id, 'delete_content', report.type)}
-                                                            title="Xóa vĩnh viễn nội dung bị báo cáo"
-                                                        >
-                                                            <Trash2 size={16} className="mr-2" /> Xóa nội dung
-                                                        </VButton>
-                                                    </>
-                                                )}
-                                                <VButton 
-                                                    variant="ghost" size="sm" 
-                                                    className="text-slate-400 hover:bg-slate-50 rounded-xl"
-                                                    onClick={() => handleAction(report.id, 'delete', report.type)}
-                                                    title="Xóa báo cáo (Báo cáo sai/không vi phạm)"
-                                                >
-                                                    <XCircle size={16} />
-                                                </VButton>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100">
-                                                <div className="flex items-center gap-3 mb-3">
-                                                    <ShieldAlert size={18} className="text-red-500" />
-                                                    <h4 className="text-sm font-black text-slate-900 tracking-tight">Lý do: {report.reason}</h4>
-                                                </div>
-                                                {report.details && (
-                                                    <p className="text-xs font-bold text-slate-600 leading-relaxed italic">
-                                                        "{report.details}"
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <div className="flex gap-4 items-center">
-                                                {report.type === 'article' && report.news_image && (
-                                                    <div className="w-16 h-16 bg-slate-100 rounded-2xl overflow-hidden shrink-0 border border-slate-50 shadow-sm">
-                                                        <img src={report.news_image} className="w-full h-full object-cover" alt="" />
+                                {(() => {
+                                    const articleLink = `/article/${encodeId(report.news_id)}${report.type === 'comment' ? `#comment-${report.target_id}` : ''}`;
+                                    return (
+                                        <div className="flex flex-col lg:flex-row gap-8 items-start relative z-10">
+                                            <div className="flex-1 space-y-6">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${
+                                                            report.status === 1 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                                                        }`}>
+                                                            {report.status === 1 ? 'Đã xử lý' : 'Chờ xử lý'}
+                                                        </span>
+                                                        <span className="text-[10px] font-bold text-slate-400 tracking-widest flex items-center gap-1.5">
+                                                            <Clock size={12} /> {report.created_at}
+                                                        </span>
                                                     </div>
-                                                )}
-                                                <div className="flex-1 min-w-0">
-                                                    <span className="text-[10px] font-black text-blue-600 tracking-widest block mb-1">
-                                                        {report.type === 'article' ? report.news_category : 'BÌNH LUẬN'}
-                                                    </span>
-                                                    <h5 className="text-sm font-black text-slate-800 line-clamp-1 group-hover:text-blue-600 transition-colors">
-                                                        {report.target_title}
-                                                    </h5>
-                                                    <div className="flex items-center gap-3 mt-1.5">
-                                                        <div className="flex items-center gap-1.5">
-                                                            <div className="w-4 h-4 bg-blue-100 rounded-md flex items-center justify-center text-[8px] font-black text-blue-600">U</div>
-                                                            <span className="text-[10px] font-bold text-slate-500">{report.reporter_name}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        {Number(report.status) === 0 && (
+                                                            <>
+                                                                <VButton 
+                                                                    variant="ghost" size="sm" 
+                                                                    className="text-green-600 hover:bg-green-50 rounded-xl"
+                                                                    onClick={() => handleAction(report.id, 'process', report.type)}
+                                                                    title="Đã xử lý (Giữ lại nội dung)"
+                                                                >
+                                                                    <CheckCircle2 size={16} className="mr-2" /> Duyệt (Giữ)
+                                                                </VButton>
+                                                                <VButton 
+                                                                    variant="ghost" size="sm" 
+                                                                    className="text-red-600 hover:bg-red-50 rounded-xl font-black"
+                                                                    onClick={() => handleAction(report.id, 'delete_content', report.type)}
+                                                                    title="Xóa vĩnh viễn nội dung bị báo cáo"
+                                                                >
+                                                                    <Trash2 size={16} className="mr-2" /> Xóa nội dung
+                                                                </VButton>
+                                                            </>
+                                                        )}
+                                                        <VButton 
+                                                            variant="ghost" size="sm" 
+                                                            className="text-slate-400 hover:bg-slate-50 rounded-xl"
+                                                            onClick={() => handleAction(report.id, 'delete', report.type)}
+                                                            title="Xóa báo cáo (Báo cáo sai/không vi phạm)"
+                                                        >
+                                                            <XCircle size={16} />
+                                                        </VButton>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <ShieldAlert size={18} className="text-red-500" />
+                                                            <h4 className="text-sm font-black text-slate-900 tracking-tight">Lý do: {report.reason}</h4>
                                                         </div>
-                                                        {report.type === 'article' && report.target_id && (
-                                                            <a 
-                                                                href={`/article/${encodeId(report.target_id)}`} target="_blank" rel="noreferrer"
-                                                                className="flex items-center gap-1 text-[9px] font-black text-blue-600 tracking-widest hover:underline"
-                                                            >
-                                                                Xem bài báo <ExternalLink size={10} />
-                                                            </a>
+                                                        {report.details && (
+                                                            <p className="text-xs font-bold text-slate-600 leading-relaxed italic">
+                                                                "{report.details}"
+                                                            </p>
                                                         )}
                                                     </div>
+
+                                                    <div className="flex gap-4 items-center">
+                                                        {report.type === 'article' && report.news_image && (
+                                                            <div className="w-16 h-16 bg-slate-100 rounded-2xl overflow-hidden shrink-0 border border-slate-50 shadow-sm">
+                                                                <img src={report.news_image} className="w-full h-full object-cover" alt="" />
+                                                            </div>
+                                                        )}
+                                                        <div className="flex-1 min-w-0">
+                                                            <span className="text-[10px] font-black text-blue-600 tracking-widest block mb-1">
+                                                                {report.type === 'article' ? report.news_category : 'BÌNH LUẬN'}
+                                                            </span>
+                                                            <h5 
+                                                                className="text-sm font-black text-slate-800 line-clamp-1 group-hover:text-blue-600 transition-colors cursor-pointer" 
+                                                                onClick={() => window.open(articleLink, '_blank')}
+                                                            >
+                                                                {report.target_title}
+                                                            </h5>
+                                                            <div className="flex items-center gap-3 mt-1.5">
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <div className="w-4 h-4 bg-blue-100 rounded-md flex items-center justify-center text-[8px] font-black text-blue-600">U</div>
+                                                                    <span className="text-[10px] font-bold text-slate-500">{report.reporter_name}</span>
+                                                                </div>
+                                                                {report.news_id && (
+                                                                    <a 
+                                                                        href={articleLink} target="_blank" rel="noreferrer"
+                                                                        className="flex items-center gap-1 text-[9px] font-black text-blue-600 tracking-widest hover:underline"
+                                                                    >
+                                                                        Xem {report.type === 'article' ? 'bài báo' : 'bình luận'} <ExternalLink size={10} />
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    );
+                                })()}
                             </motion.div>
                         ))}
                     </AnimatePresence>
