@@ -28,8 +28,10 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
     created_at: ''
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [originalProfile, setOriginalProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [tempAvatar, setTempAvatar] = useState<string | null>(null);
   const [showAvatarPreview, setShowAvatarPreview] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -65,9 +67,40 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
     }
   }, [authToken]);
 
+  const handleEditClick = () => {
+    setOriginalProfile({...profile});
+    setErrors({});
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    if (originalProfile) {
+      setProfile(originalProfile);
+    }
+    setErrors({});
+    setIsEditing(false);
+  };
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+    if (!profile.fullname || profile.fullname.trim().length < 3) {
+      newErrors.fullname = 'Họ và tên phải có ít nhất 3 ký tự';
+    }
+    
+    if (profile.phone && !/^\d{10}$/.test(profile.phone)) {
+      newErrors.phone = 'Số điện thoại phải là 10 chữ số';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authToken) return;
+    
+    if (!validateForm()) return;
+
     setSavingProfile(true);
     try {
       const res = await axios.post(`${API_BASE_URL}/index.php?module=api&action=user&token=${authToken}`, {
@@ -309,7 +342,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
               <div className="pt-8 flex justify-end">
                 <VButton 
                   variant="dark" icon={Settings} 
-                  onClick={() => setIsEditing(true)}
+                  onClick={handleEditClick}
                 >
                   Chỉnh sửa hồ sơ
                 </VButton>
@@ -320,7 +353,14 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                 <div className="space-y-3">
                   <label className="text-base font-black text-blue-600 tracking-widest ml-1">Họ và tên</label>
-                  <input type="text" value={profile.fullname || ''} onChange={e => setProfile({...profile, fullname: e.target.value})} placeholder="Nhập họ và tên..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-lg font-bold text-slate-900 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none" />
+                  <input 
+                    type="text" 
+                    value={profile.fullname || ''} 
+                    onChange={e => setProfile({...profile, fullname: e.target.value})} 
+                    placeholder="Nhập họ và tên..." 
+                    className={`w-full bg-slate-50 border ${errors.fullname ? 'border-red-500' : 'border-slate-100'} rounded-2xl px-6 py-4 text-lg font-bold text-slate-900 focus:bg-white focus:ring-4 ${errors.fullname ? 'focus:ring-red-50' : 'focus:ring-blue-50 focus:border-blue-200'} transition-all outline-none`} 
+                  />
+                  {errors.fullname && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest ml-2">{errors.fullname}</p>}
                 </div>
                 <div className="space-y-3">
                   <label className="text-base font-black text-blue-600 tracking-widest ml-1">Địa chỉ Email</label>
@@ -328,7 +368,14 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
                 </div>
                 <div className="space-y-3">
                   <label className="text-base font-black text-blue-600 tracking-widest ml-1">Số điện thoại</label>
-                  <input type="text" value={profile.phone || ''} onChange={e => setProfile({...profile, phone: e.target.value})} placeholder="Nhập số điện thoại..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-lg font-bold text-slate-900 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none" />
+                  <input 
+                    type="text" 
+                    value={profile.phone || ''} 
+                    onChange={e => setProfile({...profile, phone: e.target.value})} 
+                    placeholder="Nhập số điện thoại..." 
+                    className={`w-full bg-slate-50 border ${errors.phone ? 'border-red-500' : 'border-slate-100'} rounded-2xl px-6 py-4 text-lg font-bold text-slate-900 focus:bg-white focus:ring-4 ${errors.phone ? 'focus:ring-red-50' : 'focus:ring-blue-50 focus:border-blue-200'} transition-all outline-none`} 
+                  />
+                  {errors.phone && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest ml-2">{errors.phone}</p>}
                 </div>
                 <div className="space-y-3">
                   <label className="text-base font-black text-blue-600 tracking-widest ml-1">Địa chỉ</label>
@@ -336,7 +383,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
                 </div>
               </div>
               <div className="pt-8 flex justify-end gap-4">
-                <VButton variant="outline" onClick={() => setIsEditing(false)}>Hủy</VButton>
+                <VButton variant="outline" onClick={handleCancelEdit}>Hủy</VButton>
                 <VButton 
                   type="submit" variant="primary" 
                   loading={savingProfile} icon={Shield}
