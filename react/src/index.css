@@ -5,6 +5,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 14px;
+}
+
 @layer base {
   body {
     @apply bg-background text-slate-900 font-roboto antialiased;
@@ -16,7 +20,7 @@
   @apply text-slate-600 leading-relaxed max-w-none;
 }
 .prose p {
-  @apply mb-6 text-lg;
+  @apply mb-6 text-base;
 }
 .prose h1 {
   @apply text-3xl font-black mb-8 tracking-tighter text-slate-900;
@@ -42,7 +46,7 @@
     @apply bg-surface rounded-2xl shadow-sm border border-slate-100 p-4 transition-all duration-300;
   }
   .category-link {
-    @apply whitespace-nowrap text-lg md:text-xl font-black transition-all duration-300 relative py-2;
+    @apply whitespace-nowrap text-base md:text-lg font-black transition-all duration-300 relative py-2;
   }
   .btn-primary {
     @apply bg-blue-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-blue-700 active:scale-95 transition-all;

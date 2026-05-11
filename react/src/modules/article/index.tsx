@@ -16,6 +16,7 @@ import {
     Send,
     AlertCircle,
     X,
+    CheckCircle2,
     Camera,
     Shield,
     Activity,
@@ -377,6 +378,10 @@ const ArticleDetail = () => {
             showToast('Vui lòng chọn lý do báo cáo', 'error');
             return;
         }
+        if (reportReason === 'Khác' && !reportDetails.trim()) {
+            showToast('Vui lòng cung cấp thêm chi tiết khi chọn lý do "Khác"', 'error');
+            return;
+        }
 
         try {
             setSubmittingReport(true);
@@ -478,11 +483,11 @@ const ArticleDetail = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="max-w-4xl"
                 >
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-10 leading-[1.1] tracking-tighter">
+                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-8 leading-[1.1] tracking-tighter">
                         {article.title}
                     </h1>
 
-                    <div className="flex flex-wrap items-center justify-between gap-6 pb-12 border-b border-slate-100">
+                    <div className="flex flex-wrap items-center justify-between gap-6 pb-8 border-b border-slate-100">
                         <div className="flex flex-col gap-1.5">
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Nguồn:</span>
@@ -532,7 +537,7 @@ const ArticleDetail = () => {
                     </div>
                 </motion.div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mt-16 pb-20 border-b border-slate-100">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12 pb-16 border-b border-slate-100">
                     <div className="lg:col-span-8 flex flex-col items-start">
                         {article.image && !article.image.includes('placeholder') && article.image !== '' ? (
                             <div className="w-full aspect-[21/9] rounded-[3rem] overflow-hidden mb-16 bg-slate-100 border border-slate-50 shadow-2xl relative">
@@ -906,7 +911,7 @@ const ArticleDetail = () => {
                         )) : (
                             <div className="text-center py-20 bg-slate-50/50 rounded-[3rem] border-2 border-dashed border-slate-100">
                                 <p className="text-slate-400 font-bold mb-2">Hiện chưa có bình luận nào.</p>
-                                <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hãy là người đầu tiên chia sẻ cảm nghĩ!</p>
+                                <p className="text-[10px] font-black text-slate-300 tracking-widest">Hãy là người đầu tiên chia sẻ cảm nghĩ!</p>
                             </div>
                         )}
                     </div>
@@ -925,46 +930,48 @@ const ArticleDetail = () => {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="relative w-full max-w-lg bg-white rounded-[2.5rem] p-10 shadow-2xl overflow-hidden"
+                            className="relative w-full max-w-md bg-white rounded-[2rem] p-8 shadow-2xl overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl -z-10 translate-x-16 -translate-y-16"></div>
                             
                             <div className="flex justify-between items-center mb-8">
                                 <div className="space-y-1">
-                                    <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase">
+                                    <h3 className="text-lg font-black text-slate-900 tracking-tighter uppercase">
                                         {reportingCommentId ? 'Báo cáo bình luận' : 'Báo cáo bài viết'}
                                     </h3>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Giúp chúng tôi cải thiện môi trường tin tức</p>
+                                    <p className="text-[10px] font-black text-slate-400 tracking-widest">Giúp chúng tôi cải thiện môi trường tin tức</p>
                                 </div>
                                 <button onClick={() => setShowReportModal(false)} className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 hover:text-slate-600 transition-all">
                                     <X size={20} />
                                 </button>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <div className="grid grid-cols-1 gap-3">
                                     {reportReasons.map((reason) => (
                                         <button
                                             key={reason}
                                             onClick={() => setReportReason(reason)}
-                                            className={`flex items-center justify-between px-6 py-4 rounded-2xl border-2 transition-all font-bold text-sm ${
+                                            className={`flex items-center justify-between px-6 py-3 rounded-2xl border-2 transition-all font-bold text-sm ${
                                                 reportReason === reason 
                                                 ? 'border-blue-600 bg-blue-50/50 text-blue-600' 
                                                 : 'border-slate-50 bg-slate-50/30 text-slate-500 hover:border-slate-100'
                                             }`}
                                         >
                                             {reason}
-                                            {reportReason === reason && <div className="w-2 h-2 bg-blue-600 rounded-full"></div>}
+                                            {reportReason === reason && <CheckCircle2 size={22} strokeWidth={2.5} className="text-blue-600 fill-blue-50" />}
                                         </button>
                                     ))}
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Chi tiết thêm (Không bắt buộc)</label>
+                                    <label className="text-[10px] font-black text-slate-400 tracking-widest ml-1">
+                                        Chi tiết thêm {reportReason === 'Khác' ? '(Bắt buộc)' : '(Không bắt buộc)'}
+                                    </label>
                                     <textarea 
                                         value={reportDetails}
                                         onChange={(e) => setReportDetails(e.target.value)}
-                                        placeholder="Cung cấp thêm thông tin về báo cáo của bạn..."
+                                        placeholder={reportReason === 'Khác' ? "Vui lòng cho chúng tôi biết rõ hơn lý do báo cáo của bạn..." : "Cung cấp thêm thông tin về báo cáo của bạn..."}
                                         className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none min-h-[100px] resize-none"
                                     />
                                 </div>
