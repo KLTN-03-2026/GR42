@@ -58,7 +58,8 @@ const Profile = () => {
       axios.get(`${API_BASE_URL}/index.php`, { params: { module: 'api', action: 'user', token: authToken } })
         .then(res => { 
           if (res.data.status === 'success') {
-            setSelectedInterests(res.data.data.interests);
+            const normalizedInterests = (res.data.data.interests || []).map((i: string) => i.toUpperCase());
+            setSelectedInterests(normalizedInterests);
             setUserData(res.data.data.profile);
           }
         })
@@ -234,7 +235,7 @@ const Profile = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                       {apiCategories.map((name) => {
-                        const isSelected = selectedInterests.includes(name);
+                        const isSelected = selectedInterests.some(i => i.toUpperCase() === name.toUpperCase());
                         const { icon: CatIcon, color, label } = getCategoryInfo(name);
                         return (
                           <button key={name} onClick={() => toggleInterest(name)} className={`flex items-center gap-4 p-6 rounded-3xl border-2 transition-all ${isSelected ? 'border-blue-600 bg-blue-50/50 shadow-md shadow-blue-100' : 'border-slate-50 bg-slate-50/20 hover:border-slate-100 hover:bg-slate-50/50'}`}>
