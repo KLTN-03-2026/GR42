@@ -162,7 +162,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
   const handleMouseUp = () => setIsDragging(false);
 
   return (
-    <div className="bg-white rounded-[2.5rem] p-12 border border-slate-100 shadow-sm relative overflow-hidden group">
+    <div className="bg-white rounded-[2.5rem] p-12 shadow-sm relative overflow-hidden group">
       <div className="mb-12">
         <h3 className="text-xl font-black text-slate-900 mb-2">Hồ sơ cá nhân</h3>
         <p className="text-sm font-medium text-slate-400">Quản lý thông tin tài khoản và bảo mật của bạn.</p>
@@ -174,16 +174,16 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ authToken }) => {
       </div>
       
       <div className="flex flex-col md:flex-row items-center md:items-start gap-12">
-        <div className="relative group">
+        <div className="relative group/avatar">
           <VAvatar 
             src={userAvatar} 
             name={profile.fullname} 
             size="xl" 
             isVip={profile.is_vip === 1}
-            className="group-hover:scale-[1.02] transition-transform" 
+            className="group-hover/avatar:scale-[1.02] transition-transform duration-500" 
           />
-          <label className="absolute bottom-1 right-1 w-11 h-11 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-xl cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all active:scale-95 border-2 border-white">
-              <Camera size={18} />
+          <label className="absolute bottom-2 right-2 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-2xl cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all active:scale-95 border-4 border-white z-30">
+              <Camera size={20} />
               <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
           </label>
 

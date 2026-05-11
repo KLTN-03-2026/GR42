@@ -178,9 +178,9 @@ const Profile = () => {
                 ) : subTab === 'upgrade' ? (
                   <UpgradeVIP authToken={authToken} userData={userData} />
                 ) : subTab === 'favorites' ? (
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-[2.5rem] p-12 border border-slate-100 shadow-sm">
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-[2.5rem] p-12 shadow-sm">
                     <div className="mb-12">
-                      <h3 className="text-xl font-black text-slate-900 mb-2">Bài viết đã lưu</h3>
+                      <h3 className="text-xl font-black text-slate-900 mb-2">Bài viết đã yêu thích</h3>
                       <p className="text-sm font-medium text-slate-400">Danh sách các bài báo bạn đã thả tim và lưu lại.</p>
                     </div>
 
@@ -203,7 +203,7 @@ const Profile = () => {
                     )}
                   </motion.div>
                 ) : subTab === 'history' ? (
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-[2.5rem] p-12 border border-slate-100 shadow-sm">
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-[2.5rem] p-12 shadow-sm">
                     <div className="mb-12">
                       <h3 className="text-xl font-black text-slate-900 mb-2">Lịch sử đã xem</h3>
                       <p className="text-sm font-medium text-slate-400">Danh sách các bài báo bạn đã xem gần đây.</p>
@@ -228,7 +228,7 @@ const Profile = () => {
                     )}
                   </motion.div>
                 ) : (
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-[2.5rem] p-12 border border-slate-100 shadow-sm">
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-[2.5rem] p-12 shadow-sm">
                     <div className="mb-12">
                       <h3 className="text-xl font-black text-slate-900 mb-2">Chủ đề quan tâm</h3>
                       <p className="text-sm font-medium text-slate-400">Chọn các chủ đề bạn quan tâm để chúng tôi đề xuất tin tức phù hợp.</p>

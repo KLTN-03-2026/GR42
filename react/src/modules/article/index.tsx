@@ -306,6 +306,10 @@ const ArticleDetail = () => {
     };
 
     const handleSpeak = (text: string, index: number, autoNext = false) => {
+        if (!token) {
+            showToast('Vui lòng đăng nhập để sử dụng tính năng nghe bài báo', 'info');
+            return;
+        }
         window.speechSynthesis.cancel();
         
         if (readingIndex === index && !autoNext) {
@@ -335,6 +339,10 @@ const ArticleDetail = () => {
     };
 
     const handleReadAll = () => {
+        if (!token) {
+            showToast('Vui lòng đăng nhập để sử dụng tính năng nghe bài báo', 'info');
+            return;
+        }
         if (isReadingAll) {
             window.speechSynthesis.cancel();
             setIsReadingAll(false);
@@ -502,7 +510,7 @@ const ArticleDetail = () => {
                                 size="sm"
                                 icon={Volume2}
                                 onClick={handleReadAll}
-                                className={isReadingAll ? 'animate-pulse' : ''}
+                                className={`${isReadingAll ? 'animate-pulse' : ''} ${!token ? 'opacity-40 grayscale cursor-not-allowed' : ''}`}
                             >
                                 {isReadingAll ? 'Đang đọc...' : 'Nghe bài báo'}
                             </VButton>
@@ -580,8 +588,8 @@ const ArticleDetail = () => {
                                             {block.type === 'p' && block.text && (
                                                 <button 
                                                     onClick={() => handleSpeak(block.text!, idx)}
-                                                    className={`absolute -right-10 top-2 p-2 rounded-full transition-all flex items-center justify-center ${readingIndex === idx ? 'text-blue-600 bg-blue-50 scale-110 shadow-sm' : 'opacity-0 group-hover/para:opacity-100 text-slate-300 hover:text-blue-600 hover:bg-slate-50'}`}
-                                                    title="Đọc đoạn này"
+                                                    className={`absolute -right-10 top-2 p-2 rounded-full transition-all flex items-center justify-center ${!token ? 'opacity-20 cursor-not-allowed' : (readingIndex === idx ? 'text-blue-600 bg-blue-50 scale-110 shadow-sm' : 'opacity-0 group-hover/para:opacity-100 text-slate-300 hover:text-blue-600 hover:bg-slate-50')}`}
+                                                    title={token ? "Đọc đoạn này" : "Vui lòng đăng nhập để nghe"}
                                                 >
                                                     <Volume2 size={14} className={readingIndex === idx ? 'animate-pulse' : ''} />
                                                 </button>
