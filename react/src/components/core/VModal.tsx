@@ -13,6 +13,7 @@ interface VModalProps {
   confirmText?: string;
   cancelText?: string;
   loading?: boolean;
+  showCancel?: boolean;
 }
 
 const VModal: React.FC<VModalProps> = ({
@@ -24,7 +25,8 @@ const VModal: React.FC<VModalProps> = ({
   type = 'danger',
   confirmText = 'Xác nhận',
   cancelText = 'Hủy bỏ',
-  loading = false
+  loading = false,
+  showCancel = true
 }) => {
   return (
     <AnimatePresence>
@@ -67,13 +69,15 @@ const VModal: React.FC<VModalProps> = ({
               </div>
 
               <div className="flex gap-4">
-                <VButton 
-                  variant="ghost" 
-                  className="flex-1 !bg-slate-50 hover:!bg-slate-100" 
-                  onClick={onClose}
-                >
-                  {cancelText}
-                </VButton>
+                {showCancel && (
+                  <VButton 
+                    variant="ghost" 
+                    className="flex-1 !bg-slate-50 hover:!bg-slate-100" 
+                    onClick={onClose}
+                  >
+                    {cancelText}
+                  </VButton>
+                )}
                 {onConfirm && (
                   <VButton 
                     variant={type === 'danger' ? 'primary' : 'secondary'} 

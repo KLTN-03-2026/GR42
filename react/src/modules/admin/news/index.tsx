@@ -357,6 +357,7 @@ const AdminNewsList = () => {
                 type="info"
                 title="Thu thập dữ liệu hoàn tất"
                 confirmText="Tuyệt vời"
+                showCancel={false}
                 onConfirm={() => setIsCrawlSuccessModalOpen(false)}
                 message={
                     <div className="space-y-4">
