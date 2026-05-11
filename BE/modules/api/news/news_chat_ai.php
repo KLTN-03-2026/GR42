@@ -9,7 +9,6 @@ function streamGeminiApi(array $data, string $apiKey, string $model): array
 {
     $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:streamGenerateContent?alt=sse&key={$apiKey}";
     $ch = curl_init();
-
     $headersSent = false;
     $errorBody = '';
     $httpCode = 0;
@@ -168,10 +167,6 @@ if (!empty($articleContext)) {
     foreach ($articles as $a) {
         $context .= "- Tiêu đề: {$a['title']} (Nguồn: {$a['source']}, Ngày: {$a['pubDate']}, Đường dẫn: /article/{$a['id']})\n";
     }
-    $combinedTitles = mb_strtolower(json_encode($articles, JSON_UNESCAPED_UNICODE), 'UTF-8');
-    if (strpos($combinedTitles, 'lương cường') !== false && mb_strpos(mb_strtolower($prompt, 'UTF-8'), 'chủ tịch') !== false) {
-        $context .= "\nLưu ý: Theo dữ liệu mới nhất, ông Lương Cường là Chủ tịch nước Việt Nam hiện nay.\n";
-    }
 }
 
 $finalPrompt = "Thời gian hiện tại: {$currentDate}.\n";
@@ -185,9 +180,9 @@ $requestData = [
         "parts" => [
             [
                 "text" => "Bạn là một trợ lý AI thông minh chuyên về tin tức (hiện tại là năm 2026). Luôn trả lời bằng tiếng Việt, thân thiện và có sử dụng định dạng Markdown (như in đậm, in nghiêng, danh sách) để văn bản dễ đọc hơn.
-Nhiệm vụ: Dựa vào 'Ngữ cảnh' để trả lời. Nếu không có ngữ cảnh, hãy dùng kiến thức sẵn có nhưng nhớ báo cho người dùng biết là bạn chưa tìm thấy tin tức mới nhất về chủ đề này trên hệ thống. 
-QUAN TRỌNG: Bất cứ khi nào bạn nhắc đến một bài báo có trong 'Ngữ cảnh', BẠN BẮT BUỘC PHẢI TẠO ĐƯỜNG DẪN đến bài báo đó bằng định dạng Markdown: [Tiêu đề bài báo](Đường dẫn). Bạn PHẢI lấy chính xác chuỗi 'Đường dẫn' được cung cấp trong ngữ cảnh (ví dụ: /article/123), TUYỆT ĐỐI KHÔNG tự ý ghép thêm bất kỳ tên miền nào (như localhost hay vnexpress) vào trước đường dẫn.
-KHÔNG trả lời theo kiểu 'tôi là AI không thể dự đoán' hay 'chỉ được huấn luyện đến năm...'"
+                Nhiệm vụ: Dựa vào 'Ngữ cảnh' để trả lời. Nếu không có ngữ cảnh, hãy dùng kiến thức sẵn có nhưng nhớ báo cho người dùng biết là bạn chưa tìm thấy tin tức mới nhất về chủ đề này trên hệ thống. 
+                QUAN TRỌNG: Bất cứ khi nào bạn nhắc đến một bài báo có trong 'Ngữ cảnh', BẠN BẮT BUỘC PHẢI TẠO ĐƯỜNG DẪN đến bài báo đó bằng định dạng Markdown: [Tiêu đề bài báo](Đường dẫn). Bạn PHẢI lấy chính xác chuỗi 'Đường dẫn' được cung cấp trong ngữ cảnh (ví dụ: /article/123), TUYỆT ĐỐI KHÔNG tự ý ghép thêm bất kỳ tên miền nào (như localhost hay vnexpress) vào trước đường dẫn.
+                KHÔNG trả lời theo kiểu 'tôi là AI không thể dự đoán' hay 'chỉ được huấn luyện đến năm...'"
             ]
         ]
     ],
@@ -199,7 +194,7 @@ KHÔNG trả lời theo kiểu 'tôi là AI không thể dự đoán' hay 'chỉ
         "temperature" => 0.7,
         "topK" => 40,
         "topP" => 0.8,
-        "maxOutputTokens" => 1024
+        "maxOutputTokens" => 2048
     ]
 ];
 

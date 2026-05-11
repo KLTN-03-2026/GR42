@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  MessageSquare, X, Send, Trash2, Bot, User, Loader2, Sparkles, Maximize2, Minimize2, Mic
+  MessageSquare, X, Send, Trash2, User, Sparkles, Maximize2, Minimize2, Mic
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../../constants/config';
@@ -150,6 +150,7 @@ const Chatbot = () => {
           boundary = buffer.indexOf('\n\n');
 
           const lines = block.split('\n');
+          let textAddedInBlock = '';
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const dataStr = line.substring(6).trim();
@@ -157,16 +158,19 @@ const Chatbot = () => {
                 try {
                   const parsed = JSON.parse(dataStr);
                   if (parsed.candidates && parsed.candidates[0].content.parts) {
-                    const textPart = parsed.candidates[0].content.parts.map((p: any) => p.text).join('');
-                    botContent += textPart;
-                    setMessages(prev => prev.map(m =>
-                      m._id === botMessageId ? { ...m, content: botContent } : m
-                    ));
+                    textAddedInBlock += parsed.candidates[0].content.parts.map((p: any) => p.text).join('');
                   }
                 } catch (e) {
                 }
               }
             }
+          }
+          if (textAddedInBlock) {
+            botContent += textAddedInBlock;
+            const newContent = botContent;
+            setMessages(prev => prev.map(m =>
+              m._id === botMessageId ? { ...m, content: newContent } : m
+            ));
           }
         }
       }

@@ -8,8 +8,7 @@ import {
     Loader2,
     ShieldAlert,
     Trash2,
-    XCircle,
-    FileX
+    XCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../../../constants/config';

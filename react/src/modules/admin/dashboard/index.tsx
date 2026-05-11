@@ -6,8 +6,8 @@ import {
   PieChart, Pie, Cell,
 } from 'recharts';
 import { 
-  Users, Newspaper, MessageSquare, LineChart, Plus, UserPlus, 
-  Activity, ChevronRight, Clock, User, MessageCircle, Zap,
+  Users, Newspaper, Plus, UserPlus, 
+  Activity, ChevronRight, Clock, Zap,
   Loader2
 } from 'lucide-react';
 import { motion } from 'framer-motion';
