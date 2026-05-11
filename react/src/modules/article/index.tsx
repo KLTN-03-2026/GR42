@@ -150,9 +150,30 @@ const ArticleDetail = () => {
         if (id) {
             fetchData();
             fetchAiSummary(id);
-            window.scrollTo(0, 0);
+            if (!window.location.hash) {
+                window.scrollTo(0, 0);
+            }
         }
     }, [id, fetchData]);
+
+    useEffect(() => {
+        if (!loading && comments.length > 0) {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#comment-')) {
+                const commentId = hash.replace('#comment-', '');
+                setTimeout(() => {
+                    const element = document.getElementById(`comment-${commentId}`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        element.classList.add('ring-4', 'ring-blue-500/30', 'scale-[1.02]', 'z-50');
+                        setTimeout(() => {
+                            element.classList.remove('ring-4', 'ring-blue-500/30', 'scale-[1.02]', 'z-50');
+                        }, 4000);
+                    }
+                }, 1000); // Wait for animations and images to load
+            }
+        }
+    }, [loading, comments, id]);
 
     const handleToggleLike = async () => {
         if (!token) {
@@ -306,6 +327,10 @@ const ArticleDetail = () => {
     };
 
     const handleSpeak = (text: string, index: number, autoNext = false) => {
+        if (!token) {
+            showToast('Vui lòng đăng nhập để sử dụng tính năng nghe bài báo', 'info');
+            return;
+        }
         window.speechSynthesis.cancel();
         
         if (readingIndex === index && !autoNext) {
@@ -335,6 +360,10 @@ const ArticleDetail = () => {
     };
 
     const handleReadAll = () => {
+        if (!token) {
+            showToast('Vui lòng đăng nhập để sử dụng tính năng nghe bài báo', 'info');
+            return;
+        }
         if (isReadingAll) {
             window.speechSynthesis.cancel();
             setIsReadingAll(false);
@@ -371,7 +400,7 @@ const ArticleDetail = () => {
 
     const handleReportSubmit = async () => {
         if (!token) {
-            showToast('Vui lòng đăng nhập để báo cáo bài viết', 'error');
+            showToast('Vui lòng đăng nhập để báo cáo bài báo', 'error');
             return;
         }
         if (!reportReason) {
@@ -502,7 +531,7 @@ const ArticleDetail = () => {
                                 size="sm"
                                 icon={Volume2}
                                 onClick={handleReadAll}
-                                className={isReadingAll ? 'animate-pulse' : ''}
+                                className={`${isReadingAll ? 'animate-pulse' : ''} ${!token ? 'opacity-40 grayscale cursor-not-allowed' : ''}`}
                             >
                                 {isReadingAll ? 'Đang đọc...' : 'Nghe bài báo'}
                             </VButton>
@@ -526,9 +555,14 @@ const ArticleDetail = () => {
                                 </VButton>
                                 <VButton 
                                     variant="ghost" 
-                                    onClick={() => setShowReportModal(true)}
+                                    onClick={() => {
+                                        setReportingCommentId(null);
+                                        setReportReason("");
+                                        setReportDetails("");
+                                        setShowReportModal(true);
+                                    }}
                                     className="w-11 h-11 rounded-full p-0 flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-100 hover:bg-white hover:text-red-500 transition-all"
-                                    title="Báo cáo bài viết"
+                                    title="Báo cáo bài báo"
                                 >
                                     <AlertCircle size={22} />
                                 </VButton>
@@ -575,8 +609,8 @@ const ArticleDetail = () => {
                                             {block.type === 'p' && block.text && (
                                                 <button 
                                                     onClick={() => handleSpeak(block.text!, idx)}
-                                                    className={`absolute -right-10 top-2 p-2 rounded-full transition-all flex items-center justify-center ${readingIndex === idx ? 'text-blue-600 bg-blue-50 scale-110 shadow-sm' : 'opacity-0 group-hover/para:opacity-100 text-slate-300 hover:text-blue-600 hover:bg-slate-50'}`}
-                                                    title="Đọc đoạn này"
+                                                    className={`absolute -right-10 top-2 p-2 rounded-full transition-all flex items-center justify-center ${!token ? 'opacity-20 cursor-not-allowed' : (readingIndex === idx ? 'text-blue-600 bg-blue-50 scale-110 shadow-sm' : 'opacity-0 group-hover/para:opacity-100 text-slate-300 hover:text-blue-600 hover:bg-slate-50')}`}
+                                                    title={token ? "Đọc đoạn này" : "Vui lòng đăng nhập để nghe"}
                                                 >
                                                     <Volume2 size={14} className={readingIndex === idx ? 'animate-pulse' : ''} />
                                                 </button>
@@ -710,6 +744,12 @@ const ArticleDetail = () => {
                             <textarea 
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleAddComment(null as any);
+                                    }
+                                }}
                                 placeholder={token ? "Chia sẻ quan điểm của bạn..." : "Vui lòng đăng nhập để bình luận"}
                                 disabled={!token || submittingComment}
                                 className="w-full bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-6 text-sm font-bold placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none min-h-[120px] resize-none"
@@ -730,7 +770,7 @@ const ArticleDetail = () => {
                     <div className="space-y-12">
                         {comments.length > 0 ? comments.filter(c => !c.parent_id).map((comment) => (
                             <div key={comment.id} className="space-y-8">
-                                <div className={`flex gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 p-6 rounded-[2rem] transition-all ${Number(comment.is_vip) === 1 ? 'bg-gradient-to-br from-amber-50/50 to-transparent border-2 border-amber-200 shadow-xl shadow-amber-50 relative overflow-hidden' : ''}`}>
+                                <div id={`comment-${comment.id}`} className={`flex gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 p-6 rounded-[2rem] transition-all ${Number(comment.is_vip) === 1 ? 'bg-gradient-to-br from-amber-50/50 to-transparent border-2 border-amber-200 shadow-xl shadow-amber-50 relative overflow-hidden' : ''}`}>
                                     {Number(comment.is_vip) === 1 && (
                                         <div className="absolute top-0 right-0 p-2">
                                             <Crown size={14} className="text-amber-500 animate-pulse" />
@@ -747,6 +787,12 @@ const ArticleDetail = () => {
                                                     <textarea 
                                                         value={editingContent}
                                                         onChange={(e) => setEditingContent(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault();
+                                                                handleSaveEdit(comment.id);
+                                                            }
+                                                        }}
                                                         className="w-full bg-white border border-blue-100 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-blue-50 transition-all min-h-[80px] resize-none"
                                                         autoFocus
                                                     />
@@ -797,6 +843,8 @@ const ArticleDetail = () => {
                                                     className="hover:text-red-500 transition-colors flex items-center gap-1"
                                                     onClick={() => {
                                                         setReportingCommentId(comment.id);
+                                                        setReportReason("");
+                                                        setReportDetails("");
                                                         setShowReportModal(true);
                                                     }}
                                                 >
@@ -820,6 +868,12 @@ const ArticleDetail = () => {
                                                             <textarea 
                                                                 value={replyComment}
                                                                 onChange={(e) => setReplyComment(e.target.value)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                                                        e.preventDefault();
+                                                                        handleAddComment(null as any, comment.id);
+                                                                    }
+                                                                }}
                                                                 placeholder="Viết phản hồi của bạn..."
                                                                 className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none min-h-[100px] resize-none"
                                                             />
@@ -839,8 +893,8 @@ const ArticleDetail = () => {
                                 </div>
                                 
                                 <div className="ml-16 space-y-8 border-l-2 border-slate-50 pl-8">
-                                    {comments.filter(reply => reply.parent_id === comment.id).map(reply => (
-                                        <div key={reply.id} className={`flex gap-4 p-4 rounded-2xl transition-all ${Number(reply.is_vip) === 1 ? 'bg-amber-50/30 border border-amber-100 shadow-sm' : ''}`}>
+                                    {comments.filter(reply => Number(reply.parent_id) === Number(comment.id)).map(reply => (
+                                        <div key={reply.id} id={`comment-${reply.id}`} className={`flex gap-4 p-4 rounded-2xl transition-all duration-1000 ${Number(reply.is_vip) === 1 ? 'bg-amber-50/30 border border-amber-100 shadow-sm' : ''}`}>
                                             <VAvatar src={reply.avatar} name={reply.fullname} size="sm" className="rounded-xl" isVip={Number(reply.is_vip) === 1} />
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-1">
@@ -852,6 +906,12 @@ const ArticleDetail = () => {
                                                         <textarea 
                                                             value={editingContent}
                                                             onChange={(e) => setEditingContent(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                                    e.preventDefault();
+                                                                    handleSaveEdit(reply.id);
+                                                                }
+                                                            }}
                                                             className="w-full bg-white border border-blue-100 rounded-xl px-4 py-2 text-xs font-medium outline-none focus:ring-4 focus:ring-blue-50 transition-all min-h-[60px] resize-none"
                                                             autoFocus
                                                         />
@@ -895,6 +955,8 @@ const ArticleDetail = () => {
                                                         className="hover:text-red-500 transition-colors flex items-center gap-1"
                                                         onClick={() => {
                                                             setReportingCommentId(reply.id);
+                                                            setReportReason("");
+                                                            setReportDetails("");
                                                             setShowReportModal(true);
                                                         }}
                                                     >
@@ -937,7 +999,7 @@ const ArticleDetail = () => {
                             <div className="flex justify-between items-center mb-8">
                                 <div className="space-y-1">
                                     <h3 className="text-lg font-black text-slate-900 tracking-tighter uppercase">
-                                        {reportingCommentId ? 'Báo cáo bình luận' : 'Báo cáo bài viết'}
+                                        {reportingCommentId ? 'Báo cáo bình luận' : 'Báo cáo bài báo'}
                                     </h3>
                                     <p className="text-[10px] font-black text-slate-400 tracking-widest">Giúp chúng tôi cải thiện môi trường tin tức</p>
                                 </div>

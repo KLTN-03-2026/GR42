@@ -28,8 +28,8 @@ if (isPost()) {
     if (empty($fullname)) {
         $errors['fullname'] = 'Ho ten bat buoc phai nhap';
     } else {
-        if (mb_strlen($fullname) < 5) {
-            $errors['fullname'] = 'Ho ten phai hon 5 ki tu';
+        if (mb_strlen($fullname) < 6) {
+            $errors['fullname'] = 'Họ tên phải tối thiểu 6 ký tự';
         }
     }
 
@@ -50,7 +50,7 @@ if (isPost()) {
         $errors['password'] = 'Mat khau bat buoc phai nhap';
     } else {
         if (strlen($password) < 6) {
-            $errors['password'] = 'Mat khau phai lon hon 6 ki tu';
+            $errors['password'] = 'Mật khẩu phải tối thiểu 6 ký tự';
         }
     }
 
