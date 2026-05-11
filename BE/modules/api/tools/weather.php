@@ -7,7 +7,7 @@ $lon = isset($_GET['lon']) ? $_GET['lon'] : null;
 $q = isset($_GET['q']) ? $_GET['q'] : 'Hanoi';
 
 $apiKey = _OPENWEATHERMAP_API_KEY;
-$cacheDir = __DIR__ . '/../../cache';
+$cacheDir = __DIR__ . '/../cache';
 
 if (!is_dir($cacheDir)) {
     mkdir($cacheDir, 0777, true);
@@ -32,7 +32,7 @@ $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_TIMEOUT, 5); // 5 seconds timeout
+curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 $response = curl_exec($ch);
 $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curl_error = curl_error($ch);

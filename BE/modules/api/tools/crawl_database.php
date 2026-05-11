@@ -43,15 +43,10 @@ function cleanContent($html, $source = '')
     $html = trim(str_replace('""', '"', $html));
 
     if ($source === 'vietnamnet') {
-        // Cắt bỏ phần nội dung từ share-social trở đi
         $html = preg_replace('/<div[^>]*class="vnn-share-social share-social lg-hidden"[^>]*>[\s\S]*/i', '', $html);
-
-        // Loại bỏ các thẻ div chứa nội dung không liên quan (quảng cáo, bài liên quan, wiki)
         $html = preg_replace('/^(id="maincontent"|class="content-detail"|class="maincontent main-content")[^>]*>/i', '', $html);
         $html = preg_replace('/<div[^>]*class="[^"]*(ArticleRelate|article-relate|news-feature|related-news|insert-wiki-content|vnn-res-article-relate|vnn-title|vnn-source|vnn-author|vnn-social-share|vnn-box-app|vnn-google-news|vnn-tags|vnn-detail-author)[^"]*"[^>]*>[\s\S]*?<\/div>/i', '', $html);
         $html = preg_replace('/<table[^>]*class="[^"]*(vnn-quote)[^"]*"[^>]*>[\s\S]*?<\/table>/i', '', $html);
-
-        // Loại bỏ các hình ảnh icon hoặc logo nhỏ
         $html = preg_replace('/<img[^>]*class="[^"]*(vnn-source-icon|vnn-logo|social-icon|author-img|icon-app|icon-google-news)[^"]*"[^>]*>/i', '', $html);
     }
 
@@ -70,16 +65,11 @@ function cleanContent($html, $source = '')
             $node->parentNode->removeChild($node);
         }
     }
-
-
-
     $result = '';
-
     $body = $dom->getElementsByTagName('body')->item(0);
     if ($body) {
         $result = processNodes($body, $xpath);
     }
-
     return $result;
 }
 
@@ -104,14 +94,12 @@ function processNodes($parentNode, $xpath)
                 $src = $img->getAttribute('data-original')
                     ?: $img->getAttribute('data-src')
                     ?: $img->getAttribute('src');
-
                 if ($src) {
                     $caption = '';
                     $capNode = $xpath->query('.//figcaption|.//p[contains(@class, "caption")]|.//div[contains(@class, "caption")]', $node)->item(0);
                     if ($capNode) {
                         $caption = trim($capNode->textContent);
                     }
-
                     $content .= "
                         <figure class='news-image'>
                             <img src='$src' loading='lazy'>
@@ -130,11 +118,9 @@ function makeThumbnailUrl($url)
 {
     if (!$url)
         return '';
-
     if (strpos($url, "thanhnien.vn") !== false) {
         return preg_replace('/w=\d+/', 'w=200', $url);
     }
-
     if (strpos($url, "tuoitre.vn") !== false) {
         if (strpos($url, "zoom=") !== false) {
             return preg_replace('/zoom=\d+/', 'zoom=2', $url);
@@ -146,7 +132,6 @@ function makeThumbnailUrl($url)
 
 $jsonUrl = _JSON_URL_SHEET;
 $response = fetchUrl($jsonUrl);
-
 if (is_array($response) && isset($response['error'])) {
     die(json_encode([
         "status" => "error",
@@ -166,20 +151,19 @@ $start = strpos($response, '{');
 $end = strrpos($response, '}') + 1;
 $json = substr($response, $start, $end - $start);
 $data = json_decode($json, true);
-
 if (!$data) {
     die(json_encode([
         "status" => "error",
         "message" => "JSON decode loi tu chuoi Google Sheet"
     ]));
 }
-$sql = "INSERT INTO crawl_news (id, title, link, image, pubdate, source, savedtime, category, content) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE title = VALUES(title), link = VALUES(link),
-        image = VALUES(image), pubdate = VALUES(pubdate), source = VALUES(source), savedtime = VALUES(savedtime),
-        category = VALUES(category), content = VALUES(content)";
-$stmt = $conn->prepare($sql);
-
-if (!$stmt) {
+$checkSql = "SELECT id FROM crawl_news WHERE link = ?";
+$checkStmt = $conn->prepare($checkSql);
+$updateSql = "UPDATE crawl_news SET title=?, image=?, pubdate=?, source=?, savedtime=?, category=?, content=? WHERE id=?";
+$updateStmt = $conn->prepare($updateSql);
+$insertSql = "INSERT INTO crawl_news (title, link, image, pubdate, source, savedtime, category, content) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+$insertStmt = $conn->prepare($insertSql);
+if (!$checkStmt || !$updateStmt || !$insertStmt) {
     die(json_encode([
         "status" => "error",
         "message" => "Prepare loi: " . $conn->error
@@ -189,23 +173,17 @@ if (!$stmt) {
 $newCount = 0;
 $updateCount = 0;
 $skipCount = 0;
-
 if (isset($data['table']['rows']) && is_array($data['table']['rows'])) {
     $rows = $data['table']['rows'];
-
     foreach ($rows as $index => $row) {
         if ($index == 0)
             continue;
-
-        $id = (int) ($row['c'][0]['v'] ?? 0);
         $title = cleanText($row['c'][1]['v'] ?? '');
         $link = $row['c'][2]['v'] ?? '';
-
-        if (!$id || !$title || !$link) {
+        if (!$title || !$link) {
             $skipCount++;
             continue;
         }
-
         $imageRaw = $row['c'][3]['v'] ?? '';
         $image = makeThumbnailUrl($imageRaw);
         $pubdate = !empty($row['c'][4]['v']) ? date("Y-m-d H:i:s", strtotime($row['c'][4]['v'])) : null;
@@ -214,20 +192,32 @@ if (isset($data['table']['rows']) && is_array($data['table']['rows'])) {
         $contentRaw = isset($row['c'][8]['v']) ? $row['c'][8]['v'] : '';
         $content = cleanContent($contentRaw, $source);
         $savedtime = date("Y-m-d H:i:s");
-        $stmt->bind_param("issssssss", $id, $title, $link, $image, $pubdate, $source, $savedtime, $category, $content);
-
-        if ($stmt->execute()) {
-            if ($stmt->affected_rows == 1) {
-                $newCount++;
-            } else {
+        $checkStmt->bind_param("s", $link);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
+        if ($checkResult->num_rows > 0) {
+            $existingRow = $checkResult->fetch_assoc();
+            $existingId = $existingRow['id'];
+            $updateStmt->bind_param("sssssssi", $title, $image, $pubdate, $source, $savedtime, $category, $content, $existingId);
+            if ($updateStmt->execute()) {
                 $updateCount++;
+            } else {
+                $skipCount++;
             }
         } else {
-            $skipCount++;
+            $insertStmt->bind_param("ssssssss", $title, $link, $image, $pubdate, $source, $savedtime, $category, $content);
+            if ($insertStmt->execute()) {
+                $newCount++;
+            } else {
+                $skipCount++;
+            }
         }
     }
 }
-$stmt->close();
+$checkStmt->close();
+$updateStmt->close();
+$insertStmt->close();
+$conn->query("DELETE FROM crawl_news WHERE savedtime < DATE_SUB(NOW(), INTERVAL 7 DAY)");
 
 echo json_encode([
     "status" => "success",
