@@ -1,4 +1,4 @@
-# 🚀 Vertex
+## Vertex
 
 *Nền Tảng Tin Tức & Tổng Hợp Trí Tuệ Nhân Tạo Hiện Đại*
 
@@ -60,7 +60,7 @@ Vertex được xây dựng trên một kiến trúc hiện đại, linh hoạt,
 | **Backend** | Vanilla PHP (PHP 8.x) | Kiến trúc Smart Routing, RESTful API, cURL xử lý HTTP Request tốc độ cao. |
 | **Database** | MySQL | Quản lý quan hệ dữ liệu hiệu quả, cấu trúc chuẩn hóa cho Crawler & Auth. |
 | **AI Integration** | Gemini 2.5 Flash API | AI Engine chính xử lý phân tích ngôn ngữ tự nhiên và tóm tắt. |
-| **Third-Party** | SePay, OpenWeatherMap, Google OAuth | Tích hợp cổng thanh toán, thời tiết và xác thực tài khoản. |
+| **Third-Party** | SePay, OpenWeatherMap, Google OAuth2.0 | Tích hợp cổng thanh toán, thời tiết và xác thực tài khoản. |
 
 ---
 
@@ -101,18 +101,16 @@ GR42/
 Làm theo các bước sau để chạy dự án trong môi trường phát triển (Local).
 
 ### Yêu Cầu Hệ Thống
-- [Laragon](https://laragon.org/) hoặc XAMPP (khuyến khích Laragon).
-- PHP >= 8.1.
-- MySQL >= 8.0.
-- [Node.js](https://nodejs.org/) >= 18.x và npm.
-- Composer (Nếu có sử dụng thư viện ngoài cho PHP).
+- **Môi trường Web Server:** [Laragon](https://laragon.org/) hoặc XAMPP (khuyến khích dùng Laragon).
+- **Backend:** PHP >= 8.1 và MySQL >= 8.0.
+- **Frontend (Môi trường phát triển):** [Node.js](https://nodejs.org/) >= 18.x và `npm` 
 
 ### Bước 1: Cấu hình Backend
 1. Clone dự án và đặt thư mục `GR42` vào thư mục `www` của Laragon (VD: `C:\laragon\www\GR42`).
 2. Khởi động dịch vụ **Apache** và **MySQL** trên Laragon.
 3. Tạo một database mới tên là `crawl_news` (Collation: `utf8mb4_general_ci`).
 4. Import file SQL cấu trúc mẫu vào DB: `BE/database/crawl_news.sql`.
-5. Tạo tệp `.env` ở thư mục gốc (hoặc copy từ `.env.example` nếu có) và cấu hình lại thông số:
+5. Tạo tệp `.env` ở thư mục gốc (hoặc copy từ `.env.example`) và cấu hình lại thông số:
    ```env
    # Database Configuration
    DB_HOST=localhost
@@ -123,6 +121,19 @@ Làm theo các bước sau để chạy dự án trong môi trường phát tri�
    # API Keys
    GEMINI_API_KEY=your_gemini_api_key_here
    WEATHER_API_KEY=your_openweathermap_api_key
+   
+   #JSON URL GGSHEET (ex)
+   JSON_URL_SHEET="YOUR_JSON_GG_SHEET_HERE"
+
+   #SEPAY (ex)
+   SEPAY_TOKEN="SEPAY_TOKEN_HERE"
+
+   #MAILER
+   MAIL_HOST="smtp.gmail.com"
+   MAIL_USERNAME="GMAIL_USER_HERE"
+   MAIL_PASSWORD="GMAIL_PASSWORD_HERE"
+   MAIL_PORT=465
+   MAIL_FROM_NAME="Vertex"
    ```
 
 ### Bước 2: Cấu hình Frontend

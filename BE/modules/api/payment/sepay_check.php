@@ -96,6 +96,6 @@ if ($foundVIP) {
     update('users', ['is_vip' => 1], "id = $user_id");
     echo json_encode(['status' => 'success', 'is_vip' => 1, 'message' => 'Xác nhận thanh toán thành công. Tài khoản đã được nâng cấp VIP!']);
 } else {
-    echo json_encode(['status' => 'pending', 'is_vip' => 0, 'message' => 'Chưa tìm thấy giao dịch thanh toán hoặc giao dịch đang được xử lý.']);
+    echo json_encode(['status' => 'pending', 'is_vip' => 0, 'message' => 'Không tìm thấy giao dịch hợp lệ. Vui lòng kiểm tra lại.']);
 }
 ?>

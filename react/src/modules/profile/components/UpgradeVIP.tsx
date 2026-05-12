@@ -48,10 +48,10 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
         if (updatedIsVip) {
           if (!silent) alert(res.data.message || 'Chúc mừng! Tài khoản của bạn đã được nâng cấp lên VIP thành công.');
         } else {
-          if (!silent) alert('Chưa nhận được thanh toán hoặc giao dịch đang được xử lý. Vui lòng thử lại sau ít phút.');
+          if (!silent) alert('Không tìm thấy giao dịch hợp lệ. Vui lòng kiểm tra lại.');
         }
       } else if (res.data.status === 'pending') {
-        if (!silent) alert(res.data.message || 'Chưa tìm thấy giao dịch thanh toán hoặc giao dịch đang được xử lý.');
+        if (!silent) alert(res.data.message || 'Không tìm thấy giao dịch hợp lệ. Vui lòng kiểm tra lại.');
       } else {
         if (!silent) alert(res.data.message || 'Có lỗi xảy ra khi kiểm tra.');
       }
@@ -63,13 +63,12 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
     }
   };
 
-  // Tự động kiểm tra sau mỗi 5 giây nếu chưa là VIP
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (!isVip && authToken) {
       interval = setInterval(() => {
         handleCheckStatus(true);
-      }, 5000);
+      }, 2000);
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -92,10 +91,9 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
           <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">Đặc quyền của bạn</h4>
           <ul className="space-y-4 text-left">
             {[
-              'Đọc báo không giới hạn mọi chuyên mục',
+              'Tóm tắt báo không giới hạn mọi chuyên mục',
               'Tắt toàn bộ quảng cáo',
-              'Đánh dấu và lưu trữ bài viết yêu thích',
-              'Bình luận ưu tiên'
+              'Bình luận hiển thị và bình luận nổi bật'
             ].map((perk, i) => (
               <li key={i} className="flex items-center gap-3 text-sm font-bold text-slate-600">
                 <CheckCircle size={20} className="text-green-500 shrink-0" />
