@@ -31,7 +31,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const currentKeyword = searchParams.get('keyword') || '';
-  
+
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -46,7 +46,7 @@ const Home = () => {
     if (!token) return;
     try {
       const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-      
+
       // Fetch favorites
       const favRes = await axios.get(`${host}/BE/index.php`, {
         params: { module: 'api', action: 'favorites', token, action_type: 'list' }
@@ -151,9 +151,9 @@ const Home = () => {
 
   useEffect(() => {
     if (featuredItems.length <= 1) return;
-    
+
     const timer = setInterval(() => {
-        setActiveFeaturedIndex((prev) => (prev + 1) % featuredItems.length);
+      setActiveFeaturedIndex((prev) => (prev + 1) % featuredItems.length);
     }, 5000);
 
     return () => clearInterval(timer);
@@ -164,7 +164,7 @@ const Home = () => {
 
   useEffect(() => {
     if (featuredItem) {
-        setIsFavFeatured(featuredItem.is_favourite || false);
+      setIsFavFeatured(featuredItem.is_favourite || false);
     }
   }, [featuredItem]);
 
@@ -172,7 +172,7 @@ const Home = () => {
     e.preventDefault();
     e.stopPropagation();
     if (!featuredItem) return;
-    
+
     const token = localStorage.getItem('auth_token');
     if (!token) {
       showToast('Vui lòng đăng nhập để thực hiện tính năng này', 'error');
@@ -182,32 +182,32 @@ const Home = () => {
     if (isLikingFeatured) return;
 
     try {
-        setIsLikingFeatured(true);
-        const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-        const response = await axios.post(`${host}/BE/index.php?module=api&action=favorites`, {
-            news_id: featuredItem.id,
-            token: token,
-            action_type: 'toggle'
-        });
+      setIsLikingFeatured(true);
+      const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
+      const response = await axios.post(`${host}/BE/index.php?module=api&action=favorites`, {
+        news_id: featuredItem.id,
+        token: token,
+        action_type: 'toggle'
+      });
 
-        if (response.data.status === 'success') {
-            const isAdded = response.data.action === 'added';
-            setIsFavFeatured(isAdded);
-            setNews(prev => prev.map(n => 
-                n.id === featuredItem.id ? { ...n, is_favourite: isAdded } : n
-            ));
-        }
+      if (response.data.status === 'success') {
+        const isAdded = response.data.action === 'added';
+        setIsFavFeatured(isAdded);
+        setNews(prev => prev.map(n =>
+          n.id === featuredItem.id ? { ...n, is_favourite: isAdded } : n
+        ));
+      }
     } catch (error) {
-        console.error('Error toggling favorite:', error);
+      console.error('Error toggling favorite:', error);
     } finally {
-        setIsLikingFeatured(false);
+      setIsLikingFeatured(false);
     }
   };
 
   const handleCommentFeatured = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (featuredItem) {
-        navigate(`/article/${featuredItem.id}#comments`);
+      navigate(`/article/${featuredItem.id}#comments`);
     }
   };
 
@@ -218,15 +218,14 @@ const Home = () => {
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            className={`whitespace-nowrap text-sm md:text-base font-black transition-all duration-300 relative py-2 ${
-              selectedCategory === cat.id 
-                ? 'text-blue-600' 
+            className={`whitespace-nowrap text-sm md:text-base font-black transition-all duration-300 relative py-2 ${selectedCategory === cat.id
+                ? 'text-blue-600'
                 : 'text-slate-400 hover:text-slate-900'
-            }`}
+              }`}
           >
             {cat.name}
             {selectedCategory === cat.id && (
-              <motion.div 
+              <motion.div
                 layoutId="categoryUnderline"
                 className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-full"
               />
@@ -234,7 +233,7 @@ const Home = () => {
           </button>
         ))}
       </div>
- 
+
       {currentKeyword ? (
         <div className="mb-16">
           <div className="flex items-center gap-4 mb-10">
@@ -242,24 +241,24 @@ const Home = () => {
               <Search size={24} />
             </div>
             <div>
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Kết quả tìm kiếm</h2>
-                <p className="text-sm font-bold text-slate-400 tracking-widest mt-1">Tìm thấy {news.length} bài viết cho "{currentKeyword}"</p>
+              <h2 className="text-3xl font-black text-slate-900 tracking-tight">Kết quả tìm kiếm</h2>
+              <p className="text-sm font-bold text-slate-400 tracking-widest mt-1">Tìm thấy {news.length} bài viết cho "{currentKeyword}"</p>
             </div>
           </div>
-          
+
           {news.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {news.map(item => (
-                    <NewsCard key={item.id} item={item} />
-                ))}
+              {news.map(item => (
+                <NewsCard key={item.id} item={item} />
+              ))}
             </div>
           ) : (
             <div className="py-20 text-center bg-white rounded-[3rem] border border-slate-100 shadow-xl">
-                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
-                    <Search size={40} />
-                </div>
-                <h3 className="text-xl font-black text-slate-900 mb-2">Không tìm thấy kết quả</h3>
-                <p className="text-slate-400 font-medium">Thử lại với từ khóa khác nhé!</p>
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
+                <Search size={40} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2">Không tìm thấy kết quả</h3>
+              <p className="text-slate-400 font-medium">Thử lại với từ khóa khác nhé!</p>
             </div>
           )}
         </div>
@@ -278,133 +277,138 @@ const Home = () => {
                     className="absolute inset-0 cursor-pointer"
                     onClick={() => navigate(`/article/${encodeId(featuredItem.id)}`)}
                   >
-                    <img 
-                      src={featuredItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop'} 
+                    <img
+                      src={featuredItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop'}
                       alt={featuredItem.title}
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
-                    
+
                     <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full max-w-3xl">
-                        <motion.span 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2 }}
-                          className="inline-block px-3 py-1 bg-blue-600 rounded-lg text-white text-[10px] font-black tracking-widest mb-6"
-                        >
-                            TIÊU ĐIỂM
-                        </motion.span>
-                        <motion.h3 
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 }}
-                          className="text-xl md:text-3xl font-black text-white leading-tight mb-4 group-hover:text-blue-400 transition-colors"
-                        >
-                            {featuredItem.title}
-                        </motion.h3>
+                      <motion.span
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="inline-block px-3 py-1 bg-blue-600 rounded-lg text-white text-[10px] font-black tracking-widest mb-6"
+                      >
+                        TIÊU ĐIỂM
+                      </motion.span>
+                      <motion.h3
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-xl md:text-3xl font-black text-white leading-tight mb-4 group-hover:text-blue-400 transition-colors"
+                      >
+                        {featuredItem.title}
+                      </motion.h3>
                     </div>
                   </motion.div>
                 </AnimatePresence>
 
                 <div className="absolute bottom-10 right-10 flex items-center gap-4 z-20">
-                    <div className="flex gap-2 mr-4">
-                        {featuredItems.map((_, idx) => (
-                            <button
-                                key={idx}
-                                onClick={(e) => { e.stopPropagation(); setActiveFeaturedIndex(idx); }}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${activeFeaturedIndex === idx ? 'w-8 bg-blue-500' : 'bg-white/30 hover:bg-white/50'}`}
-                            />
-                        ))}
-                    </div>
-                    <div className="flex gap-2">
-                        <VButton
-                            variant="dark"
-                            size="sm"
-                            className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/10 border-white/20 text-white hover:bg-white/20"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveFeaturedIndex((prev) => (prev - 1 + featuredItems.length) % featuredItems.length);
-                            }}
-                        >
-                            <ChevronLeft size={20} />
-                        </VButton>
-                        <VButton
-                            variant="dark"
-                            size="sm"
-                            className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/10 border-white/20 text-white hover:bg-white/20"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveFeaturedIndex((prev) => (prev + 1) % featuredItems.length);
-                            }}
-                        >
-                            <ChevronRight size={20} />
-                        </VButton>
-                    </div>
-                </div>
-                
-                <div className="absolute top-6 right-6 flex flex-col gap-4 z-10">
+                  <div className="flex gap-2 mr-4">
+                    {featuredItems.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => { e.stopPropagation(); setActiveFeaturedIndex(idx); }}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${activeFeaturedIndex === idx ? 'w-8 bg-blue-500' : 'bg-white/30 hover:bg-white/50'}`}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
                     <VButton
                       variant="dark"
-                      onClick={handleToggleLikeFeatured}
-                      loading={isLikingFeatured}
-                      className={`w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md transition-all ${isFavFeatured ? 'bg-red-500 border-red-500 text-white' : 'bg-slate-900/80 border-slate-700/50 text-white'}`}
+                      size="sm"
+                      className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/10 border-white/20 text-white hover:bg-white/20"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveFeaturedIndex((prev) => (prev - 1 + featuredItems.length) % featuredItems.length);
+                      }}
                     >
-                        <Heart size={22} fill={isFavFeatured ? 'currentColor' : 'none'} className="transition-transform duration-300 group-hover:scale-110" />
+                      <ChevronLeft size={20} />
                     </VButton>
                     <VButton
                       variant="dark"
-                      onClick={handleCommentFeatured}
-                      icon={MessageCircle}
-                      className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-slate-900/80 border-slate-700/50 text-white"
-                    />
-                    <VButton
-                      variant="dark"
+                      size="sm"
+                      className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/10 border-white/20 text-white hover:bg-white/20"
                       onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          if (featuredItem && navigator.share) {
-                              navigator.share({ title: featuredItem.title, url: featuredItem.link })
-                                  .catch(err => {
-                                      if (err.name !== 'AbortError') {
-                                          navigator.clipboard.writeText(featuredItem.link)
-                                              .then(() => showToast('Đã sao chép liên kết!', 'success'))
-                                              .catch(() => {});
-                                      }
-                                  });
-                          } else if (featuredItem) {
-                              navigator.clipboard.writeText(featuredItem.link)
-                                  .then(() => showToast('Đã sao chép liên kết!', 'success'))
-                                  .catch(() => {});
-                          }
+                        e.stopPropagation();
+                        setActiveFeaturedIndex((prev) => (prev + 1) % featuredItems.length);
                       }}
-                      icon={Share2}
-                      className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-slate-900/80 border-slate-700/50 text-white"
-                    />
+                    >
+                      <ChevronRight size={20} />
+                    </VButton>
+                  </div>
+                </div>
+
+                <div className="absolute top-6 right-6 flex flex-col gap-4 z-10">
+                  <VButton
+                    variant="dark"
+                    onClick={handleToggleLikeFeatured}
+                    loading={isLikingFeatured}
+                    className={`w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md transition-all ${isFavFeatured ? 'bg-red-500 border-red-500 text-white' : 'bg-slate-900/80 border-slate-700/50 text-white'}`}
+                  >
+                    <Heart size={22} fill={isFavFeatured ? 'currentColor' : 'none'} className="transition-transform duration-300 group-hover:scale-110" />
+                  </VButton>
+                  <VButton
+                    variant="dark"
+                    onClick={handleCommentFeatured}
+                    icon={MessageCircle}
+                    className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-slate-900/80 border-slate-700/50 text-white"
+                  />
+                  <VButton
+                    variant="dark"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      const token = localStorage.getItem('auth_token');
+                      if (!token) {
+                        showToast('Vui lòng đăng nhập để chia sẻ bài báo', 'error');
+                        return;
+                      }
+                      if (featuredItem && navigator.share) {
+                        navigator.share({ title: featuredItem.title, url: featuredItem.link })
+                          .catch(err => {
+                            if (err.name !== 'AbortError') {
+                              navigator.clipboard.writeText(featuredItem.link)
+                                .then(() => showToast('Đã sao chép liên kết!', 'success'))
+                                .catch(() => { });
+                            }
+                          });
+                      } else if (featuredItem) {
+                        navigator.clipboard.writeText(featuredItem.link)
+                          .then(() => showToast('Đã sao chép liên kết!', 'success'))
+                          .catch(() => { });
+                      }
+                    }}
+                    icon={Share2}
+                    className="w-12 h-12 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-slate-900/80 border-slate-700/50 text-white"
+                  />
                 </div>
               </div>
               <div className="lg:col-span-4 flex flex-col">
                 <div className="flex items-center justify-between mb-8">
-                    <h3 className="font-black text-slate-900 tracking-widest">Thịnh hành</h3>
-                    <div className="h-1 flex-1 bg-slate-100 ml-4 rounded-full"></div>
+                  <h3 className="font-black text-slate-900 tracking-widest">Thịnh hành</h3>
+                  <div className="h-1 flex-1 bg-slate-100 ml-4 rounded-full"></div>
                 </div>
                 <div className="space-y-6">
-                    {trendingItems.map((item, idx) => (
-                        <div 
-                        key={item.id} 
-                        className="flex gap-4 group cursor-pointer"
-                        onClick={() => navigate(`/article/${encodeId(item.id)}`)}
-                        >
-                            <span className="text-3xl font-black text-slate-100 group-hover:text-blue-600/10 transition-colors leading-none pt-1">
-                                0{idx + 1}
-                            </span>
-                            <div className="flex-1">
-                                <CategoryBadge name={item.category} showIcon={false} className="mb-2" />
-                                <h4 className="font-bold text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
-                                    {item.title}
-                                </h4>
-                            </div>
-                        </div>
-                    ))}
+                  {trendingItems.map((item, idx) => (
+                    <div
+                      key={item.id}
+                      className="flex gap-4 group cursor-pointer"
+                      onClick={() => navigate(`/article/${encodeId(item.id)}`)}
+                    >
+                      <span className="text-3xl font-black text-slate-100 group-hover:text-blue-600/10 transition-colors leading-none pt-1">
+                        0{idx + 1}
+                      </span>
+                      <div className="flex-1">
+                        <CategoryBadge name={item.category} showIcon={false} className="mb-2" />
+                        <h4 className="font-bold text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                          {item.title}
+                        </h4>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -425,7 +429,7 @@ const Home = () => {
                 ))}
               </div>
             </div>
-            
+
             {withoutImage.length > 0 && (
               <div className="lg:col-span-4">
                 <div className="sticky top-24 space-y-12">
@@ -440,8 +444,8 @@ const Home = () => {
                       </div>
                       <div className="space-y-6">
                         {favorites.map((item) => (
-                          <div 
-                            key={`fav-${item.id}`} 
+                          <div
+                            key={`fav-${item.id}`}
                             className="group cursor-pointer flex gap-4 items-start"
                             onClick={() => navigate(`/article/${encodeId(item.id)}`)}
                           >
@@ -470,8 +474,8 @@ const Home = () => {
                       </div>
                       <div className="space-y-6">
                         {history.map((item) => (
-                          <div 
-                            key={`hist-${item.id}`} 
+                          <div
+                            key={`hist-${item.id}`}
                             className="group cursor-pointer flex gap-4 items-start"
                             onClick={() => navigate(`/article/${encodeId(item.id)}`)}
                           >
@@ -496,8 +500,8 @@ const Home = () => {
                     </div>
                     <div className="space-y-8">
                       {withoutImage.map((item) => (
-                        <div 
-                          key={item.id} 
+                        <div
+                          key={item.id}
                           className="group cursor-pointer border-b border-slate-50 pb-8 last:border-0 hover:bg-slate-50/50 -mx-4 px-4 rounded-2xl transition-all"
                           onClick={() => navigate(`/article/${encodeId(item.id)}`)}
                         >
@@ -527,7 +531,7 @@ const Home = () => {
 
       {loading && (
         <div className="flex flex-col items-center justify-center py-20">
-           <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4 opacity-20" />
+          <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4 opacity-20" />
         </div>
       )}
 
@@ -535,32 +539,32 @@ const Home = () => {
         {hasMore ? (
           <div className="w-full flex flex-col items-center gap-6">
             <div ref={observerTarget} className="h-10 w-full flex items-center justify-center">
-                {loading && (
-                    <div className="flex flex-col items-center gap-2">
-                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin opacity-40" />
-                        <p className="text-[10px] font-black text-slate-400 tracking-widest">Đang tự động tải thêm...</p>
-                    </div>
-                )}
+              {loading && (
+                <div className="flex flex-col items-center gap-2">
+                  <Loader2 className="w-8 h-8 text-blue-600 animate-spin opacity-40" />
+                  <p className="text-[10px] font-black text-slate-400 tracking-widest">Đang tự động tải thêm...</p>
+                </div>
+              )}
             </div>
-            
+
             {!loading && (
-                <VButton
-                    variant="ghost"
-                    onClick={handleLoadMore}
-                    className="px-10 py-4 rounded-2xl bg-white border border-slate-100 hover:border-blue-100 transition-all group"
-                >
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-sm font-black text-slate-900 tracking-widest group-hover:text-blue-600">Tải thêm bài viết</span>
-                        <p className="text-[9px] font-bold text-slate-400 tracking-widest mt-1">Bấm nếu không tự động tải</p>
-                    </div>
-                </VButton>
+              <VButton
+                variant="ghost"
+                onClick={handleLoadMore}
+                className="px-10 py-4 rounded-2xl bg-white border border-slate-100 hover:border-blue-100 transition-all group"
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-sm font-black text-slate-900 tracking-widest group-hover:text-blue-600">Tải thêm bài viết</span>
+                  <p className="text-[9px] font-bold text-slate-400 tracking-widest mt-1">Bấm nếu không tự động tải</p>
+                </div>
+              </VButton>
             )}
           </div>
         ) : (
           news.length > 0 && (
             <div className="flex flex-col items-center gap-4 py-10 opacity-50">
-                <div className="w-12 h-1 bg-slate-200 rounded-full mb-2"></div>
-                <p className="text-[10px] font-black text-slate-400 tracking-[0.4em]">Bạn đã xem hết tin tức hôm nay</p>
+              <div className="w-12 h-1 bg-slate-200 rounded-full mb-2"></div>
+              <p className="text-[10px] font-black text-slate-400 tracking-[0.4em]">Bạn đã xem hết tin tức hôm nay</p>
             </div>
           )
         )}

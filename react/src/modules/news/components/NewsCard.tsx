@@ -38,7 +38,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
   const handleToggleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const token = localStorage.getItem('auth_token');
     if (!token) {
       alert('Vui lòng đăng nhập để thực hiện tính năng này');
@@ -75,13 +75,13 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
 
   if (featured) {
     return (
-      <div 
+      <div
         className="group relative aspect-[16/10] rounded-[2rem] overflow-hidden bg-slate-900 border border-slate-100 shadow-xl cursor-pointer"
         onClick={() => navigate(`/article/${encodeId(item.id)}`)}
       >
         {imageUrl ? (
-          <img 
-            src={imageUrl} 
+          <img
+            src={imageUrl}
             alt={item.title}
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop';
@@ -90,16 +90,16 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center p-12 text-center">
-             <div className="space-y-4">
-                <CategoryBadge name={item.category} className="mx-auto" />
-                <h3 className="text-xl font-black text-white/40 uppercase tracking-widest leading-tight">{item.source}</h3>
-             </div>
+            <div className="space-y-4">
+              <CategoryBadge name={item.category} className="mx-auto" />
+              <h3 className="text-xl font-black text-white/40 uppercase tracking-widest leading-tight">{item.source}</h3>
+            </div>
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
-        
+
         <div className="absolute top-6 right-6 flex flex-col gap-3 z-10">
-          <VButton 
+          <VButton
             variant={isFav ? 'primary' : 'outline'}
             onClick={handleToggleLike}
             loading={isLiking}
@@ -107,7 +107,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
             iconSize={22}
             className={`w-11 h-11 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFav ? 'bg-red-500 border-red-500 text-white' : 'bg-white/10 border-white/20 text-white'}`}
           />
-          <VButton 
+          <VButton
             variant="outline"
             onClick={handleCommentClick}
             icon={MessageCircle}
@@ -117,51 +117,56 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
         </div>
 
         <div className="absolute bottom-0 left-0 p-8 w-full pr-20">
-            <CategoryBadge name={item.category} className="mb-3" />
-            <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
-                <Link to={`/article/${item.id}`}>{item.title}</Link>
-            </h3>
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{item.source} • {item.pubDate}</p>
-              <VButton 
-                variant="ghost" size="sm" icon={Share2}
-                onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (navigator.share) {
-                        navigator.share({ title: item.title, url: item.link });
-                    } else {
-                        navigator.clipboard.writeText(item.link);
-                        alert('Đã sao chép liên kết!');
-                    }
-                }}
-                className="text-white/40 p-0"
-                title="Chia sẻ"
-              />
-            </div>
+          <CategoryBadge name={item.category} className="mb-3" />
+          <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
+            <Link to={`/article/${item.id}`}>{item.title}</Link>
+          </h3>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{item.source} • {item.pubDate}</p>
+            <VButton
+              variant="ghost" size="sm" icon={Share2}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                  alert('Vui lòng đăng nhập để chia sẻ bài báo');
+                  return;
+                }
+                if (navigator.share) {
+                  navigator.share({ title: item.title, url: item.link });
+                } else {
+                  navigator.clipboard.writeText(item.link);
+                  alert('Đã sao chép liên kết!');
+                }
+              }}
+              className="text-white/40 p-0"
+              title="Chia sẻ"
+            />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div 
+    <div
       className="flex flex-col h-full group bg-transparent cursor-pointer"
       onClick={() => navigate(`/article/${encodeId(item.id)}`)}
     >
       {imageUrl && (
         <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden mb-6 bg-slate-100 border border-slate-50 shadow-sm group-hover:shadow-xl transition-all duration-500">
-          <img 
-            src={imageUrl} 
-            alt={item.title} 
+          <img
+            src={imageUrl}
+            alt={item.title}
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5a?q=80&w=2070&auto=format&fit=crop';
             }}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
-          
+
           <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-            <VButton 
+            <VButton
               variant={isFav ? 'primary' : 'outline'}
               onClick={handleToggleLike}
               loading={isLiking}
@@ -169,28 +174,33 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
               iconSize={20}
               className={`w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md ${isFav ? 'bg-red-500 border-red-500 text-white' : 'bg-white/80 border-white/40 text-slate-800'}`}
             />
-            <VButton 
+            <VButton
               variant="outline"
               onClick={handleCommentClick}
               icon={MessageCircle}
               iconSize={20}
               className="w-10 h-10 rounded-full p-0 flex items-center justify-center backdrop-blur-md bg-white/80 border-white/40 text-slate-800"
             />
-            <VButton 
+            <VButton
               variant="outline"
               onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const shareData = { title: item.title, url: item.link };
-                  if (navigator.share) {
-                      navigator.share(shareData).catch(() => {
-                          navigator.clipboard.writeText(item.link);
-                          alert('🚀 Đã sao chép liên kết!');
-                      });
-                  } else {
-                      navigator.clipboard.writeText(item.link);
-                      alert('🚀 Đã sao chép liên kết!');
-                  }
+                e.preventDefault();
+                e.stopPropagation();
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                  alert('Vui lòng đăng nhập để chia sẻ bài báo');
+                  return;
+                }
+                const shareData = { title: item.title, url: item.link };
+                if (navigator.share) {
+                  navigator.share(shareData).catch(() => {
+                    navigator.clipboard.writeText(item.link);
+                    alert('Đã sao chép liên kết!');
+                  });
+                } else {
+                  navigator.clipboard.writeText(item.link);
+                  alert('Đã sao chép liên kết!');
+                }
               }}
               icon={Share2}
               iconSize={20}
@@ -200,29 +210,29 @@ const NewsCard: React.FC<NewsCardProps> = ({ item, featured = false }) => {
           </div>
 
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-              <div className="p-4 bg-white/90 backdrop-blur-md rounded-full text-slate-900 shadow-2xl hover:bg-blue-600 hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0">
-                  <ArrowRight size={24} />
-              </div>
+            <div className="p-4 bg-white/90 backdrop-blur-md rounded-full text-slate-900 shadow-2xl hover:bg-blue-600 hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0">
+              <ArrowRight size={24} />
+            </div>
           </div>
 
           <div className="absolute top-4 left-4">
-              <CategoryBadge name={item.category} className="bg-white/90 backdrop-blur-md shadow-sm border-white" />
+            <CategoryBadge name={item.category} className="bg-white/90 backdrop-blur-md shadow-sm border-white" />
           </div>
         </div>
       )}
 
       <div className="flex-1 flex flex-col items-start px-2">
         <div className="flex items-center gap-3 mb-3 text-slate-400">
-            <span className="text-[10px] font-black uppercase tracking-[0.1em]">{item.source}</span>
-            <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-            <div className="flex items-center gap-1.5 text-[10px] font-bold">
-                <Clock size={12} className="text-slate-300" />
-                {item.pubDate}
-            </div>
+          <span className="text-[10px] font-black uppercase tracking-[0.1em]">{item.source}</span>
+          <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+          <div className="flex items-center gap-1.5 text-[10px] font-bold">
+            <Clock size={12} className="text-slate-300" />
+            {item.pubDate}
+          </div>
         </div>
-        
+
         <h3 className="font-black text-lg text-slate-800 mb-4 line-clamp-2 leading-[1.3] group-hover:text-blue-600 transition-colors tracking-tight">
-            {item.title}
+          {item.title}
         </h3>
 
         <div className="mt-auto pt-4 flex items-center justify-between w-full border-t border-slate-100">

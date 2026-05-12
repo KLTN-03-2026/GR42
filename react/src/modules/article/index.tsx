@@ -78,11 +78,11 @@ const ArticleDetail = () => {
         try {
             setLoading(true);
             const res = await axios.get(`${API_BASE_URL}/index.php`, {
-                params: { 
+                params: {
                     module: 'api',
                     action: 'news_get_detail',
-                    id, 
-                    token 
+                    id,
+                    token
                 }
             });
 
@@ -104,7 +104,7 @@ const ArticleDetail = () => {
         try {
             setAiStatus('loading');
             const host = window.location.hostname === 'localhost' ? API_BASE_URL.replace('/BE', '') : '';
-            
+
             const res = await axios.get(`${host}/BE/index.php`, {
                 params: {
                     module: 'api',
@@ -138,11 +138,11 @@ const ArticleDetail = () => {
 
     const cleanContent = (html: string) => {
         if (!html) return '';
-        
+
         let cleaned = html;
         cleaned = cleaned.replace(/id="maincontent">/g, '');
         cleaned = cleaned.replace(/<div[^>]*id="maincontent"[^>]*>/g, '');
-        
+
         return cleaned;
     };
 
@@ -208,7 +208,7 @@ const ArticleDetail = () => {
             showToast('Vui lòng đăng nhập để bình luận', 'error');
             return;
         }
-        
+
         const content = pId ? replyComment : newComment;
         if (!content.trim()) return;
         if (pId ? submittingReply : submittingComment) return;
@@ -256,9 +256,9 @@ const ArticleDetail = () => {
                 token: token
             });
             if (res.data.status === 'success') {
-                setComments(prev => prev.map(c => 
-                    c.id === commentId 
-                        ? { ...c, is_liked: res.data.action === 'liked' ? 1 : 0, like_count: res.data.like_count } 
+                setComments(prev => prev.map(c =>
+                    c.id === commentId
+                        ? { ...c, is_liked: res.data.action === 'liked' ? 1 : 0, like_count: res.data.like_count }
                         : c
                 ));
             }
@@ -311,7 +311,7 @@ const ArticleDetail = () => {
                 token: token
             });
             if (res.data.status === 'success') {
-                setComments(prev => prev.map(c => 
+                setComments(prev => prev.map(c =>
                     c.id === commentId ? { ...c, content: editingContent } : c
                 ));
                 setEditingCommentId(null);
@@ -332,7 +332,7 @@ const ArticleDetail = () => {
             return;
         }
         window.speechSynthesis.cancel();
-        
+
         if (readingIndex === index && !autoNext) {
             setReadingIndex(null);
             setIsReadingAll(false);
@@ -342,7 +342,7 @@ const ArticleDetail = () => {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'vi-VN';
         utterance.rate = 1.1;
-        
+
         utterance.onstart = () => setReadingIndex(index);
         utterance.onend = () => {
             setReadingIndex(null);
@@ -378,6 +378,10 @@ const ArticleDetail = () => {
     };
 
     const handleShare = async () => {
+        if (!token) {
+            showToast('Vui lòng đăng nhập để chia sẻ bài báo', 'error');
+            return;
+        }
         const shareData = {
             title: article?.title || 'Vertex News',
             text: article?.description || 'Xem tin tức mới nhất trên Vertex News',
@@ -537,24 +541,24 @@ const ArticleDetail = () => {
                             </VButton>
                             <div className="h-6 w-px bg-slate-100 mx-2"></div>
                             <div className="flex items-center gap-3">
-                                <VButton 
-                                    variant={isFav ? 'primary' : 'ghost'} 
+                                <VButton
+                                    variant={isFav ? 'primary' : 'ghost'}
                                     onClick={handleToggleLike}
                                     loading={isLiking}
                                     className={`w-11 h-11 rounded-full p-0 flex items-center justify-center transition-all ${isFav ? 'text-white bg-red-500 hover:bg-red-600 border-red-500 shadow-xl shadow-red-200' : 'text-slate-400 bg-slate-50 border border-slate-100 hover:bg-white hover:text-blue-600'}`}
                                 >
                                     <Heart size={22} fill={isFav ? 'currentColor' : 'none'} />
                                 </VButton>
-                                <VButton 
-                                    variant="ghost" 
+                                <VButton
+                                    variant="ghost"
                                     onClick={handleShare}
                                     className="w-11 h-11 rounded-full p-0 flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-100 hover:bg-white hover:text-blue-600 transition-all"
                                     title="Chia sẻ"
                                 >
                                     <Share2 size={22} />
                                 </VButton>
-                                <VButton 
-                                    variant="ghost" 
+                                <VButton
+                                    variant="ghost"
                                     onClick={() => {
                                         setReportingCommentId(null);
                                         setReportReason("");
@@ -580,7 +584,7 @@ const ArticleDetail = () => {
                                     alt={article.title}
                                     className="w-full h-full object-cover"
                                 />
-                                <button 
+                                <button
                                     onClick={() => window.open(article.link, '_blank')}
                                     className="absolute bottom-6 right-6 px-6 py-3 bg-white/90 backdrop-blur-md rounded-2xl text-xs font-black text-slate-900 border border-white shadow-xl hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
                                 >
@@ -590,7 +594,7 @@ const ArticleDetail = () => {
                             </div>
                         ) : (
                             <div className="mb-10 w-full flex justify-end">
-                                <button 
+                                <button
                                     onClick={() => window.open(article.link, '_blank')}
                                     className="px-6 py-3 bg-slate-50 rounded-2xl text-xs font-black text-slate-900 border border-slate-100 shadow-sm hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
                                 >
@@ -607,7 +611,7 @@ const ArticleDetail = () => {
                                         <div key={idx} className="relative group/para">
                                             <div dangerouslySetInnerHTML={{ __html: block.content }} />
                                             {block.type === 'p' && block.text && (
-                                                <button 
+                                                <button
                                                     onClick={() => handleSpeak(block.text!, idx)}
                                                     className={`absolute -right-10 top-2 p-2 rounded-full transition-all flex items-center justify-center ${!token ? 'opacity-20 cursor-not-allowed' : (readingIndex === idx ? 'text-blue-600 bg-blue-50 scale-110 shadow-sm' : 'opacity-0 group-hover/para:opacity-100 text-slate-300 hover:text-blue-600 hover:bg-slate-50')}`}
                                                     title={token ? "Đọc đoạn này" : "Vui lòng đăng nhập để nghe"}
@@ -618,15 +622,27 @@ const ArticleDetail = () => {
                                         </div>
                                     ))}
                                 </div>
-                                
+
                                 <div className="mt-20 pt-10 border-t border-slate-100 flex items-center justify-between">
                                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest italic">Nguồn tham khảo: {article.source}</p>
                                     <div className="flex items-center gap-4">
                                         <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Chia sẻ:</span>
                                         <div className="flex gap-2">
                                             <button onClick={handleShare} className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all cursor-pointer"><Share2 size={12} /></button>
-                                            <button onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')} className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all cursor-pointer font-bold text-[10px]">f</button>
-                                            <button onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`, '_blank')} className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer font-bold text-[10px]">𝕏</button>
+                                            <button onClick={() => {
+                                                if (!token) {
+                                                    showToast('Vui lòng đăng nhập để chia sẻ bài báo', 'error');
+                                                    return;
+                                                }
+                                                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+                                            }} className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all cursor-pointer font-bold text-[10px]">f</button>
+                                            <button onClick={() => {
+                                                if (!token) {
+                                                    showToast('Vui lòng đăng nhập để chia sẻ bài báo', 'error');
+                                                    return;
+                                                }
+                                                window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`, '_blank');
+                                            }} className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer font-bold text-[10px]">𝕏</button>
                                         </div>
                                     </div>
                                 </div>
@@ -656,8 +672,8 @@ const ArticleDetail = () => {
                                                 <span className="text-[10px] font-black uppercase tracking-widest">Tính năng VIP</span>
                                             </div>
                                             <p className="text-xs font-bold text-slate-600 leading-relaxed mb-4">{aiSummary}</p>
-                                            <Link 
-                                                to="/profile" 
+                                            <Link
+                                                to="/profile"
                                                 state={{ subTab: 'upgrade' }}
                                                 className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-100"
                                             >
@@ -671,8 +687,8 @@ const ArticleDetail = () => {
                                                 <span className="text-[10px] font-black uppercase tracking-widest">Yêu cầu đăng nhập</span>
                                             </div>
                                             <p className="text-xs font-bold text-slate-600 leading-relaxed mb-4">{aiSummary}</p>
-                                            <Link 
-                                                to="/login" 
+                                            <Link
+                                                to="/login"
                                                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
                                             >
                                                 Đăng nhập
@@ -683,22 +699,22 @@ const ArticleDetail = () => {
                                             <p className="text-xs font-bold leading-relaxed">{aiSummary}</p>
                                         </div>
                                     ) : (
-                                        <div 
+                                        <div
                                             className="text-xs font-bold text-slate-600 leading-relaxed italic mb-8 whitespace-pre-wrap ai-summary-content max-h-[400px] overflow-y-auto no-scrollbar"
                                             dangerouslySetInnerHTML={{ __html: aiSummary || article.description || 'Đang cập nhật tóm tắt thông minh cho bài viết này...' }}
                                         />
                                     )}
-                                    
-                                    <VButton 
-                                        variant="primary" fullWidth 
-                                        icon={MessageCircle} 
+
+                                    <VButton
+                                        variant="primary" fullWidth
+                                        icon={MessageCircle}
                                         className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
                                         onClick={() => {
-                                            const event = new CustomEvent('openChatbotWithContext', { 
-                                                detail: { 
+                                            const event = new CustomEvent('openChatbotWithContext', {
+                                                detail: {
                                                     title: article?.title,
                                                     summary: aiSummary || article?.description || 'Chưa có thông tin tóm tắt.'
-                                                } 
+                                                }
                                             });
                                             window.dispatchEvent(event);
                                         }}
@@ -741,7 +757,7 @@ const ArticleDetail = () => {
 
                     <div id="comment-form" className="mb-16">
                         <form onSubmit={(e) => handleAddComment(e)} className="relative group">
-                            <textarea 
+                            <textarea
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
                                 onKeyDown={(e) => {
@@ -782,116 +798,116 @@ const ArticleDetail = () => {
                                             <span className="font-black text-sm text-slate-900">{comment.fullname}</span>
                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{comment.created_at}</span>
                                         </div>
-                                            {editingCommentId === comment.id ? (
-                                                <div className="mt-2 space-y-3">
-                                                    <textarea 
-                                                        value={editingContent}
-                                                        onChange={(e) => setEditingContent(e.target.value)}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                                e.preventDefault();
-                                                                handleSaveEdit(comment.id);
-                                                            }
-                                                        }}
-                                                        className="w-full bg-white border border-blue-100 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-blue-50 transition-all min-h-[80px] resize-none"
-                                                        autoFocus
-                                                    />
-                                                    <div className="flex gap-2">
-                                                        <VButton variant="primary" size="sm" onClick={() => handleSaveEdit(comment.id)} loading={isSubmittingEdit}>Lưu</VButton>
-                                                        <VButton variant="ghost" size="sm" onClick={() => setEditingCommentId(null)}>Hủy</VButton>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <p className="text-slate-600 text-sm leading-relaxed mb-4 font-medium">{comment.content}</p>
-                                            )}
-                                            <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                <button 
-                                                    className={`flex items-center gap-1.5 transition-colors ${Number(comment.is_liked) === 1 ? 'text-blue-600' : 'hover:text-blue-600'}`}
-                                                    onClick={() => handleLikeComment(comment.id)}
-                                                >
-                                                    <ThumbsUp size={14} className={Number(comment.is_liked) === 1 ? 'fill-current' : ''} /> 
-                                                    {Number(comment.like_count) > 0 && comment.like_count} Thích
-                                                </button>
-                                                
-                                                {token && (Number(comment.user_id) === currentUserId || currentUserRole === 'admin') && (
-                                                    <>
-                                                        {Number(comment.user_id) === currentUserId && (
-                                                            <button 
-                                                                className="hover:text-blue-600 transition-colors"
-                                                                onClick={() => handleStartEdit(comment)}
-                                                            >
-                                                                Sửa
-                                                            </button>
-                                                        )}
-                                                        <button 
-                                                            className="hover:text-red-500 transition-colors"
-                                                            onClick={() => handleDeleteComment(comment.id)}
-                                                        >
-                                                            Xóa
-                                                        </button>
-                                                    </>
-                                                )}
-                                                
-                                                <button 
-                                                    className="hover:text-blue-600 transition-colors"
-                                                    onClick={() => handleReplyClick(comment)}
-                                                >
-                                                    Phản hồi
-                                                </button>
-
-                                                <button 
-                                                    className="hover:text-red-500 transition-colors flex items-center gap-1"
-                                                    onClick={() => {
-                                                        setReportingCommentId(comment.id);
-                                                        setReportReason("");
-                                                        setReportDetails("");
-                                                        setShowReportModal(true);
+                                        {editingCommentId === comment.id ? (
+                                            <div className="mt-2 space-y-3">
+                                                <textarea
+                                                    value={editingContent}
+                                                    onChange={(e) => setEditingContent(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                                            e.preventDefault();
+                                                            handleSaveEdit(comment.id);
+                                                        }
                                                     }}
-                                                >
-                                                    <AlertCircle size={14} /> Báo cáo
-                                                </button>
+                                                    className="w-full bg-white border border-blue-100 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-blue-50 transition-all min-h-[80px] resize-none"
+                                                    autoFocus
+                                                />
+                                                <div className="flex gap-2">
+                                                    <VButton variant="primary" size="sm" onClick={() => handleSaveEdit(comment.id)} loading={isSubmittingEdit}>Lưu</VButton>
+                                                    <VButton variant="ghost" size="sm" onClick={() => setEditingCommentId(null)}>Hủy</VButton>
+                                                </div>
                                             </div>
+                                        ) : (
+                                            <p className="text-slate-600 text-sm leading-relaxed mb-4 font-medium">{comment.content}</p>
+                                        )}
+                                        <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            <button
+                                                className={`flex items-center gap-1.5 transition-colors ${Number(comment.is_liked) === 1 ? 'text-blue-600' : 'hover:text-blue-600'}`}
+                                                onClick={() => handleLikeComment(comment.id)}
+                                            >
+                                                <ThumbsUp size={14} className={Number(comment.is_liked) === 1 ? 'fill-current' : ''} />
+                                                {Number(comment.like_count) > 0 && comment.like_count} Thích
+                                            </button>
 
-                                            <AnimatePresence>
-                                                {replyTo && replyTo.id === comment.id && (
-                                                    <motion.div 
-                                                        initial={{ opacity: 0, height: 0 }}
-                                                        animate={{ opacity: 1, height: 'auto' }}
-                                                        exit={{ opacity: 0, height: 0 }}
-                                                        className="mt-6 space-y-3 overflow-hidden"
+                                            {token && (Number(comment.user_id) === currentUserId || currentUserRole === 'admin') && (
+                                                <>
+                                                    {Number(comment.user_id) === currentUserId && (
+                                                        <button
+                                                            className="hover:text-blue-600 transition-colors"
+                                                            onClick={() => handleStartEdit(comment)}
+                                                        >
+                                                            Sửa
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        className="hover:text-red-500 transition-colors"
+                                                        onClick={() => handleDeleteComment(comment.id)}
                                                     >
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Đang phản hồi {replyTo.name}</span>
-                                                            <button onClick={() => setReplyTo(null)} className="text-[10px] font-black text-slate-400 hover:text-red-500 uppercase tracking-widest">Hủy</button>
-                                                        </div>
-                                                        <div className="relative group">
-                                                            <textarea 
-                                                                value={replyComment}
-                                                                onChange={(e) => setReplyComment(e.target.value)}
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                                                        e.preventDefault();
-                                                                        handleAddComment(null as any, comment.id);
-                                                                    }
-                                                                }}
-                                                                placeholder="Viết phản hồi của bạn..."
-                                                                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none min-h-[100px] resize-none"
-                                                            />
-                                                            <button 
-                                                                onClick={(e) => handleAddComment(e, comment.id)}
-                                                                disabled={!replyComment.trim() || submittingReply}
-                                                                className="absolute bottom-4 right-4 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all disabled:opacity-50 disabled:grayscale"
-                                                            >
-                                                                {submittingReply ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                                                            </button>
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
+                                                        Xóa
+                                                    </button>
+                                                </>
+                                            )}
+
+                                            <button
+                                                className="hover:text-blue-600 transition-colors"
+                                                onClick={() => handleReplyClick(comment)}
+                                            >
+                                                Phản hồi
+                                            </button>
+
+                                            <button
+                                                className="hover:text-red-500 transition-colors flex items-center gap-1"
+                                                onClick={() => {
+                                                    setReportingCommentId(comment.id);
+                                                    setReportReason("");
+                                                    setReportDetails("");
+                                                    setShowReportModal(true);
+                                                }}
+                                            >
+                                                <AlertCircle size={14} /> Báo cáo
+                                            </button>
+                                        </div>
+
+                                        <AnimatePresence>
+                                            {replyTo && replyTo.id === comment.id && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="mt-6 space-y-3 overflow-hidden"
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Đang phản hồi {replyTo.name}</span>
+                                                        <button onClick={() => setReplyTo(null)} className="text-[10px] font-black text-slate-400 hover:text-red-500 uppercase tracking-widest">Hủy</button>
+                                                    </div>
+                                                    <div className="relative group">
+                                                        <textarea
+                                                            value={replyComment}
+                                                            onChange={(e) => setReplyComment(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                                    e.preventDefault();
+                                                                    handleAddComment(null as any, comment.id);
+                                                                }
+                                                            }}
+                                                            placeholder="Viết phản hồi của bạn..."
+                                                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none min-h-[100px] resize-none"
+                                                        />
+                                                        <button
+                                                            onClick={(e) => handleAddComment(e, comment.id)}
+                                                            disabled={!replyComment.trim() || submittingReply}
+                                                            className="absolute bottom-4 right-4 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all disabled:opacity-50 disabled:grayscale"
+                                                        >
+                                                            {submittingReply ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
 
                                     </div>
                                 </div>
-                                
+
                                 <div className="ml-16 space-y-8 border-l-2 border-slate-50 pl-8">
                                     {comments.filter(reply => Number(reply.parent_id) === Number(comment.id)).map(reply => (
                                         <div key={reply.id} id={`comment-${reply.id}`} className={`flex gap-4 p-4 rounded-2xl transition-all duration-1000 ${Number(reply.is_vip) === 1 ? 'bg-amber-50/30 border border-amber-100 shadow-sm' : ''}`}>
@@ -903,7 +919,7 @@ const ArticleDetail = () => {
                                                 </div>
                                                 {editingCommentId === reply.id ? (
                                                     <div className="mt-2 space-y-2">
-                                                        <textarea 
+                                                        <textarea
                                                             value={editingContent}
                                                             onChange={(e) => setEditingContent(e.target.value)}
                                                             onKeyDown={(e) => {
@@ -924,48 +940,48 @@ const ArticleDetail = () => {
                                                     <>
                                                         <p className="text-slate-500 text-xs leading-relaxed mb-3 font-medium">{reply.content}</p>
                                                         <div className="flex items-center gap-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                                            <button 
+                                                            <button
                                                                 className={`flex items-center gap-1 transition-colors ${Number(reply.is_liked) === 1 ? 'text-blue-600' : 'hover:text-blue-600'}`}
                                                                 onClick={() => handleLikeComment(reply.id)}
                                                             >
-                                                                <ThumbsUp size={12} className={Number(reply.is_liked) === 1 ? 'fill-current' : ''} /> 
+                                                                <ThumbsUp size={12} className={Number(reply.is_liked) === 1 ? 'fill-current' : ''} />
                                                                 {Number(reply.like_count) > 0 && reply.like_count} Thích
                                                             </button>
-                                                    
-                                                    {token && (Number(reply.user_id) === currentUserId || currentUserRole === 'admin') && (
-                                                        <>
-                                                            {Number(reply.user_id) === currentUserId && (
-                                                                <button 
-                                                                    className="hover:text-blue-600 transition-colors"
-                                                                    onClick={() => handleStartEdit(reply)}
-                                                                >
-                                                                    Sửa
-                                                                </button>
+
+                                                            {token && (Number(reply.user_id) === currentUserId || currentUserRole === 'admin') && (
+                                                                <>
+                                                                    {Number(reply.user_id) === currentUserId && (
+                                                                        <button
+                                                                            className="hover:text-blue-600 transition-colors"
+                                                                            onClick={() => handleStartEdit(reply)}
+                                                                        >
+                                                                            Sửa
+                                                                        </button>
+                                                                    )}
+                                                                    <button
+                                                                        className="hover:text-red-500 transition-colors"
+                                                                        onClick={() => handleDeleteComment(reply.id)}
+                                                                    >
+                                                                        Xóa
+                                                                    </button>
+                                                                </>
                                                             )}
-                                                            <button 
-                                                                className="hover:text-red-500 transition-colors"
-                                                                onClick={() => handleDeleteComment(reply.id)}
+
+                                                            <button
+                                                                className="hover:text-red-500 transition-colors flex items-center gap-1"
+                                                                onClick={() => {
+                                                                    setReportingCommentId(reply.id);
+                                                                    setReportReason("");
+                                                                    setReportDetails("");
+                                                                    setShowReportModal(true);
+                                                                }}
                                                             >
-                                                                Xóa
+                                                                <AlertCircle size={12} /> Báo cáo
                                                             </button>
-                                                        </>
-                                                    )}
-                                                    
-                                                    <button 
-                                                        className="hover:text-red-500 transition-colors flex items-center gap-1"
-                                                        onClick={() => {
-                                                            setReportingCommentId(reply.id);
-                                                            setReportReason("");
-                                                            setReportDetails("");
-                                                            setShowReportModal(true);
-                                                        }}
-                                                    >
-                                                        <AlertCircle size={12} /> Báo cáo
-                                                    </button>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -983,19 +999,19 @@ const ArticleDetail = () => {
             <AnimatePresence>
                 {showReportModal && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             onClick={() => setShowReportModal(false)}
                             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
                         />
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             className="relative w-full max-w-md bg-white rounded-[2rem] p-8 shadow-2xl overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl -z-10 translate-x-16 -translate-y-16"></div>
-                            
+
                             <div className="flex justify-between items-center mb-8">
                                 <div className="space-y-1">
                                     <h3 className="text-lg font-black text-slate-900 tracking-tighter uppercase">
@@ -1014,11 +1030,10 @@ const ArticleDetail = () => {
                                         <button
                                             key={reason}
                                             onClick={() => setReportReason(reason)}
-                                            className={`flex items-center justify-between px-6 py-3 rounded-2xl border-2 transition-all font-bold text-sm ${
-                                                reportReason === reason 
-                                                ? 'border-blue-600 bg-blue-50/50 text-blue-600' 
-                                                : 'border-slate-50 bg-slate-50/30 text-slate-500 hover:border-slate-100'
-                                            }`}
+                                            className={`flex items-center justify-between px-6 py-3 rounded-2xl border-2 transition-all font-bold text-sm ${reportReason === reason
+                                                    ? 'border-blue-600 bg-blue-50/50 text-blue-600'
+                                                    : 'border-slate-50 bg-slate-50/30 text-slate-500 hover:border-slate-100'
+                                                }`}
                                         >
                                             {reason}
                                             {reportReason === reason && <CheckCircle2 size={22} strokeWidth={2.5} className="text-blue-600 fill-blue-50" />}
@@ -1030,7 +1045,7 @@ const ArticleDetail = () => {
                                     <label className="text-[10px] font-black text-slate-400 tracking-widest ml-1">
                                         Chi tiết thêm {reportReason === 'Khác' ? '(Bắt buộc)' : '(Không bắt buộc)'}
                                     </label>
-                                    <textarea 
+                                    <textarea
                                         value={reportDetails}
                                         onChange={(e) => setReportDetails(e.target.value)}
                                         placeholder={reportReason === 'Khác' ? "Vui lòng cho chúng tôi biết rõ hơn lý do báo cáo của bạn..." : "Cung cấp thêm thông tin về báo cáo của bạn..."}
@@ -1039,14 +1054,14 @@ const ArticleDetail = () => {
                                 </div>
 
                                 <div className="pt-4 flex gap-4">
-                                    <VButton 
+                                    <VButton
                                         variant="outline" fullWidth onClick={() => setShowReportModal(false)}
                                         className="py-4"
                                     >
                                         Hủy bỏ
                                     </VButton>
-                                    <VButton 
-                                        variant="primary" fullWidth 
+                                    <VButton
+                                        variant="primary" fullWidth
                                         onClick={handleReportSubmit}
                                         loading={submittingReport}
                                         className="py-4 bg-red-500 hover:bg-red-600 shadow-lg shadow-red-100"
