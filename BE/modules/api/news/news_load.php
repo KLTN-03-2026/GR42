@@ -14,7 +14,6 @@ if (empty($token)) {
     if (function_exists('getSession')) {
         $token = getSession('token_login');
     }
-    // Lấy thử trực tiếp từ session nếu getSession không có
     if (empty($token) && isset($_SESSION['token_login'])) {
         $token = $_SESSION['token_login'];
     }
@@ -53,16 +52,16 @@ if (!empty($category)) {
     $interestsRes = getAll("SELECT category_name FROM user_interests WHERE user_id = $user_id");
     if (!empty($interestsRes)) {
         $interests = array_column($interestsRes, 'category_name');
-        $safeInterests = array_map(function($val) use ($conn) {
+        $safeInterests = array_map(function ($val) use ($conn) {
             return "'" . $conn->real_escape_string($val) . "'";
         }, $interests);
         $interestsString = implode(',', $safeInterests);
-        
+
         $selectFields = ", 
             CASE WHEN n.category IN ($interestsString) THEN 1 ELSE 0 END as is_interest,
             ROW_NUMBER() OVER(PARTITION BY CASE WHEN n.category IN ($interestsString) THEN 1 ELSE 0 END ORDER BY n.pubdate DESC) as r_num
         ";
-        
+
         $orderBy = "r_num ASC, is_interest DESC";
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../../../config.php';
 require_once _PATH_URL . '/modules/api/cors.php';
-require_once _PATH_URL . '/config.php';
 require_once _PATH_URL . '/includes/database.php';
 
 set_time_limit(0);
@@ -157,13 +157,20 @@ if (!$data) {
         "message" => "JSON decode loi tu chuoi Google Sheet"
     ]));
 }
-$checkSql = "SELECT id FROM crawl_news WHERE link = ?";
-$checkStmt = $conn->prepare($checkSql);
+$existingLinks = [];
+$allLinksRes = $conn->query("SELECT id, link FROM crawl_news");
+if ($allLinksRes) {
+    while ($r = $allLinksRes->fetch_assoc()) {
+        $existingLinks[$r['link']] = $r['id'];
+    }
+}
+
 $updateSql = "UPDATE crawl_news SET title=?, image=?, pubdate=?, source=?, savedtime=?, category=?, content=? WHERE id=?";
 $updateStmt = $conn->prepare($updateSql);
 $insertSql = "INSERT INTO crawl_news (title, link, image, pubdate, source, savedtime, category, content) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 $insertStmt = $conn->prepare($insertSql);
-if (!$checkStmt || !$updateStmt || !$insertStmt) {
+
+if (!$updateStmt || !$insertStmt) {
     die(json_encode([
         "status" => "error",
         "message" => "Prepare loi: " . $conn->error
@@ -173,48 +180,60 @@ if (!$checkStmt || !$updateStmt || !$insertStmt) {
 $newCount = 0;
 $updateCount = 0;
 $skipCount = 0;
-if (isset($data['table']['rows']) && is_array($data['table']['rows'])) {
-    $rows = $data['table']['rows'];
-    foreach ($rows as $index => $row) {
-        if ($index == 0)
-            continue;
-        $title = cleanText($row['c'][1]['v'] ?? '');
-        $link = $row['c'][2]['v'] ?? '';
-        if (!$title || !$link) {
-            $skipCount++;
-            continue;
-        }
-        $imageRaw = $row['c'][3]['v'] ?? '';
-        $image = makeThumbnailUrl($imageRaw);
-        $pubdate = !empty($row['c'][4]['v']) ? date("Y-m-d H:i:s", strtotime($row['c'][4]['v'])) : null;
-        $source = cleanText($row['c'][5]['v'] ?? '');
-        $category = cleanText($row['c'][7]['v'] ?? '');
-        $contentRaw = isset($row['c'][8]['v']) ? $row['c'][8]['v'] : '';
-        $content = cleanContent($contentRaw, $source);
-        $savedtime = date("Y-m-d H:i:s");
-        $checkStmt->bind_param("s", $link);
-        $checkStmt->execute();
-        $checkResult = $checkStmt->get_result();
-        if ($checkResult->num_rows > 0) {
-            $existingRow = $checkResult->fetch_assoc();
-            $existingId = $existingRow['id'];
-            $updateStmt->bind_param("sssssssi", $title, $image, $pubdate, $source, $savedtime, $category, $content, $existingId);
-            if ($updateStmt->execute()) {
-                $updateCount++;
-            } else {
+
+$conn->begin_transaction();
+try {
+    if (isset($data['table']['rows']) && is_array($data['table']['rows'])) {
+        $rows = $data['table']['rows'];
+        foreach ($rows as $index => $row) {
+            if ($index == 0)
+                continue;
+            
+            $title = cleanText($row['c'][1]['v'] ?? '');
+            $link = $row['c'][2]['v'] ?? '';
+            if (!$title || !$link) {
                 $skipCount++;
+                continue;
             }
-        } else {
-            $insertStmt->bind_param("ssssssss", $title, $link, $image, $pubdate, $source, $savedtime, $category, $content);
-            if ($insertStmt->execute()) {
-                $newCount++;
+            
+            $imageRaw = $row['c'][3]['v'] ?? '';
+            $image = makeThumbnailUrl($imageRaw);
+            $pubdate = !empty($row['c'][4]['v']) ? date("Y-m-d H:i:s", strtotime($row['c'][4]['v'])) : null;
+            $source = cleanText($row['c'][5]['v'] ?? '');
+            $category = cleanText($row['c'][7]['v'] ?? '');
+            $contentRaw = isset($row['c'][8]['v']) ? $row['c'][8]['v'] : '';
+            $content = cleanContent($contentRaw, $source);
+            $savedtime = date("Y-m-d H:i:s");
+            
+            if (isset($existingLinks[$link])) {
+                $existingId = $existingLinks[$link];
+                $updateStmt->bind_param("sssssssi", $title, $image, $pubdate, $source, $savedtime, $category, $content, $existingId);
+                if ($updateStmt->execute()) {
+                    $updateCount++;
+                } else {
+                    $skipCount++;
+                }
             } else {
-                $skipCount++;
+                $insertStmt->bind_param("ssssssss", $title, $link, $image, $pubdate, $source, $savedtime, $category, $content);
+                if ($insertStmt->execute()) {
+                    $newCount++;
+                    // Optionally add to existingLinks to avoid duplicate inserts in the same batch
+                    $existingLinks[$link] = $insertStmt->insert_id;
+                } else {
+                    $skipCount++;
+                }
             }
         }
     }
+    $conn->commit();
+} catch (Exception $e) {
+    $conn->rollback();
+    die(json_encode([
+        "status" => "error",
+        "message" => "Transaction error: " . $e->getMessage()
+    ]));
 }
-$checkStmt->close();
+
 $updateStmt->close();
 $insertStmt->close();
 $conn->query("DELETE FROM crawl_news WHERE savedtime < DATE_SUB(NOW(), INTERVAL 7 DAY)");
