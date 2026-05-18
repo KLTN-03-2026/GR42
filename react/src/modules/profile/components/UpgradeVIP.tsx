@@ -68,7 +68,7 @@ const UpgradeVIP: React.FC<UpgradeVIPProps> = ({ userData, authToken }) => {
     if (!isVip && authToken) {
       interval = setInterval(() => {
         handleCheckStatus(true);
-      }, 2000);
+      }, 1);
     }
     return () => {
       if (interval) clearInterval(interval);

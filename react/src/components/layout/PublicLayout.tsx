@@ -3,6 +3,8 @@ import Chatbot from '../core/Chatbot';
 import Header from './Header';
 
 const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const authToken = localStorage.getItem('auth_token');
+
   return (
     <div className="min-h-screen bg-[#F9F9FC] flex flex-col font-roboto">
       <Header />
@@ -11,7 +13,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         {children}
       </main>
 
-      <Chatbot />
+      {authToken && <Chatbot />}
     </div>
   );
 };
