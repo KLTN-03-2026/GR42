@@ -236,7 +236,7 @@ try {
 
 $updateStmt->close();
 $insertStmt->close();
-$conn->query("DELETE FROM crawl_news WHERE savedtime < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+$conn->query("DELETE FROM crawl_news WHERE savedtime < DATE_SUB(NOW(), INTERVAL 3 DAY)");
 
 echo json_encode([
     "status" => "success",
