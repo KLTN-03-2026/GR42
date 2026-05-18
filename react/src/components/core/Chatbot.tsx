@@ -18,7 +18,7 @@ interface Message {
 
 const SUGGESTED_PROMPTS = [
   "Tin tức nổi bật hôm nay là gì?",
-  "Cập nhật tin công nghệ mới nhất",
+  "Cập nhật giá vàng mới nhất",
   "Ai là chủ tịch nước Việt Nam?"
 ];
 
@@ -308,7 +308,7 @@ const Chatbot = () => {
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
-                              a: ({ node, href, children, ...props }:any) => {
+                              a: ({ node, href, children, ...props }: any) => {
                                 if (href && href.startsWith('/')) {
                                   return <Link to={href} className="text-blue-600 hover:underline font-medium" {...props}>{children}</Link>;
                                 }

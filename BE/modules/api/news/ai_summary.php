@@ -102,7 +102,7 @@ if (mb_strlen($cleanContent, 'UTF-8') > 10000) {
 }
 $prompt = "Bạn là một biên tập viên tin tức chuyên nghiệp. Hãy đọc kỹ bài báo dưới đây và viết một bản tóm tắt gọn gàng, súc tích.\n"
     . "Yêu cầu bắt buộc:\n"
-    . "- Độ dài khoảng 1000 - 1500 ký tự.\n"
+    . "- Độ dài khoảng 300 - 500 ký tự.\n"
     . "- BẮT BUỘC trả về kết quả dưới định dạng thẻ HTML (chỉ dùng các thẻ <b>, <i>, <ul>, <li>, <p>, <br>).\n"
     . "- Trình bày đẹp mắt, có thể dùng gạch đầu dòng (<ul><li>) cho các ý chính.\n"
     . "- KHÔNG bọc bằng ký hiệu markdown ```html hay bất kỳ định dạng nào khác.\n"

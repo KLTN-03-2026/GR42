@@ -188,14 +188,14 @@ try {
         foreach ($rows as $index => $row) {
             if ($index == 0)
                 continue;
-            
+
             $title = cleanText($row['c'][1]['v'] ?? '');
             $link = $row['c'][2]['v'] ?? '';
             if (!$title || !$link) {
                 $skipCount++;
                 continue;
             }
-            
+
             $imageRaw = $row['c'][3]['v'] ?? '';
             $image = makeThumbnailUrl($imageRaw);
             $pubdate = !empty($row['c'][4]['v']) ? date("Y-m-d H:i:s", strtotime($row['c'][4]['v'])) : null;
@@ -204,7 +204,7 @@ try {
             $contentRaw = isset($row['c'][8]['v']) ? $row['c'][8]['v'] : '';
             $content = cleanContent($contentRaw, $source);
             $savedtime = date("Y-m-d H:i:s");
-            
+
             if (isset($existingLinks[$link])) {
                 $existingId = $existingLinks[$link];
                 $updateStmt->bind_param("sssssssi", $title, $image, $pubdate, $source, $savedtime, $category, $content, $existingId);
@@ -217,7 +217,6 @@ try {
                 $insertStmt->bind_param("ssssssss", $title, $link, $image, $pubdate, $source, $savedtime, $category, $content);
                 if ($insertStmt->execute()) {
                     $newCount++;
-                    // Optionally add to existingLinks to avoid duplicate inserts in the same batch
                     $existingLinks[$link] = $insertStmt->insert_id;
                 } else {
                     $skipCount++;
